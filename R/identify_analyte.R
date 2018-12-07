@@ -158,7 +158,7 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
 #' annot_events %>% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 #'
 #' # Looks strange because some true beads events have randomly been placed far
-#' # from the centre in the forward-side scatter when the data was created
+#' # from the center in the forward-side scatter when the data was created
 #' annot_events %>%
 #'   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 #' }
@@ -204,7 +204,7 @@ identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL
 #'
 #' annot_events %>% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 #' # Looks strange because some true beads events have randomly been placed far
-#' # from the centre in the forward-side scatter when the data was created
+#' # from the center in the forward-side scatter when the data was created
 #' annot_events %>%
 #'   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 #' }
@@ -290,7 +290,7 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'
 #'   * Finding analyte clusters
 #'   * Trimming the clusters by removing the cluster members most distant from
-#'     the cluster centre
+#'     the cluster center
 #'   * Sorting the analyte clusters based on their centers
 #'   * Giving each analyte cluster a useful name
 #'

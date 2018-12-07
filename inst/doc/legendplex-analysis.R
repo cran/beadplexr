@@ -36,7 +36,7 @@ facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 #  facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
 #  facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 
-## ----pseudo-colour, fig.show='hold'--------------------------------------
+## ----pseudo-color, fig.show='hold'---------------------------------------
 .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
                   .filter = list("FSC-A" = c(4e5, 6e5L),
                                  "SSC-A" = c(4e5, 1e6),
@@ -172,7 +172,7 @@ find_and_trim <- function(.data){
 
 analytes_identified <- lplex %>% lapply(find_and_trim) 
 
-## ----visualise-analytes, message=FALSE, fig.width=7----------------------
+## ----visualize-analytes, message=FALSE, fig.width=7----------------------
 library(gridExtra)
 
 plot_side_by_side <- function(.data, .cur_sample){

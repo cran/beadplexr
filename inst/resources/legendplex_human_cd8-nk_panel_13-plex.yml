@@ -1,0 +1,62 @@
+panel_name: Human CD8/NK Panel (13-plex)
+species: Human
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/Human_CD8_NK_Panel_V02.pdf
+analyte_unit: ng/ml
+std_dilution: 4
+
+# The beads fall on some major groups - for legendplex panels
+# there are two named A and B. The group_order element sets the
+# order of the major groups in the forward and side scatter channels.
+# In practice, then the groups are identified, the mean of the
+# forward satterchannel and the mean of the side scatter chennel
+# is calculated for each identified group and sorted by FSC and SSC
+group_order:
+- A
+- B
+
+# A list of Bead IDs,
+# where each bead ID consist of a list with Target name
+# and standard start concentration as value
+analytes:
+  A:
+    A4:
+      name: IL-2
+      concentration: 10
+    A5:
+      name: IL-4
+      concentration: 10
+    A6:
+      name: IL-10
+      concentration: 10
+    A7:
+      name: IL-6
+      concentration: 10
+    A8:
+      name: IL-17A
+      concentration: 10
+    A10:
+      name: TNF-a
+      concentration: 10
+  B:
+    B2:
+      name: sFas
+      concentration: 50
+    B3:
+      name: sFasL
+      concentration: 10
+    B4:
+      name: IFN-g
+      concentration: 10
+    B5:
+      name: Granzyme A
+      concentration: 10
+    B6:
+      name: Granzyme B
+      concentration: 50
+    B7:
+      name: Perforin
+      concentration: 10
+    B9:
+      name: Granulysin
+      concentration: 50
+

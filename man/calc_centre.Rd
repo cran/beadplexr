@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_events.R
 \name{calc_centre}
 \alias{calc_centre}
-\title{Calculate population centre}
+\title{Calculate population center}
 \usage{
 calc_centre(.x, .method = "density")
 }
@@ -15,7 +15,7 @@ calc_centre(.x, .method = "density")
 A numeric
 }
 \description{
-Calculate population centre
+Calculate population center
 }
 \examples{
 \dontrun{

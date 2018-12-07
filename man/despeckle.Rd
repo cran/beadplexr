@@ -13,7 +13,7 @@ despeckle(.data, .parameters, .bins = 256L, .neighbours = 4L, ...)
 
 \item{.bins}{A numeric giving the resolution of the raster matrix.}
 
-\item{.neighbours}{A numeric giving the minimum number of neighbours. Points with fewer neighbours are removed.}
+\item{.neighbours}{A numeric giving the minimum number of neighbors. Points with fewer neighbors are removed.}
 
 \item{...}{Additional parameters passed to \code{\link[raster:clump]{raster::clump()}}}
 }
@@ -30,7 +30,7 @@ parameters ending up as rows, the bins of the second parameter as
 columns, and combinations are marked by \code{1}.
 
 This matrix is turned into a \code{RasterLayer} by \code{\link[raster:raster]{raster::raster()}} and the
-number of neighbours are calculated by \code{\link[raster:clump]{raster::clump()}}.
+number of neighbors are calculated by \code{\link[raster:clump]{raster::clump()}}.
 
 The rows of the \code{.data} where lonely points are found in \code{.parameters} are removed.
 }

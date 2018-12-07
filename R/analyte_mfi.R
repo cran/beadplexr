@@ -11,7 +11,7 @@
 #'
 #' @inheritSection geometric_mean Mean calculation
 #'
-#' @return A summarised `data.frame`
+#' @return A summarized `data.frame`
 #' @export
 #'
 #' @examples

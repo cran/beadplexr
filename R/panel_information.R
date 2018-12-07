@@ -20,10 +20,15 @@
 #' @section Included panels:
 #'
 #'   \itemize{
-#'    \item Human Th Cytokine Panel (13-plex)
+#'    \item Human Adipokine Panel* (13-plex)
+#'    \item Human Anti-Virus Response Panel (13-plex)
+#'    \item Human CD8/NK Panel (13-plex)
 #'    \item Human Cytokine Panel 2 (13-plex)
-#'    \item Human Proinflammatory Chemokine Panel (13-plex)
 #'    \item Human Growth Factor Panel (13-plex)
+#'    \item Human Inflammation Panel (13-plex)
+#'    \item Human Metabolic Panel 1 (4-plex)
+#'    \item Human Proinflammatory Chemokine Panel (13-plex)
+#'    \item Human T Helper Cytokine Panels (13-plex)
 #'   }
 #'
 #' @section Example panel file:
@@ -45,7 +50,7 @@
 #' @examples
 #' library(beadplexr)
 #'
-#' .panel_name <- "Human Th Cytokine Panel (13-plex)"
+#' .panel_name <- "Human T Helper Cytokine Panels (13-plex)"
 #' panel_info <- load_panel(.panel_name = .panel_name)
 #' panel_info$panel_name
 #'
@@ -83,7 +88,7 @@ load_panel <- function(.file_name = NULL, .panel_name = NULL, .panel_pattern = N
   yaml::yaml.load_file(.file_name)
 }
 
-#' Get file name form panel name
+#' Get file name from panel name
 #'
 #' Conversion from panel name to internal panel info file name
 #'
@@ -97,10 +102,28 @@ load_panel <- function(.file_name = NULL, .panel_name = NULL, .panel_pattern = N
 #'   panel_name_file(.panel_name = "Human Th Cytokine Panel (13-plex)")
 #' }
 panel_name_file <- function(.panel_name){
-  switch(.panel_name,
-         `Human Th Cytokine Panel (13-plex)` = "legendplex_human_th_cytokine_panel_13-plex",
-         `Human Cytokine Panel 2 (13-plex)` = "legendplex_human_cytokine_panel_2_13-plex",
-         `Human Proinflammatory Chemokine Panel (13-plex)` = "legendplex_human_proinflammatory_chemokine_panel_13-plex",
-         `Human Growth Factor Panel (13-plex)` = "legendplex_human_growth_factor_panel_13-plex",
-         warning("Panel name not found. Did you write it in full? See the documentation for a list fo accepted panel names."))
+  switch(
+    .panel_name,
+    `Human Adipokine Panel* (13-plex)` =
+      "legendplex_human_adipokine_panel_13-plex.yml",
+    `Human Anti-Virus Response Panel (13-plex)` =
+      "legendplex_human_anti-virus_response_panel_13-plex.yml",
+    `Human CD8/NK Panel (13-plex)` =
+      "legendplex_human_cd8-nk_panel_13-plex.yml",
+    `Human Cytokine Panel 2 (13-plex)` =
+      "legendplex_human_cytokine_panel_2_13-plex.yml",
+    `Human Growth Factor Panel (13-plex)` =
+      "legendplex_human_growth_factor_panel_13-plex.yml",
+    `Human Inflammation Panel (13-plex)` =
+      "legendplex_human_inflammation_panel_13-plex.yml",
+    `Human Metabolic Panel 1 (4-plex)` =
+      "legendplex_human_metabolic_panel_1_4-plex.yml",
+    `Human Proinflammatory Chemokine Panel (13-plex)` =
+      "legendplex_human_proinflammatory_chemokine_panel_13-plex.yml",
+    `Human T Helper Cytokine Panels (13-plex)` =
+      "legendplex_human_t_helper_cytokine_panels_13-plex.yml",
+    warning(
+      "Panel name not found. Did you write it in full? See the documentation for a list of accepted panel names."
+    )
+  )
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/panel_information.R
 \name{panel_name_file}
 \alias{panel_name_file}
-\title{Get file name form panel name}
+\title{Get file name from panel name}
 \usage{
 panel_name_file(.panel_name)
 }

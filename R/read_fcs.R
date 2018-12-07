@@ -31,7 +31,7 @@
 #' values of \code{.compensation} can also be \code{NULL}, in which case, no
 #' compensation is performed.
 #'
-#' To summarise, the argument \code{.compensation} can be:
+#' To summarize, the argument \code{.compensation} can be:
 #'
 #' \describe{
 #'   \item{A matrix}{The compensation matrix to apply}
@@ -352,7 +352,7 @@ transform_bead_channels <- function(.flow_frame, .bead_channels){
 #' values of \code{.compensation} can also be \code{NULL}, in which case, no
 #' compensation is performed.
 #'
-#' To summarise, the argument \code{.compensation} can be:
+#' To summarize, the argument \code{.compensation} can be:
 #'
 #' \describe{
 #'   \item{A numerical matrix}{The compensation matrix to apply}
@@ -397,14 +397,14 @@ apply_compensation <- function(.flow_frame, .compensation){
     return(.flow_frame)
   }
 
-  if(purrr::is_character(.compensation) & length(.compensation) > 1){
+  if(is.character(.compensation) & length(.compensation) > 1){
     warning(".compensation can only have the length of 1. I am using just the first element")
     .compensation <- .compensation[1]
   }
 
   # Test if .x is a numerical matrix with the parameters
   .get_potential_comp_matrices <- function(.x, .p){
-    if((class(.x) == "matrix") & purrr::is_numeric(.x)){
+    if((class(.x) == "matrix") & is.numeric(.x)){
       TRUE %in% (.p %in% colnames(.x))
     }else{
       FALSE
@@ -422,7 +422,7 @@ apply_compensation <- function(.flow_frame, .compensation){
   }
 
   # We get either a character or something which can be turned into a numerical matrix
-  if(purrr::is_character(.compensation)){
+  if(is.character(.compensation)){
     ff_keywords <- flowCore::keyword(.flow_frame)
     ff_parameters <- flowCore::colnames(.flow_frame)
 
@@ -466,7 +466,7 @@ apply_compensation <- function(.flow_frame, .compensation){
     }
   }
   else{
-    if(purrr::is_numeric(.compensation)){
+    if(is.numeric(.compensation)){
       comp_matrix <- .compensation
     }else{
       stop("I don't know how to deal with what you gave me. Please check the documentation.")

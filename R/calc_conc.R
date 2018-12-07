@@ -175,7 +175,9 @@ fit_standard_curve <- function(.data,
                                        param_column = as.name(.parameter))
 
   .data <- .data %>%
-    dplyr::filter_(.filter_criteria)
+    dplyr::filter_(.filter_criteria) %>%
+    dplyr::select(dplyr::one_of(.parameter, .concentration)) %>%
+    stats::setNames(c("y", "x"))
 
   fct <- switch (.fct,
                  LL.2 = drc::LL.2(),
@@ -198,7 +200,7 @@ fit_standard_curve <- function(.data,
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
 
-  .fit_formula <- stats::as.formula(paste(.parameter, .concentration, sep = "~"))
+  .fit_formula <- stats::as.formula(y ~ x)
 
   .all_args <- list(formula = .fit_formula, data = .data, fct = fct)
 

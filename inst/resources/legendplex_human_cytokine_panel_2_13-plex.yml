@@ -1,7 +1,10 @@
-panel_name: "Human Cytokine Panel 2 (13-plex)"
-cytokine_unit: "pg/ml"
+panel_name: Human Cytokine Panel 2 (13-plex)
+species: Human
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/76119_Hu_Cytokine_Panel_2_V03.pdf
+analyte_unit: pg/ml
 std_dilution: 4
-# The beads fall on some majour groups - for legendplex panels
+
+# The beads fall on some major groups - for legendplex panels
 # there are two named A and B. The group_order element sets the
 # order of the major groups in the forward and side scatter channels.
 # In practice, then the groups are identified, the mean of the
@@ -10,48 +13,50 @@ std_dilution: 4
 group_order:
 - A
 - B
+
 # A list of Bead IDs,
 # where each bead ID consist of a list with Target name
 # and standard start concentration as value
 analytes:
   A:
-    A4: 
-      name: "TSLP"
+    A4:
+      name: TSLP
       concentration: 10000
-    A5: 
-      name: "IL-1a"
+    A5:
+      name: IL-1a
       concentration: 10000
-    A6: 
-      name: "IL-1b"
+    A6:
+      name: IL-1b
       concentration: 10000
-    A7: 
-      name: "GM-CSF"
+    A7:
+      name: GM-CSF
       concentration: 10000
-    A8: 
-      name: "IFN-a"
+    A8:
+      name: IFN-a2
       concentration: 10000
-    A10: 
-      name: "IL-23"
+    A10:
+      name: IL-23
       concentration: 10000
   B:
     B2:
-      name: "IL-12p40"
+      name: IL-12 (p40)
       concentration: 50000
     B3:
-      name: "IL-12p70"
+      name: IL-12 (p70)
       concentration: 10000
     B4:
-      name: "IL-15"
+      name: IL-15
       concentration: 50000
     B5:
-      name: "IL-18"
+      name: IL-18
       concentration: 10000
     B6:
-      name: "IL-11"
+      name: IL-11
       concentration: 50000
     B7:
-      name: "IL-27"
+      name: IL-27
       concentration: 10000
     B9:
-      name: "IL-33"
+      name: IL-33
       concentration: 50000
+

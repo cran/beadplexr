@@ -19,7 +19,7 @@ test_file <- function(.file_path){
   test_that(paste(basename(.file_path), "slots present"), {
     slot_names <- names(panel_info)
     expect_equal(TRUE %in% grepl("panel_name", slot_names), TRUE)
-    expect_equal(TRUE %in% grepl("cytokine_unit", slot_names), TRUE)
+    expect_equal(TRUE %in% grepl("analyte_unit", slot_names), TRUE)
     expect_equal(TRUE %in% grepl("std_dilution", slot_names), TRUE)
     expect_equal(TRUE %in% grepl("analytes", slot_names), TRUE)
   })

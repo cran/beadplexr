@@ -1,5 +1,7 @@
 context("Identify assay analytes")
 
+exclude_dbscan <- FALSE
+
 # Preparation -------------------------------------------------------------
 library(beadplexr)
 data("lplex")
@@ -113,6 +115,54 @@ test_that("Legendplex works without column_names in .method_args",{
 
   expect_true(TRUE %in% grepl("A", annot_events[["analyte"]]))
   expect_true(TRUE %in% grepl("B", annot_events[["analyte"]]))
+})
+
+# dbscan works as expected ------------------------------------------------
+dbscan_num_clusters <- function(.data, eps, MinPts){
+  dbc <- fpc::dbscan(.data, eps = eps, MinPts = MinPts)
+  dbc <- dbc$cluster
+  max(dbc)
+}
+
+test_that("dbscan works as expected", {
+  if(exclude_dbscan){
+    skip("In-depth test of bp_dbscan")
+  }else{
+    expect_warning(identify_analyte(.data, .parameter = c("FSC-A", "SSC-A"),
+                                    .analyte_id = c("A"), .method = "dbscan"))
+
+    expect_is(.analyte_set <- identify_analyte(.data, .parameter = c("FSC-A", "SSC-A"),
+                                               .analyte_id = c("A", "B"), .method = "dbscan",
+                                               .column_name = "Bead group"), "data.frame")
+
+    .bead_a <- dplyr::filter(.analyte_set, `Bead group` == "A")
+    .bead_b <- dplyr::filter(.analyte_set, `Bead group` == "B")
+
+    expect_equal(dbscan_num_clusters(.bead_a[, c("FL6-H", "FL2-H")], eps = 0.12, MinPts = 110), 6)
+    expect_equal(dbscan_num_clusters(.bead_b[, c("FL6-H", "FL2-H")], eps = 0.2, MinPts = 110), 7)
+
+    expect_warning(identify_analyte(.bead_a, .parameter = c("FL6-H", "FL2-H"),
+                                    .analyte_id = "A1", .method = "dbscan",
+                                    .column_name = "Analyte ID", .eps = 0.12, .MinPts = 110))
+
+    expect_warning(identify_analyte(.bead_b, .parameter = c("FL6-H", "FL2-H"),
+                                    .analyte_id = "A1", .method = "dbscan",
+                                    .column_name = "Analyte ID", .eps = 0.2, .MinPts = 110, scale = FALSE))
+
+    expect_silent(identify_analyte(.bead_a, .parameter = c("FL6-H", "FL2-H"),
+                                   .analyte_id = names(panel_info$analytes$A),
+                                   .method = "dbscan",
+                                   .column_name = "Analyte ID",
+                                   .eps = 0.12,
+                                   .MinPts = 110, scale = FALSE))
+
+    expect_silent(identify_analyte(.data = .bead_b, .parameter = c("FL6-H", "FL2-H"),
+                                   .analyte_id = names(panel_info$analytes$B),
+                                   .method = "dbscan",
+                                   .column_name = "Analyte ID",
+                                   .eps = 0.2,
+                                   .MinPts = 110, scale = FALSE))
+  }
 })
 
 # Legendplex recalculation ------------------------------------------------

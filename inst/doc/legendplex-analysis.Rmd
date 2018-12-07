@@ -33,9 +33,9 @@ All multiplex systems come with their own analysis software. The analysis soluti
 
 Here the general usage of the **beadplexr** package is introduced. It will be demonstrated how to load the FACS-files, identify bead populations, draw standard curves and calculate concentrations of analytes.
 
-# Naming Legendplex data-files
+# Naming LEGENDplex data-files
 
-Each sample in the Legendplex experiment must have a unique and meaningful name. I suggest that the file name includes indication of the kit and the standard or experimental sample. For the indication of kit I use 'K' followed by a number, for the indication of the standard sample I use 'C' followed by a number -- just as in the kit manual --  and for the experimental sample, I use 'S' followed by a number. The different parts of the file name should be separated by a character not used in the IDs; this will make for easy parsing of the file names. It is not strictly needed, but adding a leading '0' to all values below 10 will result in expected order when the files are sorted. If might be useful to include a 'P' followed by a number to indicate the plate number.
+Each sample in the LEGENDplex experiment must have a unique and meaningful name. I suggest that the file name includes indication of the kit and the standard or experimental sample. For the indication of kit I use 'K' followed by a number, for the indication of the standard sample I use 'C' followed by a number -- just as in the kit manual --  and for the experimental sample, I use 'S' followed by a number. The different parts of the file name should be separated by a character not used in the IDs; this will make for easy parsing of the file names. It is not strictly needed, but adding a leading '0' to all values below 10 will result in expected order when the files are sorted. If might be useful to include a 'P' followed by a number to indicate the plate number.
 
 With this outlined nomenclature I can have the following FACS-files:
 
@@ -49,7 +49,7 @@ Single letter abbreviations gives short file names and thereby reducing the chan
 
 # Reading FACS data
 
-The output of a LegendPlex experiment is a series of Flow Cytometry Standard (FCS) files. The exact version of the fcs-files produced, depends on the flow cytometer used. However, getting data into R should be the same irrespective of the cytometer used.
+The output of a LEGENDplex experiment is a series of Flow Cytometry Standard (FCS) files. The exact version of the fcs-files produced, depends on the flow cytometer used. However, getting data into R should be the same irrespective of the cytometer used.
 
 The **beadplexr** provides the function `read_fcs()` to read in a fcs file. It is a wrapper around the functionality provided by the [**flowCore**](http://bioconductor.org/packages/flowCore/) package and performs the following steps:
 
@@ -69,14 +69,14 @@ library(beadplexr)
 
 ```
 
-The **beadplexr** package also comes with some simple plot functions to help visualise the FACS-data. The functions are wrappers around [**ggplot2**](http://ggplot2.org/), and are meant to provide an easy view of the data. For more control it is probably better to use **ggplot2** directly.
+The **beadplexr** package also comes with some simple plot functions to help visualize the FACS-data. The functions are wrappers around [**ggplot2**](http://ggplot2.org/), and are meant to provide an easy view of the data. For more control it is probably better to use **ggplot2** directly.
 
 ```{r raw-events, fig.show='hold'}
 facs_plot(.data)
 facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 ```
 
-<!-- A Legendplex experiment exists of several FACS files and the function `read_fcs_files()` makes it easy to read all the files into a list. The function is a wrapper around a combination of the **purrr** function `map()` and `read_fcs()`, and returns a list where each element is the bead events of the FACS-file. The names of the elements are taken from the given file names. -->
+<!-- A LEGENDplex experiment exists of several FACS files and the function `read_fcs_files()` makes it easy to read all the files into a list. The function is a wrapper around a combination of the **purrr** function `map()` and `read_fcs()`, and returns a list where each element is the bead events of the FACS-file. The names of the elements are taken from the given file names. -->
 
 <!-- ```{r read-fcs-files, eval=FALSE} -->
 <!-- .files <- system.file("extdata", c("K2-C07-A7.fcs", "K2-C07-A7.fcs"), package = "beadplexr") -->
@@ -120,11 +120,11 @@ facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
 facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 ```
 
-## Pseudo-colour plots
+## Pseudo-color plots
 
-If you prefer, and have **hexbin** installed, you can view the FACS data with the commonly used pseudo-colour.
+If you prefer, and have **hexbin** installed, you can view the FACS data with the commonly used pseudo-color.
 
-```{r pseudo-colour, fig.show='hold'}
+```{r pseudo-color, fig.show='hold'}
 .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
                   .filter = list("FSC-A" = c(4e5, 6e5L),
                                  "SSC-A" = c(4e5, 1e6),
@@ -138,7 +138,7 @@ facs_plot(.data, .x = "FL2-H", .y = "FL6-H", .type = "hexbin")
 
 # Load panel information
 
-Each LegendPlex panel measures different analytes, and the start concentration of the standards occasionally have different initial concentrations. The **legendplex** package comes with all the required information for the LegendPLex panels from BioLegend. These panels are loaded easily by passing the name or a name pattern to the `load_panel()` function:
+Each LEGENDplex panel measures different analytes, and the start concentration of the standards occasionally have different initial concentrations. The **beadplexr** package comes with all the required information for the LEGENDplex panels from BioLegend. These panels are loaded easily by passing the name or a name pattern to the `load_panel()` function:
 
 ```{r load-panel-name}
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
@@ -190,8 +190,8 @@ First task is to identify the two bead populations in the forward-side scatter. 
 
   * Finding analyte clusters
   * Trimming the clusters by removing the cluster members most distant from
-    the cluster centre
-  * Sorting the analyte clusters based on their centres
+    the cluster center
+  * Sorting the analyte clusters based on their centers
   * Applying the population names A and B 
   
 ```{r fsc-ssc-ident-1, fig.width=6}
@@ -209,7 +209,7 @@ The above call use the default function `clara` (clustering large applications) 
 
 The two populations above are quite well defined, but they include too much noise for my taste. Also, some events of the B bead group are assigned to the A group. It is not a lot of events that probably does not affect the outcome much, but we can do better.
 
-We can either apply the `dbscan` or just remove the events furthest from the centres of the groups by setting the `.trim` parameter. In this case we remove 3% of the of the events based on their distance to the group centre. The population centre is found by a Gaussian kernel estimate.
+We can either apply the `dbscan` or just remove the events furthest from the centers of the groups by setting the `.trim` parameter. In this case we remove 3% of the of the events based on their distance to the group center. The population center is found by a Gaussian kernel estimate.
 ```{r fsc-ssc-ident-2, fig.width=6}
 plex_sub_sample$`Bead group` <- NULL
 
@@ -274,7 +274,7 @@ bead_b %>% split(.$`Analyte ID`) %>%
 
 ## Putting it all together
 
-It is tiresome to perform the above on each element of the FASC-data list, and though you could wrap the code in a function to apply to each element of the FACSdata list, it is much easier to use the built-in `identify_legendplex_analyte()`.
+It is tiresome to perform the above on each element of the FACS-data list, and though you could wrap the code in a function to apply to each element of the FACSdata list, it is much easier to use the built-in `identify_legendplex_analyte()`.
 
 ```{r, fig.show='hold', cache=TRUE}
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
@@ -322,9 +322,9 @@ find_and_trim <- function(.data){
 analytes_identified <- lplex %>% lapply(find_and_trim) 
 ```
 
-The FACS data is best visualised when the three dot-plots are side by side.
+The FACS data is best visualized when the three dot-plots are side by side.
 
-```{r visualise-analytes, message=FALSE, fig.width=7}
+```{r visualize-analytes, message=FALSE, fig.width=7}
 library(gridExtra)
 
 plot_side_by_side <- function(.data, .cur_sample){
@@ -399,7 +399,7 @@ sample_data <- analyte_mfi %>%
 
 The first thing needed to calculate the standard curve for each analyte is the concentration of the analyte. This we can calculate using the function `calc_std_conc()`, when we know the order of the samples, the start concentration, and the dilution factor. 
 
-The order of the samples usually range from 0 to 7. If you follow the nomenclature on the LegendPlex assay protocol 7 indicate the highest concentration of the standard analyte, 1 indicate the lowest concentration and 0 indicate no analyte. The start concentration for each analyte is stored in the Panel Information (depending on the panel it might differ from analyte to analyte). The dilution factor is also given in the Panel Information and is usually 4 (the concentration of each standard analyte is 4 times lower than the previous concentration). If - for some reason - you do not use the same dilution factor throughout all analytes and standards you need to indicate the appropriate dilution factors by hand.
+The order of the samples usually range from 0 to 7. If you follow the nomenclature on the LEGENDplex assay protocol 7 indicate the highest concentration of the standard analyte, 1 indicate the lowest concentration and 0 indicate no analyte. The start concentration for each analyte is stored in the Panel Information (depending on the panel it might differ from analyte to analyte). The dilution factor is also given in the Panel Information and is usually 4 (the concentration of each standard analyte is 4 times lower than the previous concentration). If - for some reason - you do not use the same dilution factor throughout all analytes and standards you need to indicate the appropriate dilution factors by hand.
 
 ```{r calc-std-conc}
 # Helper function to extract the sample number
@@ -426,7 +426,7 @@ standard_data <- standard_data %>%
 
 ```
 
-The next step is to fit a standard curve for each analyte. With the standard curve we can calculate the concentration of the experimental samples (the purpose of the initial work), we can check the quality of the measurements - and the standard curve - by back calculate the standard concentration and compare this to the expected concentration, and we can plot the experimental samples on the standard curve (*beadplexr* provides easy functions for al of this). 
+The next step is to fit a standard curve for each analyte. With the standard curve we can calculate the concentration of the experimental samples (the purpose of the initial work), we can check the quality of the measurements - and the standard curve - by back calculate the standard concentration and compare this to the expected concentration, and we can plot the experimental samples on the standard curve (*beadplexr* provides easy functions for all of this). 
 
 However, in each case we need to ensure that the correct standard curve is used with the correct data, which means we have to juggle at least three structures: A `data.frame` with the standard data, a `data.frame` with the experimental sample data and the models for each analyte (probably a `list`). It quickly become tedious to ensure that everything is in the correct order - and to be sure it is error prone.
 
@@ -480,7 +480,7 @@ plex_data[2, "Std curve"][[1]][[1]]
 
 With the standard curve created we can estimate the concentrations of the samples, but also of the standards. The latter is to help us verify that the standard measurements were all fine, and that we can trust the estimation of the sample concentrations.
 
-After calculating the concentrations we can plot the known standard concentrations versus the estimated standard concentrations using the function `plot_target_est_conc()` and visualise where the samples fall on the standard curve with `plot_target_est_conc`.
+After calculating the concentrations we can plot the known standard concentrations versus the estimated standard concentrations using the function `plot_target_est_conc()` and visualize where the samples fall on the standard curve with `plot_target_est_conc`.
 
 ```{r calc-conc}
 plex_data <- plex_data %>% 
@@ -535,7 +535,7 @@ ggsave("std_plots.pdf", plot = plots_to_save,
        title = "Standard plots")
 ```
 
-We should also not forget to save the visualise of the samples on the standard curve.
+We should also not forget to save the visualize of the samples on the standard curve.
 
 ```{r example-save-est-plot, eval=FALSE}
 plots_to_save <- gridExtra::marrangeGrob(plex_data$`Est curve`, 
@@ -546,7 +546,7 @@ ggsave("estimation_curve.pdf", plot = plots_to_save,
        title = "Samples on std curve")
 ```
 
-Lastly we fulfil the purpose of everything above - we extract the concentration of each analyte for each sample
+Lastly we fulfill the purpose of everything above - we extract the concentration of each analyte for each sample
 
 ```{r example-extract-conc, eval=FALSE}
 plex_data %>% 

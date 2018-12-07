@@ -4,8 +4,8 @@
 \alias{do_find_turning_points}
 \title{Find turning points}
 \usage{
-do_find_turning_points(.x, .return = c("value", "index"), .adjust = 1.5,
-  ...)
+do_find_turning_points(.x, .return = c("value", "index"),
+  .adjust = 1.5, ...)
 }
 \arguments{
 \item{.x}{A numeric vector}

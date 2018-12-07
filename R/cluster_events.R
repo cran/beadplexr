@@ -42,7 +42,7 @@
 #' @seealso [trim_population()], [identify_analyte()].
 #'
 #' @note An alternative approach to the trimming of clusters found with [kmeans()] is
-#'   to use the [trimcluster::trimkmeans()]. However, being superiour
+#'   to use the [trimcluster::trimkmeans()]. However, being superior
 #'   regarding speed with few clusters, the speed of `trimkmeans()`
 #'   dramatically decreases with increasing number of clusters.
 #'
@@ -54,12 +54,15 @@
 #'
 #' @examples
 #' library(beadplexr)
-#' library(magrittr)
+#' library(dplyr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
 #' lplex[[1]] %>%
+#'   # Speed things up a bit by selecting one fourth of the events.
+#'   # Probably not something you'd usually do
+#'   dplyr::sample_frac(0.25) %>%
 #'   bp_kmeans(.parameter = c("FSC-A", "SSC-A"),
 #'             .column_name = "population", .trim = 0.1, .k = 2) %>%
 #'   ggplot() +
@@ -114,12 +117,15 @@ bp_kmeans <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #'
 #' @examples
 #' library(beadplexr)
-#' library(magrittr)
+#' library(dplyr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
 #' lplex[[1]] %>%
+#'   # Speed things up a bit by selecting one fourth of the events.
+#'   # Probably not something you'd usually do
+#'   dplyr::sample_frac(0.25) %>%
 #'   bp_clara(.parameter = c("FSC-A", "SSC-A"),
 #'            .column_name = "population", .trim = 0.1, .k = 2) %>%
 #'   ggplot() +
@@ -127,6 +133,9 @@ bp_kmeans <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #'   geom_point()
 #'
 #' lplex[[1]] %>%
+#'   # Speed things up a bit by selecting one fourth of the events.
+#'   # Probably not something you'd usually do
+#'   dplyr::sample_frac(0.25) %>%
 #'   bp_clara(.parameter = c("FSC-A", "SSC-A"),
 #'            .column_name = "population", .trim = 0, .k = 2) %>%
 #'   ggplot() +
@@ -182,22 +191,46 @@ bp_clara <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #' are returned, and it might be better to use this on the forward - side
 #' scatter discrimination.
 #'
+#' Scaling of the parameters seems to be appropriate in most cases for the
+#' forward - side scatter discrimination and is automatically performed.
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' library(beadplexr)
-#' library(magrittr)
+#' library(dplyr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
 #' lplex[[1]] %>%
+#'   # Speed things up a bit by selecting one fourth of the events.
+#'   # Probably not something you'd usually do
+#'   dplyr::sample_frac(0.25) %>%
 #'   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
 #'             eps = 0.2, MinPts = 50) %>%
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
+#'
+#' pop1 <- lplex[[1]] %>%
+#'   # Speed things up a bit by selecting one fourth of the events.
+#'   # Probably not something you'd usually do
+#'   dplyr::sample_frac(0.25) %>%
+#'   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
+#'     eps = 0.2, MinPts = 50) %>%
+#'   dplyr::filter(population == "1")
+#'
+#' pop1 %>%
+#'   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
+#'     eps = 0.2, MinPts = 50) %>%
+#'   .$population %>% unique
+#'
+#' pop1 %>%
+#'   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
+#'     eps = 0.2, MinPts = 50, scale = FALSE) %>%
+#'   .$population %>% unique
 #' }
 bp_dbscan <- function(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50, ...){
   # Give function arguments useful values, if they are not set by the user
@@ -255,7 +288,6 @@ bp_dbscan <- function(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50,
 bp_mclust <- function(.data, .parameter, .column_name, .k, .trim = 0, .sample_frac = 0.05, .max_subset = 500, ...){
   # Need to load the mclust because it failes with:
   # Error: 'MclustBIC' is not an exported object from 'namespace:mclust'
-  requireNamespace("mclust")
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
 
@@ -285,7 +317,7 @@ bp_mclust <- function(.data, .parameter, .column_name, .k, .trim = 0, .sample_fr
     return(.data)
   }
 
-  .clust_res <- do.call(Mclust, .all_args)
+  .clust_res <- do.call(mclust::Mclust, .all_args)
   .data[[.column_name]] <- .clust_res$classification %>% as.character()
 
   # Do trimming
@@ -397,7 +429,7 @@ bp_density_cut <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #' Calculate euclidean distance between two points.
 #'
 #' @param .x A numerical vector with coordinates to a point.
-#' @param .c A numerical vector with the coordinates to the centre.
+#' @param .c A numerical vector with the coordinates to the center.
 #'
 #' @return A numerical vector with the euclidean distance between the two points.
 #'
@@ -418,7 +450,7 @@ calc_dist_to_centre <- function(.x, .c){
     sqrt
 }
 
-#' Calculate population centre
+#' Calculate population center
 #'
 #' @param .x A numerical vector.
 #' @param .method A character giving the method to use. Currently only density is available.
@@ -439,7 +471,7 @@ calc_centre <- function(.x, .method = "density"){
 
 #' Trim cluster.
 #'
-#' Remove the points furthest form the centre of the cluster.
+#' Remove the points furthest form the center of the cluster.
 #'
 #' @param .data The tidy data.frame with clusters to be modified.
 #' @param .parameter A character giving the name of dimensions to calculate

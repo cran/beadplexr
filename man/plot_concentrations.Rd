@@ -10,8 +10,8 @@
 plot_std_curve(.data, .model, .title = NULL, .parameter = "FL2.H",
   .concentration = "Concentration")
 
-plot_target_est_conc(.data, .title = NULL, .concentration = "Calc.conc",
-  .std_concentration = "Concentration")
+plot_target_est_conc(.data, .title = NULL,
+  .concentration = "Calc.conc", .std_concentration = "Concentration")
 
 plot_estimate(.sample_data, .standard_data, .model, .title = NULL,
   .parameter = "FL2.H", .concentration = "Concentration")

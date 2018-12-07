@@ -12,8 +12,8 @@ identify_legendplex_analyte(.data, .analytes, .method_args)
 identify_cba_analyte(.data, .analytes, .method_args, .trim_fs = NULL,
   .parameter_fs = NULL)
 
-identify_macsplex_analyte(.data, .analytes, .method_args, .trim_fs = NULL,
-  .parameter_fs = NULL)
+identify_macsplex_analyte(.data, .analytes, .method_args,
+  .trim_fs = NULL, .parameter_fs = NULL)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}
@@ -124,7 +124,7 @@ annot_events <- identify_cba_analyte(.data = .data,
 annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 
 # Looks strange because some true beads events have randomly been placed far
-# from the centre in the forward-side scatter when the data was created
+# from the center in the forward-side scatter when the data was created
 annot_events \%>\%
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 }
@@ -157,7 +157,7 @@ annot_events <- identify_macsplex_analyte(.data = .data,
 
 annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 # Looks strange because some true beads events have randomly been placed far
-# from the centre in the forward-side scatter when the data was created
+# from the center in the forward-side scatter when the data was created
 annot_events \%>\%
   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 }

@@ -7,7 +7,7 @@
 #' @param .x,.y Character vector with the column name for the variable to plot
 #'   on the x or y-axis.
 #' @param .beads Character vector to with the column name with identification of
-#'   beads. If used it will show up with the aesthetic 'colour'. Defaults to not
+#'   beads. If used it will show up with the aesthetic 'color'. Defaults to not
 #'   being used.
 #' @param .plot_distinct Boolean to decide if only distinct events should be
 #'   plotted. If used, the number of data points might be greatly reduced which
@@ -230,11 +230,12 @@ plot_std_curve <- function(.data, .model, .title = NULL,
 
   .data %>%
     ggplot2::ggplot() +
-    ggplot2::aes_string(x = .concentration, y = .parameter) +
+    ggplot2::aes_(x = as.name(.concentration),
+                        y = as.name(.parameter)) +
     ggplot2::geom_point()  +
     ggplot2::geom_ribbon(data = fit_line_range,
                          ggplot2::aes_string(ymin = "Lower", ymax = "Upper"), alpha=0.2) +
-    ggplot2::geom_line(data = fit_line_range, color = "blue") +
+    ggplot2::geom_line(data = fit_line_range, colour = "blue") +
     ggplot2::labs(title = .title)
 }
 
@@ -275,16 +276,16 @@ plot_target_est_conc <- function(.data, .title = NULL,
     dplyr::summarise_(.dots = stats::setNames(list(.get_min_x, .get_max_y),
                                 c(.std_concentration, .concentration))) %>%
     dplyr::mutate(label = paste("R2:", format(r_squared, digits = 3), "\n",
-                         "Slope:", format.pval(slope, digits = 3), "\n",
+                         "Slope:", format(slope, digits = 3), "\n",
                          "p:", format.pval(p_value, digits = 3)))
 
   .data %>%
     ggplot2::ggplot() +
-    ggplot2::aes_string(x = .std_concentration, y = .concentration) +
+    ggplot2::aes_(x = as.name(.std_concentration), y = as.name(.concentration)) +
     ggplot2::geom_point() +
     ggplot2::geom_text(data = fit_text,
                        ggplot2::aes_string(label = "label"),
-                       vjust = 1, hjust = 0, size = 3) +
+                       vjust = 1, hjust = 0) +
     ggplot2::stat_smooth(method = "lm") +
     ggplot2::labs(title = .title)
 }
@@ -320,13 +321,13 @@ plot_estimate <- function(.sample_data, .standard_data, .model, .title = NULL,
 
   .standard_data %>%
     ggplot2::ggplot() +
-    ggplot2::aes_string(x = .concentration, y = .parameter) +
+    ggplot2::aes_(x = as.name(.concentration), y = as.name(.parameter)) +
     ggplot2::geom_ribbon(data = fit_line_range,
                          ggplot2::aes_string(ymin = "Lower", ymax = "Upper"),
                          alpha=0.2) +
-    ggplot2::geom_line(data = fit_line_range, color = "blue") +
+    ggplot2::geom_line(data = fit_line_range, colour = "blue") +
     ggplot2::geom_hline(data = .sample_data,
-                        ggplot2::aes_string(yintercept = .parameter),
+                        ggplot2::aes_string(yintercept = as.name(.parameter)),
                         linetype = 2) +
     ggplot2::labs(title = .title)
 }

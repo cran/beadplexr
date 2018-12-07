@@ -4,7 +4,8 @@
 \alias{trim_population}
 \title{Trim cluster.}
 \usage{
-trim_population(.data, .parameter, .column_name = "population", .trim = 0.1)
+trim_population(.data, .parameter, .column_name = "population",
+  .trim = 0.1)
 }
 \arguments{
 \item{.data}{The tidy data.frame with clusters to be modified.}
@@ -22,7 +23,7 @@ remove.}
 A data.frame
 }
 \description{
-Remove the points furthest form the centre of the cluster.
+Remove the points furthest form the center of the cluster.
 }
 \details{
 The euclidean distance is calculated for each point defined by

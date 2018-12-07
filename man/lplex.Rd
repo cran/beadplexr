@@ -14,10 +14,11 @@ acquisition):
 \item{FL2-H}{Intensity in the FL2 channel}
 }
 
-The list contains 8 standard samples in duplicates, and one serum sample,
-also in duplicate. The names of each element have the format K3 (internal
-panel shorthand), C:num: for standards and S:num: for serum sample, and a
-number indicating the replicate (1 or 2).}
+The list contains 8 standard samples in duplicates, and one serum
+sample, also in duplicate. The names of each element have the
+format K3 (internal panel shorthand), C:number: for standards and
+S:number: for serum sample, and a number indicating the replicate
+(1 or 2).}
 \source{
 Ulrik Stervbo, 2016, Unpublished
 }
@@ -26,7 +27,7 @@ data("lplex")
 }
 \description{
 Data from a "Human Growth Factor Panel (13-plex)" LEGENDplex experiment, with
-8 controls and 4 human serum samples, all in duplicates. The beads were
+8 controls and 1 human serum samples, all in duplicates. The beads were
 measured on a CytoFLEX cytometer, and the fcs-files were processed using
 \code{\link[=read_fcs]{read_fcs()}}, with default settings.
 }

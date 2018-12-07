@@ -60,7 +60,7 @@ Since there is just a single population in the forward-side scatter we can jump 
 ### MACSPlex-like
 We use the `identify_analyte()` to annotate the correct analytes in the MACSPlex-like data. The function requires the parameter `.analyte_id`, which -- in a true experiment -- correspond to some identifier given by Miltenyi Biotec. Here we just assign a number.
 
-The function also allows for removing events that are far from the centre of the analyte clusters. This is done by the parameter `.trim`. Here we set the value to `0.1` which means that 10% of the events are removed from the clusters. Excluded events are given the analyte ID `NA` and can easily be excluded from further processing.
+The function also allows for removing events that are far from the center of the analyte clusters. This is done by the parameter `.trim`. Here we set the value to `0.1` which means that 10% of the events are removed from the clusters. Excluded events are given the analyte ID `NA` and can easily be excluded from further processing.
 
 ```{r, fig.width=7}
 mplex_analyte <- mplex_data %>% 
@@ -119,7 +119,7 @@ cba_analyte %>%
 
 ## ID assignment
 
-The analyte ID is assigned to each cluster, based on the order of the centre of the cluster. For analytes where the bead is identified by two fluorescent parameters it could be a little tricky, because the centres are first sorted by the **first** parameter given, and then the **second**. The order of parameters and analyte IDs matter a lot! I urge you to double check that the beads are identified as expected. Once you have everything sorted out, it should remain stable for your cytometer.
+The analyte ID is assigned to each cluster, based on the order of the center of the cluster. For analytes where the bead is identified by two fluorescent parameters it could be a little tricky, because the centers are first sorted by the **first** parameter given, and then the **second**. The order of parameters and analyte IDs matter a lot! I urge you to double check that the beads are identified as expected. Once you have everything sorted out, it should remain stable for your cytometer.
 
 For the simulated MACSPlex-like data the IDs are assigned as below.
 

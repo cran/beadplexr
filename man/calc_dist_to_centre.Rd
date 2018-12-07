@@ -9,7 +9,7 @@ calc_dist_to_centre(.x, .c)
 \arguments{
 \item{.x}{A numerical vector with coordinates to a point.}
 
-\item{.c}{A numerical vector with the coordinates to the centre.}
+\item{.c}{A numerical vector with the coordinates to the center.}
 }
 \value{
 A numerical vector with the euclidean distance between the two points.

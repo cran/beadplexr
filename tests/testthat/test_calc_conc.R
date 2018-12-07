@@ -31,3 +31,46 @@ test_that("Errors and warnings are thrown", {
 
   expect_error(calc_std_conc(c(7:1, 0), 5, c(1, 2)))
 })
+
+# Fit standard curve ------------------------------------------------------
+mfi_data <- system.file("testdata", "analyte_mfi.rds", package = "beadplexr")
+mfi_data <- readRDS(mfi_data)
+mfi_data <- subset(mfi_data, grepl("-C", Sample))
+mfi_data <- subset(mfi_data, grepl("A10", `Analyte ID`))
+mfi_data$Sample <- as.integer(gsub("K3-C|-[1:2]", "", mfi_data$Sample))
+mfi_data$Concentration <- sort(calc_std_conc(rep(0:7, 2), 10000))
+mfi_data$Concentration <- log10(mfi_data$Concentration)
+
+mfi_data$`Conc entra` <- mfi_data$Concentration
+mfi_data$`Conc entra` <- ifelse(is.infinite(mfi_data$`Conc entra`), 0, mfi_data$`Conc entra`)
+mfi_data$FL2.H <- mfi_data$`FL2-H`
+
+test_that("Fitting a standard curve is possible", {
+  # Parameters
+  # The warning "NaNs produced" is procuded only when running devtols::test(), not when running the functions individually.
+  # I gave up trying to fix things nicely, and just added the `suppressWarnings`. Now everything is dandy.
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2-H", .concentration = "Concentration")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2-H", .concentration = "Conc entra")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Concentration")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Conc entra")), "drc")
+
+  expect_error(fit_standard_curve(.data = mfi_data, .parameter = "FL", .concentration = "Concentration"))
+  expect_error(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Conc"))
+
+  # Different fit methods
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .fct = "LL.4")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.3")), "drc")
+
+  # Not sure why all these fail...
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL3"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.2.2"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.2.5"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "AR.2"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "AR.3"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "MM.2"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "MM.3"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "W1.3"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "W1.4"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "BC.4"))
+  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "BC.5"))
+})

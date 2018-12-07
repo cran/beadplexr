@@ -4,7 +4,8 @@
 \alias{load_panel}
 \title{Load panel information}
 \usage{
-load_panel(.file_name = NULL, .panel_name = NULL, .panel_pattern = NULL)
+load_panel(.file_name = NULL, .panel_name = NULL,
+  .panel_pattern = NULL)
 }
 \arguments{
 \item{.file_name}{Character vector giving the name of an external panel info
@@ -33,10 +34,15 @@ If an explicit \code{.file_name} is given, \code{.panel_name} and
 
 
 \itemize{
-\item Human Th Cytokine Panel (13-plex)
+\item Human Adipokine Panel* (13-plex)
+\item Human Anti-Virus Response Panel (13-plex)
+\item Human CD8/NK Panel (13-plex)
 \item Human Cytokine Panel 2 (13-plex)
-\item Human Proinflammatory Chemokine Panel (13-plex)
 \item Human Growth Factor Panel (13-plex)
+\item Human Inflammation Panel (13-plex)
+\item Human Metabolic Panel 1 (4-plex)
+\item Human Proinflammatory Chemokine Panel (13-plex)
+\item Human T Helper Cytokine Panels (13-plex)
 }
 }
 
@@ -60,7 +66,7 @@ package directory.
 \examples{
 library(beadplexr)
 
-.panel_name <- "Human Th Cytokine Panel (13-plex)"
+.panel_name <- "Human T Helper Cytokine Panels (13-plex)"
 panel_info <- load_panel(.panel_name = .panel_name)
 panel_info$panel_name
 

@@ -4,8 +4,8 @@
 \alias{ident_bead_pop}
 \title{Identify bead populations}
 \usage{
-ident_bead_pop(.analytes, .column_name = NULL, .cluster = NULL, .call_args,
-  .data)
+ident_bead_pop(.analytes, .column_name = NULL, .cluster = NULL,
+  .call_args, .data)
 }
 \arguments{
 \item{.analytes}{A vector or list giving the IDs of the analytes.}

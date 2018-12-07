@@ -31,7 +31,7 @@ first matrix which contains the parameter names as column names. Finally, the
 values of \code{.compensation} can also be \code{NULL}, in which case, no
 compensation is performed.
 
-To summarise, the argument \code{.compensation} can be:
+To summarize, the argument \code{.compensation} can be:
 
 \describe{
 \item{A numerical matrix}{The compensation matrix to apply}

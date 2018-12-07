@@ -1,0 +1,15 @@
+bibentry(bibtype = "Article",
+	title = "beadplexr: Reproducible and automated analysis of multiplex bead assays",
+	volume = "6",
+	issn = "2167-8359",
+	shorttitle = "beadplexr",
+	url = "https://gitlab.com/ustervbo/beadplexr",
+	doi = "10.7717/peerj.5794",
+	language = "en",
+	urldate = "2018-11-16",
+	journal = "PeerJ",
+	author = c(person("Ulrik", "Stervbo"), person("Timm", "Westhoff", "H"), person("Nina", "Babel")),
+	month = "nov",
+	year = "2018",
+	pages = "e5794"
+)

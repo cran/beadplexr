@@ -1,3 +1,6 @@
+## quiets concerns of R CMD check re: the .'s that appear in pipelines
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
+
 #' Despeckle parameters
 #'
 #' Remove lonely, noisy data points in a 2D scatter matrix
@@ -5,7 +8,7 @@
 #' @param .data A tidy data.frame
 #' @param .parameters A character of the length of two giving the parameters to despeckle.
 #' @param .bins A numeric giving the resolution of the raster matrix.
-#' @param .neighbours A numeric giving the minimum number of neighbours. Points with fewer neighbours are removed.
+#' @param .neighbours A numeric giving the minimum number of neighbors. Points with fewer neighbors are removed.
 #' @param ... Additional parameters passed to [raster::clump()]
 #'
 #' @details
@@ -15,7 +18,7 @@
 #' columns, and combinations are marked by `1`.
 #'
 #' This matrix is turned into a `RasterLayer` by [raster::raster()] and the
-#' number of neighbours are calculated by [raster::clump()].
+#' number of neighbors are calculated by [raster::clump()].
 #'
 #' The rows of the `.data` where lonely points are found in `.parameters` are removed.
 #'
@@ -25,7 +28,7 @@
 #' @return A `data.frame` with noisy points removed.
 #'
 #' @importFrom magrittr "%>%"
-#' @importFrom raster freq "%in%"
+#' @importFrom raster "%in%"
 #'
 #' @export
 #'
@@ -63,7 +66,7 @@ despeckle <- function(.data, .parameters, .bins = 256L, .neighbours = 4L, ...){
 
   .col_names_bin <- c("x_bin", "y_bin")
   names(.parameters) <- .col_names_bin
-  # We use the raster package to calculate the number of neighbours each point
+  # We use the raster package to calculate the number of neighbors each point
   # have when the two paramters are plotted against eachother. This works best
   # if we have integers, but we must also be able to  identify the points we
   # have discharge in the original data. By breaking the values of the two
@@ -90,13 +93,10 @@ despeckle <- function(.data, .parameters, .bins = 256L, .neighbours = 4L, ...){
     dplyr::distinct() %>%
     dplyr::mutate_(.dots = .present_value) %>%
     tidyr::spread_(key_col = .col_names_bin[2], value_col = "present", fill = 0L) %>%
-    # Rownames are not allowed on tibbles so we cast to a regular data.frame
     as.data.frame() %>%
-    # For some reason, the rownames is set already, so it must be removed
-    tibble::remove_rownames() %>%
     tibble::column_to_rownames(var = .col_names_bin[1]) %>% as.matrix
 
-  # It a little bit of work getting to the values with low number of neighbours.
+  # It a little bit of work getting to the values with low number of neighbors.
   # First we have to find the number of neighboutrs ofcourse and the ones below
   # the cutoff so we can the number of neightbours to nothing
   .raster_res <- raster::raster(.binned_matrix)
@@ -104,18 +104,18 @@ despeckle <- function(.data, .parameters, .bins = 256L, .neighbours = 4L, ...){
   # igraph or where, but annoying it is
   .clump_res <- suppressWarnings(raster::clump(.raster_res, ...))
 
-  # clump assigns each data point a number and a count of neighbours
+  # clump assigns each data point a number and a count of neighbors
   .neighbour_filter <-lazyeval::interp(
     ~ .the_column < .the_neighbours,
     .the_column = as.name("count"),
     .the_neighbours = .neighbours)
 
-  .speckles <- .clump_res %>% freq %>%
+  .speckles <- .clump_res %>% raster::freq() %>%
     as.data.frame() %>%
     dplyr::filter_(.dots = .neighbour_filter)
 
   .clump_res[.clump_res %in% .speckles$value] <- NA
-  # The number of neighbours are stored in a single vector which we must turn
+  # The number of neighbors are stored in a single vector which we must turn
   # into a tidy data.frame. The column and row names of the binned matrix
   # corrospond to the bin number, which is what we need to filter the original
   # data
@@ -127,8 +127,9 @@ despeckle <- function(.data, .parameters, .bins = 256L, .neighbours = 4L, ...){
   .despeckled_data <- .clump_res@data@values %>%
     as.integer() %>%
     matrix(ncol = ncol(.binned_matrix), byrow = TRUE) %>%
-    dplyr::as_data_frame() %>%
-    stats::setNames(colnames(.binned_matrix)) %>%
+    magrittr::set_colnames(value = colnames(.binned_matrix)) %>%
+    magrittr::set_rownames(value = NULL) %>%
+    tibble::as_data_frame() %>%
     dplyr::mutate_(.dots = .set_x_bin) %>%
     # The row names are converted to double, though they are stored as character
     dplyr::mutate_at(names(.set_x_bin), as.character) %>%
@@ -136,7 +137,7 @@ despeckle <- function(.data, .parameters, .bins = 256L, .neighbours = 4L, ...){
     dplyr::filter_(.dots = .neighbour_filter)
 
   # Having the bin numbers of all data points with more than the minimum number
-  # of neighbours we can now filtermclean and return
+  # of neighbors we can now filtermclean and return
   .despeckled_data %>%
     dplyr::left_join(.binned_data, by = .col_names_bin) %>%
     dplyr::select_("-x_bin", "-y_bin", "-raster_number")

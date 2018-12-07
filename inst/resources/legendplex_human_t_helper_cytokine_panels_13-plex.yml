@@ -1,6 +1,6 @@
-panel_name: Human Proinflammatory Chemokine Panel (13-plex)
+panel_name: Human T Helper Cytokine Panels (13-plex)
 species: Human
-panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/Human_Proinflammatory_Chemokine_Panel_01142016_V03.pdf
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/75475_Hu_Th_Cytokine_Panel_Replacement_V01.pdf
 analyte_unit: pg/ml
 std_dilution: 4
 
@@ -20,43 +20,43 @@ group_order:
 analytes:
   A:
     A4:
-      name: CXCL8 (IL-8)
+      name: IL-5
       concentration: 10000
     A5:
-      name: CXCL10 (IP-10)
+      name: IL-13
       concentration: 10000
     A6:
-      name: CCL11 (Eotaxin)
+      name: IL-2
       concentration: 10000
     A7:
-      name: CCL17 (TARC)
+      name: IL-6
       concentration: 10000
     A8:
-      name: CCL2 (MCP-1)
+      name: IL-9
       concentration: 10000
     A10:
-      name: CCL5 (RANTES)
+      name: IL-10
       concentration: 10000
   B:
     B2:
-      name: CCL3 (MIP-1a)
+      name: IFN-g
       concentration: 10000
     B3:
-      name: CXCL9 (MIG)
+      name: TNF-a
       concentration: 10000
     B4:
-      name: CXCL5 (ENA-78)
+      name: IL-17A
       concentration: 10000
     B5:
-      name: CCL20 (MIP-3a)
+      name: IL-17F
       concentration: 10000
     B6:
-      name: CXCL1 (GROa)
+      name: IL-4
       concentration: 10000
     B7:
-      name: CXCL11 (I-TAC)
+      name: IL-21
       concentration: 10000
     B9:
-      name: CCL4 (MIP-1b)
+      name: IL-22
       concentration: 10000
 

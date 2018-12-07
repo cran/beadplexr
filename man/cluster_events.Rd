@@ -13,7 +13,8 @@ bp_kmeans(.data, .parameter, .column_name, .k, .trim = 0, ...)
 
 bp_clara(.data, .parameter, .column_name, .k, .trim = 0, ...)
 
-bp_dbscan(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50, ...)
+bp_dbscan(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50,
+  ...)
 
 bp_mclust(.data, .parameter, .column_name, .k, .trim = 0,
   .sample_frac = 0.05, .max_subset = 500, ...)
@@ -56,7 +57,7 @@ Cluster identification with various algorithms and subsequent trimming of each c
 }
 \note{
 An alternative approach to the trimming of clusters found with \code{\link[=kmeans]{kmeans()}} is
-to use the \code{\link[trimcluster:trimkmeans]{trimcluster::trimkmeans()}}. However, being superiour
+to use the \code{\link[trimcluster:trimkmeans]{trimcluster::trimkmeans()}}. However, being superior
 regarding speed with few clusters, the speed of \code{trimkmeans()}
 dramatically decreases with increasing number of clusters.
 
@@ -95,6 +96,9 @@ entire experiment and over time (assuming that there is only little drift in
 the flow cytometer). There is no guarantee that the correct number of clusters
 are returned, and it might be better to use this on the forward - side
 scatter discrimination.
+
+Scaling of the parameters seems to be appropriate in most cases for the
+forward - side scatter discrimination and is automatically performed.
 }
 
 \section{Parameters to mclust}{
@@ -115,12 +119,15 @@ point between two clusters.
 
 \examples{
 library(beadplexr)
-library(magrittr)
+library(dplyr)
 library(ggplot2)
 
 data("lplex")
 
 lplex[[1]] \%>\%
+  # Speed things up a bit by selecting one fourth of the events.
+  # Probably not something you'd usually do
+  dplyr::sample_frac(0.25) \%>\%
   bp_kmeans(.parameter = c("FSC-A", "SSC-A"),
             .column_name = "population", .trim = 0.1, .k = 2) \%>\%
   ggplot() +
@@ -128,12 +135,15 @@ lplex[[1]] \%>\%
   geom_point()
 
 library(beadplexr)
-library(magrittr)
+library(dplyr)
 library(ggplot2)
 
 data("lplex")
 
 lplex[[1]] \%>\%
+  # Speed things up a bit by selecting one fourth of the events.
+  # Probably not something you'd usually do
+  dplyr::sample_frac(0.25) \%>\%
   bp_clara(.parameter = c("FSC-A", "SSC-A"),
            .column_name = "population", .trim = 0.1, .k = 2) \%>\%
   ggplot() +
@@ -141,6 +151,9 @@ lplex[[1]] \%>\%
   geom_point()
 
 lplex[[1]] \%>\%
+  # Speed things up a bit by selecting one fourth of the events.
+  # Probably not something you'd usually do
+  dplyr::sample_frac(0.25) \%>\%
   bp_clara(.parameter = c("FSC-A", "SSC-A"),
            .column_name = "population", .trim = 0, .k = 2) \%>\%
   ggplot() +
@@ -149,17 +162,38 @@ lplex[[1]] \%>\%
 
 \dontrun{
 library(beadplexr)
-library(magrittr)
+library(dplyr)
 library(ggplot2)
 
 data("lplex")
 
 lplex[[1]] \%>\%
+  # Speed things up a bit by selecting one fourth of the events.
+  # Probably not something you'd usually do
+  dplyr::sample_frac(0.25) \%>\%
   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
             eps = 0.2, MinPts = 50) \%>\%
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
+
+pop1 <- lplex[[1]] \%>\%
+  # Speed things up a bit by selecting one fourth of the events.
+  # Probably not something you'd usually do
+  dplyr::sample_frac(0.25) \%>\%
+  bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
+    eps = 0.2, MinPts = 50) \%>\%
+  dplyr::filter(population == "1")
+
+pop1 \%>\%
+  bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
+    eps = 0.2, MinPts = 50) \%>\%
+  .$population \%>\% unique
+
+pop1 \%>\%
+  bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
+    eps = 0.2, MinPts = 50, scale = FALSE) \%>\%
+  .$population \%>\% unique
 }
 library(beadplexr)
 library(magrittr)

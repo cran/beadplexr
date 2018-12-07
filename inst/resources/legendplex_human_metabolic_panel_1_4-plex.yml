@@ -1,0 +1,35 @@
+panel_name: Human Metabolic Panel 1 (4-plex)
+species: Human
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/Human_Metabolic_Panel_1_Manual.pdf
+analyte_unit: pg/ml
+std_dilution: 4
+
+# The beads fall on some major groups - for legendplex panels
+# there are two named A and B. The group_order element sets the
+# order of the major groups in the forward and side scatter channels.
+# In practice, then the groups are identified, the mean of the
+# forward satterchannel and the mean of the side scatter chennel
+# is calculated for each identified group and sorted by FSC and SSC
+group_order:
+- A
+- B
+
+# A list of Bead IDs,
+# where each bead ID consist of a list with Target name
+# and standard start concentration as value
+analytes:
+  A:
+    A4:
+      name: Adiponectin
+      concentration: 200000
+    A5:
+      name: Adipsin
+      concentration: 50000
+  B:
+    B4:
+      name: Leptin
+      concentration: 10000
+    B7:
+      name: Resistin
+      concentration: 10000
+

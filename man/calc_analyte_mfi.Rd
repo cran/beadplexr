@@ -19,7 +19,7 @@ population information.}
 \item{.mean_fun}{A character giving the mean function to use.}
 }
 \value{
-A summarised \code{data.frame}
+A summarized \code{data.frame}
 }
 \description{
 The mean fluorescence intensity (MFI) of the analyte
