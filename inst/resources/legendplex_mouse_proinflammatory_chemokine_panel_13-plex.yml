@@ -1,0 +1,62 @@
+panel_name: Mouse Proinflammatory Chemokine Panel (13-plex)
+species: Mouse
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/Mouse_Proinflammatory_Chemokine_Panel_09162016_V05.pdf
+analyte_unit: pg/ml
+std_dilution: 4
+
+# The beads fall on some major groups - for legendplex panels
+# there are two named A and B. The group_order element sets the
+# order of the major groups in the forward and side scatter channels.
+# In practice, then the groups are identified, the mean of the
+# forward satterchannel and the mean of the side scatter chennel
+# is calculated for each identified group and sorted by FSC and SSC
+group_order:
+- A
+- B
+
+# A list of Bead IDs,
+# where each bead ID consist of a list with Target name
+# and standard start concentration as value
+analytes:
+  A:
+    A4:
+      name: CCL5 (RANTES)
+      concentration: 10000
+    A5:
+      name: CCL20 (MIP-3a)
+      concentration: 10000
+    A6:
+      name: CCL11 (Eotaxin)
+      concentration: 10000
+    A7:
+      name: CCL17 (TARC)
+      concentration: 10000
+    A8:
+      name: CXCL1 (KC)
+      concentration: 10000
+    A10:
+      name: CCL2 (MCP-1)
+      concentration: 10000
+  B:
+    B2:
+      name: CXCL9 (MIG)
+      concentration: 10000
+    B3:
+      name: CXCL10 (IP-10)
+      concentration: 10000
+    B4:
+      name: CCL3 (MIP-1a)
+      concentration: 10000
+    B5:
+      name: CCL4 (MIP-1b)
+      concentration: 10000
+    B6:
+      name: CXCL13 (BLC)
+      concentration: 10000
+    B7:
+      name: CXCL5 (LIX)
+      concentration: 10000
+    B9:
+      name: CCL22 (MDC)
+      concentration: 10000
+

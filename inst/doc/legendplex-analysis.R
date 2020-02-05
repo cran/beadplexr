@@ -1,4 +1,4 @@
-## ----read-fcs-defaults---------------------------------------------------
+## ----read-fcs-defaults--------------------------------------------------------
 library(beadplexr)
 
 .file_name <- system.file("extdata", "K2-C07-A7.fcs", package = "beadplexr")
@@ -7,17 +7,17 @@ library(beadplexr)
 .data <- read_fcs(.file_name = .file_name)
 
 
-## ----raw-events, fig.show='hold'-----------------------------------------
+## ----raw-events, fig.show='hold'----------------------------------------------
 facs_plot(.data)
 facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 
-## ----read-fcs-no-filter, fig.show='hold', eval=FALSE---------------------
+## ----read-fcs-no-filter, fig.show='hold', eval=FALSE--------------------------
 #  .data <- read_fcs(.file_name = .file_name, .filter = NULL)
 #  
 #  facs_plot(.data)
 #  facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 
-## ----fcs-h-filter, fig.show='hold'---------------------------------------
+## ----fcs-h-filter, fig.show='hold'--------------------------------------------
 .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"), 
                   .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
                                  "SSC-H" = c(4e5, 1e6),
@@ -26,7 +26,7 @@ facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
 facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 
-## ----read-fcs-fl2-filter, fig.show='hold', eval=FALSE--------------------
+## ----read-fcs-fl2-filter, fig.show='hold', eval=FALSE-------------------------
 #  .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"),
 #                    .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
 #                                   "SSC-H" = c(4e5, 1e6),
@@ -36,7 +36,7 @@ facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 #  facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
 #  facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 
-## ----pseudo-color, fig.show='hold'---------------------------------------
+## ----pseudo-color, fig.show='hold'--------------------------------------------
 .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
                   .filter = list("FSC-A" = c(4e5, 6e5L),
                                  "SSC-A" = c(4e5, 1e6),
@@ -47,7 +47,7 @@ facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
 facs_plot(.data, .type = "hexbin", .bins = 50)
 facs_plot(.data, .x = "FL2-H", .y = "FL6-H", .type = "hexbin")
 
-## ----load-panel-name-----------------------------------------------------
+## ----load-panel-name----------------------------------------------------------
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 panel_info$panel_name
 
@@ -55,21 +55,21 @@ panel_info$panel_name
 panel_info <- load_panel(.panel_pattern = ".*rowth.*panel")
 panel_info$panel_name
 
-## ----content-panel-example, echo=FALSE-----------------------------------
+## ----content-panel-example, echo=FALSE----------------------------------------
 res <- readLines(system.file("resources/legendplex_human_growth_factor_panel_13-plex.yml", package = "beadplexr"))
 cat(paste(res, collapse = "\n"))
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  system.file(package = "beadplexr")
 
-## ----load-lplex-data, message=FALSE, warning=FALSE-----------------------
+## ----load-lplex-data, message=FALSE, warning=FALSE----------------------------
 library(beadplexr)
 library(dplyr)
 library(purrr)
 
 data(lplex)
 
-## ----fsc-ssc-ident-1, fig.width=6----------------------------------------
+## ----fsc-ssc-ident-1, fig.width=6---------------------------------------------
 plex_sub_sample <- lplex[[1]]
 plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SSC-A"), 
                                .analyte_id = c("A", "B"),
@@ -77,7 +77,7 @@ plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SS
 facs_plot(plex_sub_sample, .x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
 
 
-## ----fsc-ssc-ident-2, fig.width=6----------------------------------------
+## ----fsc-ssc-ident-2, fig.width=6---------------------------------------------
 plex_sub_sample$`Bead group` <- NULL
 
 plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SSC-A"), 
@@ -86,7 +86,7 @@ plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SS
                                .trim = 0.03)
 facs_plot(plex_sub_sample, .x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
 
-## ----bead-ident, fig.show='hold'-----------------------------------------
+## ----bead-ident, fig.show='hold'----------------------------------------------
 library(ggplot2)
 
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
@@ -113,7 +113,7 @@ facs_scatter(bead_a, .x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitl
 facs_density1d(bead_b, .x = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 facs_scatter(bead_b, .x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 
-## ----trim-analyte, fig.show='hold', eval=FALSE---------------------------
+## ----trim-analyte, fig.show='hold', eval=FALSE--------------------------------
 #  bead_a %>% split(list(.$`Analyte ID`)) %>%
 #    map_df(trim_population, .parameter = c("FL6-H", "FL2-H"),
 #           .column_name = "Analyte ID",
@@ -130,7 +130,7 @@ facs_scatter(bead_b, .x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitl
 #    mutate(`Analyte ID` = factor(`Analyte ID`, levels = names(panel_info$analytes$B))) %>%
 #    facs_scatter(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 
-## ---- fig.show='hold', cache=TRUE----------------------------------------
+## ---- fig.show='hold', cache=TRUE---------------------------------------------
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 
 args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
@@ -159,7 +159,7 @@ analytes_identified %>%
   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 
 
-## ----find-analytes-------------------------------------------------------
+## ----find-analytes------------------------------------------------------------
 
 find_and_trim <- function(.data){
   identify_legendplex_analyte(.data, .analytes = panel_info$analytes,
@@ -172,7 +172,7 @@ find_and_trim <- function(.data){
 
 analytes_identified <- lplex %>% lapply(find_and_trim) 
 
-## ----visualize-analytes, message=FALSE, fig.width=7----------------------
+## ----visualize-analytes, message=FALSE, fig.width=7---------------------------
 library(gridExtra)
 
 plot_side_by_side <- function(.data, .cur_sample){
@@ -199,7 +199,7 @@ analytes_identified[1] %>%
   map2(names(.), plot_side_by_side) %>% 
   walk(grid.arrange)
 
-## ----save-plots, eval=FALSE----------------------------------------------
+## ----save-plots, eval=FALSE---------------------------------------------------
 #  
 #  all_plots <- analytes_identified %>%
 #    map2(names(.), plot_side_by_side) %>%
@@ -208,7 +208,7 @@ analytes_identified[1] %>%
 #  ggsave(filename = "dot_plot.pdf", plot = all_plots, width = 8.27, height = 11.69)
 #  
 
-## ----calculate-mfi-------------------------------------------------------
+## ----calculate-mfi------------------------------------------------------------
 analyte_mfi <- analytes_identified %>% 
   map_df(calc_analyte_mfi, 
          .parameter = "FL2-H", 
@@ -218,7 +218,7 @@ analyte_mfi <- analytes_identified %>%
   mutate(`FL2-H` = log10(`FL2-H`)) %>% 
   filter(!is.na(`Analyte ID`))
 
-## ----split-data----------------------------------------------------------
+## ----split-data---------------------------------------------------------------
 library(stringr)
 # All standard samples have the pattern C[number]
 standard_data <- analyte_mfi %>% 
@@ -228,7 +228,7 @@ standard_data <- analyte_mfi %>%
 sample_data <- analyte_mfi %>% 
   filter(!str_detect(Sample, "C[0-9]")) 
 
-## ----calc-std-conc-------------------------------------------------------
+## ----calc-std-conc------------------------------------------------------------
 # Helper function to extract the sample number
 as_numeric_standard_id <- function(.s){
   .s %>% 
@@ -252,7 +252,7 @@ standard_data <- standard_data %>%
   select(-concentration, -`Bead group`)
 
 
-## ----combine-data--------------------------------------------------------
+## ----combine-data-------------------------------------------------------------
 library(tidyr)
 # It seems that tidyr::nest has problems with non-standard names, so the names 
 # must all be concerted to syntactically valid column names.
@@ -270,7 +270,7 @@ plex_data <-
   inner_join(standard_data, sample_data, by = "Analyte.ID")
 
 
-## ----fit-standard-curve--------------------------------------------------
+## ----fit-standard-curve-------------------------------------------------------
 library(purrr)
 
 # When clustering is performed with mclust, the package mclust is loaded in the
@@ -281,13 +281,13 @@ plex_data <- plex_data %>%
   group_by(Analyte.ID) %>% 
   mutate(`Model fit` = purrr::map(`Standard data`, fit_standard_curve))
 
-## ----example-std-curve, echo=FALSE---------------------------------------
+## ----example-std-curve, echo=FALSE--------------------------------------------
 plex_data <- plex_data %>% 
   mutate(`Std curve` = purrr::map2(`Standard data`, `Model fit`, plot_std_curve))
 
 plex_data[2, "Std curve"][[1]][[1]]
 
-## ----calc-conc-----------------------------------------------------------
+## ----calc-conc----------------------------------------------------------------
 plex_data <- plex_data %>% 
   group_by(Analyte.ID) %>% 
   mutate(`Standard data` = 
@@ -304,7 +304,7 @@ plex_data <- plex_data %>%
                        plot_estimate))
 
 
-## ----example-comb-plots, eval=TRUE---------------------------------------
+## ----example-comb-plots, eval=TRUE--------------------------------------------
 comb_plots <- function(..., .title, .ncol, .nrow = 1){
   .grobs <- list(...)
   
@@ -318,11 +318,11 @@ plex_data <- plex_data %>%
    mutate(`Std plots` = pmap(list(`Std curve`, `Std conc`, .title = name), comb_plots))
 
 
-## ----example-std-plots, echo=FALSE, fig.show='hold'----------------------
+## ----example-std-plots, echo=FALSE, fig.show='hold'---------------------------
 plex_data[2, "Std plots"][[1]][[1]]
 plex_data[2, "Est curve"][[1]][[1]]
 
-## ----example-save-std-plot, eval=FALSE-----------------------------------
+## ----example-save-std-plot, eval=FALSE----------------------------------------
 #  plots_to_save <- gridExtra::marrangeGrob(plex_data$`Std plots` %>% flatten(),
 #                                           ncol = 1, nrow = 6)
 #  
@@ -330,7 +330,7 @@ plex_data[2, "Est curve"][[1]][[1]]
 #         path = "./", width = 210, height = 297, units = "mm",
 #         title = "Standard plots")
 
-## ----example-save-est-plot, eval=FALSE-----------------------------------
+## ----example-save-est-plot, eval=FALSE----------------------------------------
 #  plots_to_save <- gridExtra::marrangeGrob(plex_data$`Est curve`,
 #                                           ncol = 1, nrow = 6)
 #  
@@ -338,11 +338,11 @@ plex_data[2, "Est curve"][[1]][[1]]
 #         path = "./", width = 210, height = 297, units = "mm",
 #         title = "Samples on std curve")
 
-## ----example-extract-conc, eval=FALSE------------------------------------
+## ----example-extract-conc, eval=FALSE-----------------------------------------
 #  plex_data %>%
 #    unnest(`Sample data`) %>%
 #    mutate(Calc.conc = 10^Calc.conc, `Calc.conc error` = 10^`Calc.conc error`)
 
-## ----results='markup', echo=FALSE----------------------------------------
+## ----results='markup', echo=FALSE---------------------------------------------
 sessionInfo()
 

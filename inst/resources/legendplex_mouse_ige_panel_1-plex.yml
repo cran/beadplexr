@@ -1,0 +1,25 @@
+panel_name: Mouse IgE Panel (1-plex)
+species: Mouse
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/750000159_Mouse_IgE_Assay_Full_Kit_V01.pdf
+analyte_unit: pg/ml
+std_dilution: 4
+
+# The beads fall on some major groups - for legendplex panels
+# there are two named A and B. The group_order element sets the
+# order of the major groups in the forward and side scatter channels.
+# In practice, then the groups are identified, the mean of the
+# forward satterchannel and the mean of the side scatter chennel
+# is calculated for each identified group and sorted by FSC and SSC
+group_order:
+- A
+- B
+
+# A list of Bead IDs,
+# where each bead ID consist of a list with Target name
+# and standard start concentration as value
+analytes:
+  B:
+    B5:
+      name: IgE
+      concentration: 10000
+

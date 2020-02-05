@@ -69,7 +69,7 @@ library(beadplexr)
 
 ```
 
-The **beadplexr** package also comes with some simple plot functions to help visualize the FACS-data. The functions are wrappers around [**ggplot2**](http://ggplot2.org/), and are meant to provide an easy view of the data. For more control it is probably better to use **ggplot2** directly.
+The **beadplexr** package also comes with some simple plot functions to help visualize the FACS-data. The functions are wrappers around [**ggplot2**](https://ggplot2.tidyverse.org/), and are meant to provide an easy view of the data. For more control it is probably better to use **ggplot2** directly.
 
 ```{r raw-events, fig.show='hold'}
 facs_plot(.data)

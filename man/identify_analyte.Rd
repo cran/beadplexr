@@ -4,10 +4,17 @@
 \alias{identify_analyte}
 \title{Identify analyte}
 \usage{
-identify_analyte(.data, .parameter, .analyte_id,
-  .column_name = "analyte", .k = length(.analyte_id), .trim = 0,
-  .desc = FALSE, .method = c("clara", "kmeans", "dbscan", "mclust",
-  "density_cut"), ...)
+identify_analyte(
+  .data,
+  .parameter,
+  .analyte_id,
+  .column_name = "analyte",
+  .k = length(.analyte_id),
+  .trim = 0,
+  .desc = FALSE,
+  .method = c("clara", "kmeans", "dbscan", "mclust", "density_cut"),
+  ...
+)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}

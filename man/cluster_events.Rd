@@ -13,11 +13,18 @@ bp_kmeans(.data, .parameter, .column_name, .k, .trim = 0, ...)
 
 bp_clara(.data, .parameter, .column_name, .k, .trim = 0, ...)
 
-bp_dbscan(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50,
-  ...)
+bp_dbscan(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50, ...)
 
-bp_mclust(.data, .parameter, .column_name, .k, .trim = 0,
-  .sample_frac = 0.05, .max_subset = 500, ...)
+bp_mclust(
+  .data,
+  .parameter,
+  .column_name,
+  .k,
+  .trim = 0,
+  .sample_frac = 0.05,
+  .max_subset = 500,
+  ...
+)
 
 bp_density_cut(.data, .parameter, .column_name, .k, .trim = 0, ...)
 }
@@ -54,16 +61,6 @@ the column given by \code{.column_name}.
 }
 \description{
 Cluster identification with various algorithms and subsequent trimming of each cluster
-}
-\note{
-An alternative approach to the trimming of clusters found with \code{\link[=kmeans]{kmeans()}} is
-to use the \code{\link[trimcluster:trimkmeans]{trimcluster::trimkmeans()}}. However, being superior
-regarding speed with few clusters, the speed of \code{trimkmeans()}
-dramatically decreases with increasing number of clusters.
-
-Mclust and dbscan seems to do an excellent job at separating on the forward
-and side scatter parameters. Mclust and clara both perform well separating
-beads in the APC channel, but clara is about 3 times faster than Mclust.
 }
 \section{Additional parameters}{
 
@@ -223,4 +220,8 @@ lplex[[1]] \%>\%
 }
 \seealso{
 \code{\link[=trim_population]{trim_population()}}, \code{\link[=identify_analyte]{identify_analyte()}}.
+
+Mclust and dbscan seems to do an excellent job at separating on the forward
+and side scatter parameters. Mclust and clara both perform well separating
+beads in the APC channel, but clara is about 3 times faster than Mclust.
 }

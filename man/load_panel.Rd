@@ -4,8 +4,7 @@
 \alias{load_panel}
 \title{Load panel information}
 \usage{
-load_panel(.file_name = NULL, .panel_name = NULL,
-  .panel_pattern = NULL)
+load_panel(.file_name = NULL, .panel_name = NULL, .panel_pattern = NULL)
 }
 \arguments{
 \item{.file_name}{Character vector giving the name of an external panel info
@@ -43,6 +42,15 @@ If an explicit \code{.file_name} is given, \code{.panel_name} and
 \item Human Metabolic Panel 1 (4-plex)
 \item Human Proinflammatory Chemokine Panel (13-plex)
 \item Human T Helper Cytokine Panels (13-plex)
+\item Mouse Anti-Virus Response Panel (13-plex)
+\item Mouse Cytokine Panel 2 (13-plex)
+\item Mouse Free Active/Total TGF-b1 Panel (Mouse/Rat) (1-plex)
+\item Mouse HSC Panel (13-plex)
+\item Mouse IgE Panel (1-plex)
+\item Mouse Immunoglobulin Isotyping Panel (6-plex)
+\item Mouse Inflammation Panel (13-plex)
+\item Mouse Proinflammatory Chemokine Panel (13-plex)
+\item Mouse T Helper Cytokine Panels (13-plex)
 }
 }
 

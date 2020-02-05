@@ -8,11 +8,21 @@
 \alias{facs_hexbin}
 \title{Plot FACS data.}
 \usage{
-facs_plot(.data, .x = "FSC-A", .y = "SSC-A", .type = c("scatter",
-  "density1d", "density2d", "hexbin"), ...)
+facs_plot(
+  .data,
+  .x = "FSC-A",
+  .y = "SSC-A",
+  .type = c("scatter", "density1d", "density2d", "hexbin"),
+  ...
+)
 
-facs_scatter(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL,
-  .plot_distinct = TRUE)
+facs_scatter(
+  .data,
+  .x = "FSC-A",
+  .y = "SSC-A",
+  .beads = NULL,
+  .plot_distinct = TRUE
+)
 
 facs_density2d(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL)
 

@@ -4,9 +4,14 @@
 \alias{assign_analyte_id}
 \title{Assign analyte ID}
 \usage{
-assign_analyte_id(.data, .parameter, .analyte_id, .column_name,
+assign_analyte_id(
+  .data,
+  .parameter,
+  .analyte_id,
+  .column_name,
   .cluster_column_name = paste0("cluster_", .column_name),
-  .desc = FALSE)
+  .desc = FALSE
+)
 }
 \arguments{
 \item{.data}{The tidy data.frame, with indication of clusters}

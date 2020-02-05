@@ -4,8 +4,14 @@
 \alias{turning_point}
 \title{Turning points}
 \usage{
-turning_point(.x, .which = c("both", "minima", "maxima"),
-  .return = c("value", "index"), .adjust = 1.5, .k = NULL, ...)
+turning_point(
+  .x,
+  .which = c("both", "minima", "maxima"),
+  .return = c("value", "index"),
+  .adjust = 1.5,
+  .k = NULL,
+  ...
+)
 }
 \arguments{
 \item{.x}{A numeric vector or a list of numeric vectors. If the list is
@@ -19,13 +25,14 @@ named, the names become column names in the returned data.frames}
 
 \item{.k}{Numeric giving the number of expected clusters.}
 
-\item{...}{Arguments passed on to \code{approx_adjust}
-\describe{
-  \item{.lower}{The interval for possible value of adjust.}
-  \item{.upper}{The interval for possible value of adjust.}
-  \item{.step}{A numeric giving the increment to adjust. Sometimes low values
+\item{...}{
+  Arguments passed on to \code{\link[=approx_adjust]{approx_adjust}}
+  \describe{
+    \item{\code{.lower}}{The interval for possible value of adjust.}
+    \item{\code{.upper}}{The interval for possible value of adjust.}
+    \item{\code{.step}}{A numeric giving the increment to adjust. Sometimes low values
 are needed to find a proper adjust value.}
-}}
+  }}
 }
 \value{
 A list with the two elements \code{maxima} and \code{minima}. each element

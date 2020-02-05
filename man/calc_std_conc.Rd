@@ -4,8 +4,7 @@
 \alias{calc_std_conc}
 \title{Calculate standard concentration}
 \usage{
-calc_std_conc(.standard_sample, .start_concentration,
-  .dilution_factor = 4L)
+calc_std_conc(.standard_sample, .start_concentration, .dilution_factor = 4L)
 }
 \arguments{
 \item{.standard_sample}{a vector giving the standard samples. The sample with

@@ -9,11 +9,21 @@
 \usage{
 identify_legendplex_analyte(.data, .analytes, .method_args)
 
-identify_cba_analyte(.data, .analytes, .method_args, .trim_fs = NULL,
-  .parameter_fs = NULL)
+identify_cba_analyte(
+  .data,
+  .analytes,
+  .method_args,
+  .trim_fs = NULL,
+  .parameter_fs = NULL
+)
 
-identify_macsplex_analyte(.data, .analytes, .method_args,
-  .trim_fs = NULL, .parameter_fs = NULL)
+identify_macsplex_analyte(
+  .data,
+  .analytes,
+  .method_args,
+  .trim_fs = NULL,
+  .parameter_fs = NULL
+)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}

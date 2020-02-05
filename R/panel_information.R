@@ -29,6 +29,15 @@
 #'    \item Human Metabolic Panel 1 (4-plex)
 #'    \item Human Proinflammatory Chemokine Panel (13-plex)
 #'    \item Human T Helper Cytokine Panels (13-plex)
+#'    \item Mouse Anti-Virus Response Panel (13-plex)
+#'    \item Mouse Cytokine Panel 2 (13-plex)
+#'    \item Mouse Free Active/Total TGF-b1 Panel (Mouse/Rat) (1-plex)
+#'    \item Mouse HSC Panel (13-plex)
+#'    \item Mouse IgE Panel (1-plex)
+#'    \item Mouse Immunoglobulin Isotyping Panel (6-plex)
+#'    \item Mouse Inflammation Panel (13-plex)
+#'    \item Mouse Proinflammatory Chemokine Panel (13-plex)
+#'    \item Mouse T Helper Cytokine Panels (13-plex)
 #'   }
 #'
 #' @section Example panel file:
@@ -122,6 +131,25 @@ panel_name_file <- function(.panel_name){
       "legendplex_human_proinflammatory_chemokine_panel_13-plex.yml",
     `Human T Helper Cytokine Panels (13-plex)` =
       "legendplex_human_t_helper_cytokine_panels_13-plex.yml",
+    `Mouse Anti-Virus Response Panel (13-plex)` =
+    "legendplex_mouse_anti-virus_response_panel_13-plex.yml",
+    `Mouse Cytokine Panel 2 (13-plex)` =
+    "legendplex_mouse_cytokine_panel_2_13-plex.yml",
+    `Mouse Free Active/Total TGF-b1 Panel (Mouse/Rat) (1-plex)` =
+    "legendplex_mouse_free_active-total_tgf-b1_panel_mouse-rat_1-plex.yml",
+    `Mouse HSC Panel (13-plex)` =
+    "legendplex_mouse_hsc_panel_13-plex.yml",
+    `Mouse IgE Panel (1-plex)` =
+    "legendplex_mouse_ige_panel_1-plex.yml",
+    `Mouse Immunoglobulin Isotyping Panel (6-plex)` =
+    "legendplex_mouse_immunoglobulin_isotyping_panel_6-plex.yml",
+    `Mouse Inflammation Panel (13-plex)` =
+    "legendplex_mouse_inflammation_panel_13-plex.yml",
+    `Mouse Proinflammatory Chemokine Panel (13-plex)` =
+    "legendplex_mouse_proinflammatory_chemokine_panel_13-plex.yml",
+    `Mouse T Helper Cytokine Panels (13-plex)` =
+    "legendplex_mouse_t_helper_cytokine_panels_13-plex.yml",
+
     warning(
       "Panel name not found. Did you write it in full? See the documentation for a list of accepted panel names."
     )

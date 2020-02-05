@@ -28,7 +28,7 @@ devtools::install_git("https://gitlab.com/ustervbo/beadplexr")
 # devtools::install_git("https://gitlab.com/ustervbo/beadplexr", build_vignettes = TRUE)
 ```
 
-`beadplexr` depends on the `nloptr` package. During the installation of `nloptr` on an Unix/Linux system, the `nlopt` library should be autimatically downloaded and installed. If this fails, installing the library with 
+`beadplexr` depends on the `nloptr` package. During the installation of `nloptr` on an Unix/Linux system, the `nlopt` library should be automatically downloaded and installed. If this fails, installing the library with 
 
 
 ```
@@ -50,7 +50,7 @@ The package comes with a comprehensive example in the vignette 'Analysis of LEGE
 vignette("legendplex-analysis", package = "beadplexr")
 ```
 
-Or read the vignette [here](https://cran.r-project.org/web/packages/beadplexr/vignettes/legendplex-analysis.html).
+Or read the vignette [here](https://CRAN.R-project.org/package=beadplexr/vignettes/legendplex-analysis.html).
 
 ## Citing the package
 

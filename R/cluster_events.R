@@ -41,11 +41,6 @@
 #' @rdname cluster_events
 #' @seealso [trim_population()], [identify_analyte()].
 #'
-#' @note An alternative approach to the trimming of clusters found with [kmeans()] is
-#'   to use the [trimcluster::trimkmeans()]. However, being superior
-#'   regarding speed with few clusters, the speed of `trimkmeans()`
-#'   dramatically decreases with increasing number of clusters.
-#'
 #' Mclust and dbscan seems to do an excellent job at separating on the forward
 #' and side scatter parameters. Mclust and clara both perform well separating
 #' beads in the APC channel, but clara is about 3 times faster than Mclust.

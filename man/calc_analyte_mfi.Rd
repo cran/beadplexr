@@ -4,8 +4,12 @@
 \alias{calc_analyte_mfi}
 \title{Calculate the analyte intensity}
 \usage{
-calc_analyte_mfi(.data, .parameter, .column_name = "analyte",
-  .mean_fun = c("geometric", "harmonic", "arithmetic"))
+calc_analyte_mfi(
+  .data,
+  .parameter,
+  .column_name = "analyte",
+  .mean_fun = c("geometric", "harmonic", "arithmetic")
+)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}

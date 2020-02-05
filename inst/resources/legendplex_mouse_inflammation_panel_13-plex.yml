@@ -1,0 +1,62 @@
+panel_name: Mouse Inflammation Panel (13-plex)
+species: Mouse
+panel_manual: https://www.biolegend.com/media_assets/pro_detail/datasheets/76100_Mouse_Inflammation_Panel_V04.pdf
+analyte_unit: pg/ml
+std_dilution: 4
+
+# The beads fall on some major groups - for legendplex panels
+# there are two named A and B. The group_order element sets the
+# order of the major groups in the forward and side scatter channels.
+# In practice, then the groups are identified, the mean of the
+# forward satterchannel and the mean of the side scatter chennel
+# is calculated for each identified group and sorted by FSC and SSC
+group_order:
+- A
+- B
+
+# A list of Bead IDs,
+# where each bead ID consist of a list with Target name
+# and standard start concentration as value
+analytes:
+  A:
+    A4:
+      name: IL-23
+      concentration: 10000
+    A5:
+      name: IL-1a
+      concentration: 10000
+    A6:
+      name: IFN-g
+      concentration: 10000
+    A7:
+      name: TNF-a
+      concentration: 10000
+    A8:
+      name: CCL2 (MCP-1)
+      concentration: 10000
+    A10:
+      name: IL-12 (p70)
+      concentration: 10000
+  B:
+    B2:
+      name: IL-1b
+      concentration: 10000
+    B3:
+      name: IL-10
+      concentration: 10000
+    B4:
+      name: IL-6
+      concentration: 10000
+    B5:
+      name: IL-27
+      concentration: 10000
+    B6:
+      name: IL-17A
+      concentration: 10000
+    B7:
+      name: IFN-b
+      concentration: 10000
+    B9:
+      name: GM-CSF
+      concentration: 10000
+

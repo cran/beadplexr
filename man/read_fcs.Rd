@@ -4,10 +4,15 @@
 \alias{read_fcs}
 \title{Read a fcs file.}
 \usage{
-read_fcs(.file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
-  .bead_channels = c("FL6-H", "FL2-H"), .filter = list(`FSC-A` =
-  c(200000L, 800000L), `SSC-A` = c(200000L, 1000000L), `FL6-H` = c(7.3,
-  Inf)), .compensation = "guess", ...)
+read_fcs(
+  .file_name,
+  .fsc_ssc = c("FSC-A", "SSC-A"),
+  .bead_channels = c("FL6-H", "FL2-H"),
+  .filter = list(`FSC-A` = c(200000L, 800000L), `SSC-A` = c(200000L, 1000000L), `FL6-H`
+    = c(7.3, Inf)),
+  .compensation = "guess",
+  ...
+)
 }
 \arguments{
 \item{.file_name}{The path and name of the file to be read.}

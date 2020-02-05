@@ -4,8 +4,7 @@
 \alias{trim_population}
 \title{Trim cluster.}
 \usage{
-trim_population(.data, .parameter, .column_name = "population",
-  .trim = 0.1)
+trim_population(.data, .parameter, .column_name = "population", .trim = 0.1)
 }
 \arguments{
 \item{.data}{The tidy data.frame with clusters to be modified.}

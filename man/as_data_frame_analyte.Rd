@@ -4,8 +4,11 @@
 \alias{as_data_frame_analyte}
 \title{Cast list of analytes to \code{data.frame}}
 \usage{
-as_data_frame_analyte(.analytes, .id_bead = "Bead group",
-  .id_analyte = "Analyte ID")
+as_data_frame_analyte(
+  .analytes,
+  .id_bead = "Bead group",
+  .id_analyte = "Analyte ID"
+)
 }
 \arguments{
 \item{.analytes}{The named list to be cast. It usually is loaded using

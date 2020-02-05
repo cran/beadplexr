@@ -4,8 +4,12 @@
 \alias{calculate_concentration}
 \title{Calculate concentration.}
 \usage{
-calculate_concentration(.data, .model, .parameter = "FL2.H",
-  .value = "Calc.conc")
+calculate_concentration(
+  .data,
+  .model,
+  .parameter = "FL2.H",
+  .value = "Calc.conc"
+)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}

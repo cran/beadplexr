@@ -404,7 +404,7 @@ apply_compensation <- function(.flow_frame, .compensation){
 
   # Test if .x is a numerical matrix with the parameters
   .get_potential_comp_matrices <- function(.x, .p){
-    if((class(.x) == "matrix") & is.numeric(.x)){
+    if(("matrix" %in% class(.x)) & is.numeric(.x)){
       TRUE %in% (.p %in% colnames(.x))
     }else{
       FALSE

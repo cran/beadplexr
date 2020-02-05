@@ -1,7 +1,7 @@
 Package: beadplexr
 Type: Package
 Title: Analysis of Multiplex Cytometric Bead Assays
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c( person(given = "Ulrik", 
                      family = "Stervbo", 
                      email = "ulrik.stervbo@gmail.com", 
@@ -26,12 +26,12 @@ Depends: R (>= 3.2)
 Suggests: gridExtra, hexbin, igraph, knitr, rmarkdown, stringr,
         testthat
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Imports: cluster, dplyr, drc, flowCore, fpc, ggplot2, lazyeval,
         magrittr, mclust, purrr, raster, tibble, tidyr, yaml
 NeedsCompilation: no
-Packaged: 2018-12-07 14:56:00 UTC; ulrik
+Packaged: 2020-02-05 15:38:54 UTC; ulrik
 Author: Ulrik Stervbo [aut, cre] (<https://orcid.org/0000-0002-2831-8868>)
 Maintainer: Ulrik Stervbo <ulrik.stervbo@gmail.com>
 Repository: CRAN
-Date/Publication: 2018-12-07 23:40:08 UTC
+Date/Publication: 2020-02-05 17:00:02 UTC

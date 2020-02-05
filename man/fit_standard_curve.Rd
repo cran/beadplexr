@@ -4,8 +4,13 @@
 \alias{fit_standard_curve}
 \title{Fit a standard curve}
 \usage{
-fit_standard_curve(.data, .parameter = "FL2.H",
-  .concentration = "Concentration", .fct = "LL.5", ...)
+fit_standard_curve(
+  .data,
+  .parameter = "FL2.H",
+  .concentration = "Concentration",
+  .fct = "LL.5",
+  ...
+)
 }
 \arguments{
 \item{.data}{A tidy data.frame.}
