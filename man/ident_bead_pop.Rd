@@ -9,7 +9,8 @@ ident_bead_pop(
   .column_name = NULL,
   .cluster = NULL,
   .call_args,
-  .data
+  df,
+  .data = NULL
 )
 }
 \arguments{
@@ -22,7 +23,9 @@ by.}
 
 \item{.call_args}{A list giving the parameters passed on to \code{identify_analyte()}.}
 
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 }
 \value{
 A data.frame.

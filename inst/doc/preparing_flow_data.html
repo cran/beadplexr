@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ulrik Stervbo" />
+
+<meta name="date" content="2020-04-04" />
+
+<title>Preparing flow-data for use with with beadplexr</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Preparing flow-data for use with with <code>beadplexr</code></h1>
+<h4 class="author">Ulrik Stervbo</h4>
+<h4 class="date">2020-04-04</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#reading-facs-data">Reading FACS data</a></li>
+<li><a href="#applying-the-event-filter">Applying the event filter</a></li>
+<li><a href="#pseudo-color-plots">Pseudo-color plots</a></li>
+<li><a href="#copy-paste-code">Copy-paste code</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Because of potential license problems with some dependencies in the <code>flowCore</code>-package, the functionality of reading and preparing flow-data for <code>beadplexr</code> is removed. This vignette described how to quickly achieve the same functionality as before the issues.</p>
+<p>The following will not be executed when the vignette is built, but should work when executed manually, providing all packages are installed.</p>
+</div>
+<div id="reading-facs-data" class="section level2">
+<h2>Reading FACS data</h2>
+<p>Install <code>flowCore</code> and its dependencies:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">    <span class="kw">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;flowCore&quot;</span>)</a></code></pre></div>
+<p>Source the code found in section <a href="#copy-paste-code">Copy-paste code</a>.</p>
+<p>The output of a LEGENDplex experiment is a series of Flow Cytometry Standard (FCS) files. The exact version of the fcs-files produced, depends on the flow cytometer used. However, getting data into R should be the same irrespective of the cytometer used.</p>
+<p>The <strong>beadplexr</strong> provides the function <code>read_fcs()</code> to read in a fcs file. It is a wrapper around the functionality provided by the <a href="http://bioconductor.org/packages/flowCore/"><strong>flowCore</strong></a> package and performs the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Read the file with <code>flowCore::read.FCS()</code></li>
+<li>Apply an <em>arcsinh</em> transformation of the APC and PE channels</li>
+<li>Remove boundary events of of the forward and side scatter channels</li>
+<li>Optionally subset the channels to contain just bead events – this might improve identification of the beads</li>
+<li>Convert the FACS data to a <code>data.frame</code></li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(beadplexr)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">.file_name &lt;-</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;K2-C07-A7.fcs&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;beadplexr&quot;</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co"># Load the fcs file with all defaults</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">df &lt;-<span class="st"> </span><span class="kw">read_fcs</span>(<span class="dt">.file_name =</span> .file_name)</a></code></pre></div>
+<p>The <strong>beadplexr</strong> package also comes with some simple plot functions to help visualize the FACS data. The functions are wrappers around <a href="https://ggplot2.tidyverse.org/"><strong>ggplot2</strong></a>, and are meant to provide an easy view of the data. For more control it is probably better to use <strong>ggplot2</strong> directly.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">facs_plot</span>(df)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FL2-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;FL6-H&quot;</span>)</a></code></pre></div>
+</div>
+<div id="applying-the-event-filter" class="section level2">
+<h2>Applying the event filter</h2>
+<p>In the above example we used the default filter settings. These settings fit nicely with the settings of our flow cytometer, but might not work so well for yours, so the following demonstrates the arguments to the <code>read_fcs()</code>.</p>
+<p>Here we apply no filter at all:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">read_fcs</span>(<span class="dt">.file_name =</span> .file_name, <span class="dt">.filter =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">facs_plot</span>(df)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FL2-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;FL6-H&quot;</span>)</a></code></pre></div>
+<p>And here we look at the beads with the larger forward and side scatter, but using the height parameter in stead of the area parameter:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">read_fcs</span>(<span class="dt">.file_name =</span> .file_name, <span class="dt">.fsc_ssc =</span> <span class="kw">c</span>(<span class="st">&quot;FSC-H&quot;</span>, <span class="st">&quot;SSC-H&quot;</span>), </a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">                  <span class="dt">.filter =</span> <span class="kw">list</span>(<span class="st">&quot;FSC-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">3.75e5</span>L, <span class="fl">5.5e5</span>L),</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">                                 <span class="st">&quot;SSC-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">4e5</span>, <span class="fl">1e6</span>),</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">                                 <span class="st">&quot;FL6-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(7L, <span class="ot">Inf</span>)))</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FSC-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;SSC-H&quot;</span>)</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FL2-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;FL6-H&quot;</span>)</a></code></pre></div>
+<p>If you insist, you can also filter the PE channel, but that is probably not such a good idea:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">read_fcs</span>(<span class="dt">.file_name =</span> .file_name, <span class="dt">.fsc_ssc =</span> <span class="kw">c</span>(<span class="st">&quot;FSC-H&quot;</span>, <span class="st">&quot;SSC-H&quot;</span>), </a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">                  <span class="dt">.filter =</span> <span class="kw">list</span>(<span class="st">&quot;FSC-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">3.75e5</span>L, <span class="fl">5.5e5</span>L),</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">                                 <span class="st">&quot;SSC-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">4e5</span>, <span class="fl">1e6</span>),</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">                                 <span class="st">&quot;FL6-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(7L, <span class="ot">Inf</span>),</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">                                 <span class="st">&quot;FL2-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">10</span>)))</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FSC-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;SSC-H&quot;</span>)</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FL2-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;FL6-H&quot;</span>)</a></code></pre></div>
+</div>
+<div id="pseudo-color-plots" class="section level2">
+<h2>Pseudo-color plots</h2>
+<p>If you prefer, and have <strong>hexbin</strong> installed, you can view the FACS data with the commonly used pseudo-color.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">read_fcs</span>(<span class="dt">.file_name =</span> .file_name, <span class="dt">.fsc_ssc =</span> <span class="kw">c</span>(<span class="st">&quot;FSC-A&quot;</span>, <span class="st">&quot;SSC-A&quot;</span>),</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">                  <span class="dt">.filter =</span> <span class="kw">list</span>(<span class="st">&quot;FSC-A&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">4e5</span>, <span class="fl">6e5</span>L),</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">                                 <span class="st">&quot;SSC-A&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">4e5</span>, <span class="fl">1e6</span>),</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">                                 <span class="st">&quot;FL6-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(7L, <span class="ot">Inf</span>)))</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co"># We have relatively few events (around 2500), so decreasing the number of bins</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co"># make the scale more visible</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw">facs_plot</span>(df, <span class="dt">.type =</span> <span class="st">&quot;hexbin&quot;</span>, <span class="dt">.bins =</span> <span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="kw">facs_plot</span>(df, <span class="dt">.x =</span> <span class="st">&quot;FL2-H&quot;</span>, <span class="dt">.y =</span> <span class="st">&quot;FL6-H&quot;</span>, <span class="dt">.type =</span> <span class="st">&quot;hexbin&quot;</span>)</a></code></pre></div>
+</div>
+<div id="copy-paste-code" class="section level2">
+<h2>Copy-paste code</h2>
+<p>Place the code below in a file and source the R-script.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">#' Read a fcs file.</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#' This is a wrapper around reading a FACS data file using \code{flowCore},</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#' transforming the channels with bead signal events using</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#' \code{arcsinhTransform()} from \code{flowCore}, automatic removing boundary</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#' events of the forward and side scatter channels, subsetting channels (if</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#' needed), and cast to a \code{data.frame}.</span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#' @param .file_name The path and name of the file to be read.</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#' @param .fsc_ssc The names of the forward and side scatter channels. A</span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#'   character vector of length of two.</span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#' @param .bead_channels The names of the channels with bead events. A character</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#'   vector of length of at least two.</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#' @param .filter Optional list of upper and lower cut-off for individual</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#'   channels. Use \code{.filter = NULL} for no filtering at all.</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#' @param .compensation A character vector, a compensation matrix, or</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#'   \code{NULL}. See 'Details' for extended information of the argument.</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#' @param ... additional arguments passed to \code{flowCore::read.FCS}</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-21" data-line-number="21"><span class="co">#' @details</span></a>
+<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-23" data-line-number="23"><span class="co">#' The \code{.compensation} argument takes a character vector or an actual</span></a>
+<a class="sourceLine" id="cb8-24" data-line-number="24"><span class="co">#' compensation matrix. In case of the latter, it must be a object of class</span></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="co">#' \code{matrix}. If an object of class \code{character} is given to the</span></a>
+<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="co">#' \code{.compensation} argument, it can be the keyword 'guess' or a search</span></a>
+<a class="sourceLine" id="cb8-27" data-line-number="27"><span class="co">#' pattern matching the keyword in the fcs file that contains the compensation</span></a>
+<a class="sourceLine" id="cb8-28" data-line-number="28"><span class="co">#' matrix. If the keyword 'guess' is passed, the function looks for a matrix at</span></a>
+<a class="sourceLine" id="cb8-29" data-line-number="29"><span class="co">#' the keywords &quot;SPILL&quot; and &quot;SPILLOVER&quot;, and if none are found it takes the</span></a>
+<a class="sourceLine" id="cb8-30" data-line-number="30"><span class="co">#' first matrix which contains the parameter names as column names. Finally, the</span></a>
+<a class="sourceLine" id="cb8-31" data-line-number="31"><span class="co">#' values of \code{.compensation} can also be \code{NULL}, in which case, no</span></a>
+<a class="sourceLine" id="cb8-32" data-line-number="32"><span class="co">#' compensation is performed.</span></a>
+<a class="sourceLine" id="cb8-33" data-line-number="33"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-34" data-line-number="34"><span class="co">#' To summarize, the argument \code{.compensation} can be:</span></a>
+<a class="sourceLine" id="cb8-35" data-line-number="35"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-36" data-line-number="36"><span class="co">#' \describe{</span></a>
+<a class="sourceLine" id="cb8-37" data-line-number="37"><span class="co">#'   \item{A matrix}{The compensation matrix to apply}</span></a>
+<a class="sourceLine" id="cb8-38" data-line-number="38"><span class="co">#'   \item{A character}{</span></a>
+<a class="sourceLine" id="cb8-39" data-line-number="39"><span class="co">#'     \describe{</span></a>
+<a class="sourceLine" id="cb8-40" data-line-number="40"><span class="co">#'       \item{The word 'guess'}{Looks for a matrix at the keywords &quot;SPILL&quot;</span></a>
+<a class="sourceLine" id="cb8-41" data-line-number="41"><span class="co">#'       and &quot;SPILLOVER&quot;. If none found the first matrix with parameter names is</span></a>
+<a class="sourceLine" id="cb8-42" data-line-number="42"><span class="co">#'       applied}</span></a>
+<a class="sourceLine" id="cb8-43" data-line-number="43"><span class="co">#'       \item{A search string}{The first matrix found within the keywords</span></a>
+<a class="sourceLine" id="cb8-44" data-line-number="44"><span class="co">#'       matching the given search string is applied. The search string can be a</span></a>
+<a class="sourceLine" id="cb8-45" data-line-number="45"><span class="co">#'       regular expression}</span></a>
+<a class="sourceLine" id="cb8-46" data-line-number="46"><span class="co">#'     }</span></a>
+<a class="sourceLine" id="cb8-47" data-line-number="47"><span class="co">#'   }</span></a>
+<a class="sourceLine" id="cb8-48" data-line-number="48"><span class="co">#'   \item{NULL}{Nothing is done}</span></a>
+<a class="sourceLine" id="cb8-49" data-line-number="49"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-50" data-line-number="50"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-51" data-line-number="51"><span class="co">#' @return A \code{data.frame} with the columns given in \code{.fsc_ssc} and \code{.bead_channels}.</span></a>
+<a class="sourceLine" id="cb8-52" data-line-number="52"><span class="co">#' @export</span></a>
+<a class="sourceLine" id="cb8-53" data-line-number="53"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-54" data-line-number="54"><span class="co">#' @seealso \code{\link[flowCore]{rectangleGate}} for instructions to the</span></a>
+<a class="sourceLine" id="cb8-55" data-line-number="55"><span class="co">#'   \code{.filter} list argument, \code{\link[flowCore]{boundaryFilter}}</span></a>
+<a class="sourceLine" id="cb8-56" data-line-number="56"><span class="co">#'   for automatic removal of boundary events, and</span></a>
+<a class="sourceLine" id="cb8-57" data-line-number="57"><span class="co">#'   \code{\link[flowCore]{arcsinhTransform}} for the transformation.</span></a>
+<a class="sourceLine" id="cb8-58" data-line-number="58"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-59" data-line-number="59"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-60" data-line-number="60"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-61" data-line-number="61"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-62" data-line-number="62"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-63" data-line-number="63"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-64" data-line-number="64"><span class="co">#'                           package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-65" data-line-number="65"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-66" data-line-number="66"><span class="co">#' # Load the fcs file, with no filter</span></a>
+<a class="sourceLine" id="cb8-67" data-line-number="67"><span class="co">#' df &lt;- read_fcs(.file_name = .file_name, .filter = NULL)</span></a>
+<a class="sourceLine" id="cb8-68" data-line-number="68"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-69" data-line-number="69"><span class="co">#' plot(df[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-70" data-line-number="70"><span class="co">#' plot(df[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-71" data-line-number="71"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-72" data-line-number="72"><span class="co">#' # Load the fcs file, with default filter</span></a>
+<a class="sourceLine" id="cb8-73" data-line-number="73"><span class="co">#' df &lt;- read_fcs(.file_name = .file_name, .fsc_ssc = c(&quot;FSC-H&quot;, &quot;SSC-H&quot;))</span></a>
+<a class="sourceLine" id="cb8-74" data-line-number="74"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-75" data-line-number="75"><span class="co">#' plot(df[, c(&quot;FSC-H&quot;, &quot;SSC-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-76" data-line-number="76"><span class="co">#' plot(df[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-77" data-line-number="77"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-78" data-line-number="78"><span class="co">#' # Load the fcs file, with custom filter</span></a>
+<a class="sourceLine" id="cb8-79" data-line-number="79"><span class="co">#' df &lt;- read_fcs(.file_name = .file_name,</span></a>
+<a class="sourceLine" id="cb8-80" data-line-number="80"><span class="co">#'                   .filter = list(&quot;FSC-A&quot; = c(2e5L, 3.3e5L),</span></a>
+<a class="sourceLine" id="cb8-81" data-line-number="81"><span class="co">#'                                  &quot;SSC-A&quot; = c(2e5, 1e6L),</span></a>
+<a class="sourceLine" id="cb8-82" data-line-number="82"><span class="co">#'                                  &quot;FL2-H&quot; = c(11L, 14L),</span></a>
+<a class="sourceLine" id="cb8-83" data-line-number="83"><span class="co">#'                                  &quot;FL6-H&quot; = c(9L, Inf)))</span></a>
+<a class="sourceLine" id="cb8-84" data-line-number="84"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-85" data-line-number="85"><span class="co">#' plot(df[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-86" data-line-number="86"><span class="co">#' plot(df[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-87" data-line-number="87"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-88" data-line-number="88"><span class="co">#' # Specify three bead channels</span></a>
+<a class="sourceLine" id="cb8-89" data-line-number="89"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-90" data-line-number="90"><span class="co">#' df &lt;- read_fcs(.file_name = .file_name,</span></a>
+<a class="sourceLine" id="cb8-91" data-line-number="91"><span class="co">#'                   .bead_channels = c(&quot;FL6-H&quot;, &quot;FL2-H&quot;, &quot;FL1-H&quot;))</span></a>
+<a class="sourceLine" id="cb8-92" data-line-number="92"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-93" data-line-number="93"><span class="co">#' plot(df[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-94" data-line-number="94"><span class="co">#' plot(df[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-95" data-line-number="95"><span class="co">#' plot(df[, c(&quot;FL1-H&quot;, &quot;FL2-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-96" data-line-number="96"><span class="co">#' plot(df[, c(&quot;FL1-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-97" data-line-number="97"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-98" data-line-number="98">read_fcs &lt;-<span class="st"> </span><span class="cf">function</span>(.file_name, <span class="dt">.fsc_ssc =</span> <span class="kw">c</span>(<span class="st">&quot;FSC-A&quot;</span>, <span class="st">&quot;SSC-A&quot;</span>), <span class="dt">.bead_channels =</span> <span class="kw">c</span>(<span class="st">&quot;FL6-H&quot;</span>, <span class="st">&quot;FL2-H&quot;</span>),</a>
+<a class="sourceLine" id="cb8-99" data-line-number="99">                     <span class="dt">.filter =</span> <span class="kw">list</span>(<span class="st">&quot;FSC-A&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">2e5</span>L, <span class="fl">8e5</span>L), <span class="st">&quot;SSC-A&quot;</span>=<span class="st"> </span><span class="kw">c</span>(<span class="fl">2e5</span>L, <span class="fl">1e6</span>L), <span class="st">&quot;FL6-H&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">7.3</span>, <span class="ot">Inf</span>)),</a>
+<a class="sourceLine" id="cb8-100" data-line-number="100">                     <span class="dt">.compensation =</span> <span class="st">&quot;guess&quot;</span>, ...){</a>
+<a class="sourceLine" id="cb8-101" data-line-number="101">  </a>
+<a class="sourceLine" id="cb8-102" data-line-number="102">  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(.fsc_ssc)){</a>
+<a class="sourceLine" id="cb8-103" data-line-number="103">    <span class="cf">if</span>(<span class="kw">length</span>(.fsc_ssc) <span class="op">!=</span><span class="st"> </span><span class="dv">2</span> <span class="op">|</span><span class="st"> </span><span class="op">!</span><span class="kw">is.character</span>(.fsc_ssc)){</a>
+<a class="sourceLine" id="cb8-104" data-line-number="104">      <span class="kw">stop</span>(<span class="st">&quot;.fsc_ssc must be a character vector of length 2&quot;</span>)</a>
+<a class="sourceLine" id="cb8-105" data-line-number="105">    }</a>
+<a class="sourceLine" id="cb8-106" data-line-number="106">  }</a>
+<a class="sourceLine" id="cb8-107" data-line-number="107">  </a>
+<a class="sourceLine" id="cb8-108" data-line-number="108">  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(.bead_channels)){</a>
+<a class="sourceLine" id="cb8-109" data-line-number="109">    <span class="cf">if</span>(<span class="kw">length</span>(.bead_channels) <span class="op">&lt;</span><span class="st"> </span><span class="dv">2</span> <span class="op">|</span><span class="st"> </span><span class="op">!</span><span class="kw">is.character</span>(.bead_channels)){</a>
+<a class="sourceLine" id="cb8-110" data-line-number="110">      <span class="kw">stop</span>(<span class="st">&quot;.bead_channels must be a character vector of at least 2&quot;</span>)</a>
+<a class="sourceLine" id="cb8-111" data-line-number="111">    }</a>
+<a class="sourceLine" id="cb8-112" data-line-number="112">  }</a>
+<a class="sourceLine" id="cb8-113" data-line-number="113">  </a>
+<a class="sourceLine" id="cb8-114" data-line-number="114">  </a>
+<a class="sourceLine" id="cb8-115" data-line-number="115">  flowCore<span class="op">::</span><span class="kw">read.FCS</span>(<span class="dt">filename =</span> .file_name, <span class="dt">transformation =</span> <span class="ot">FALSE</span>, ...) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-116" data-line-number="116"><span class="st">    </span><span class="kw">transform_bead_channels</span>(<span class="dt">.bead_channels =</span> .bead_channels) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-117" data-line-number="117"><span class="st">    </span><span class="kw">apply_compensation</span>(<span class="dt">.compensation =</span> .compensation) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-118" data-line-number="118"><span class="st">    </span><span class="kw">remove_boundary_events</span>(<span class="dt">.channels =</span> <span class="kw">c</span>(.fsc_ssc)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-119" data-line-number="119"><span class="st">    </span><span class="kw">subset_channels</span>(<span class="dt">.filter =</span> .filter) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-120" data-line-number="120"><span class="st">    </span><span class="kw">as_data_frame_flow_frame</span>(<span class="dt">.channels =</span> <span class="kw">c</span>(.fsc_ssc, .bead_channels))</a>
+<a class="sourceLine" id="cb8-121" data-line-number="121">}</a>
+<a class="sourceLine" id="cb8-122" data-line-number="122"></a>
+<a class="sourceLine" id="cb8-123" data-line-number="123"><span class="co">#' Remove boundary events.</span></a>
+<a class="sourceLine" id="cb8-124" data-line-number="124"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-125" data-line-number="125"><span class="co">#' A wrapper around application of \code{flowCore}'s \code{boundaryFilter}.</span></a>
+<a class="sourceLine" id="cb8-126" data-line-number="126"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-127" data-line-number="127"><span class="co">#' @param .flow_frame A \code{flowFrame}. Usually the result of \code{read.FCS} from \code{flowCore}.</span></a>
+<a class="sourceLine" id="cb8-128" data-line-number="128"><span class="co">#' @param .channels A character vector with the channels to apply the filter to (mostly just forward and side scatter).</span></a>
+<a class="sourceLine" id="cb8-129" data-line-number="129"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-130" data-line-number="130"><span class="co">#' @return A \code{FlowFrame} with border events removed.</span></a>
+<a class="sourceLine" id="cb8-131" data-line-number="131"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-132" data-line-number="132"><span class="co">#' @seealso \code{\link[flowCore]{boundaryFilter}} for comments on the filter.</span></a>
+<a class="sourceLine" id="cb8-133" data-line-number="133"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-134" data-line-number="134"><span class="co">#' @keywords internal</span></a>
+<a class="sourceLine" id="cb8-135" data-line-number="135"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-136" data-line-number="136"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-137" data-line-number="137"><span class="co">#' \dontrun{</span></a>
+<a class="sourceLine" id="cb8-138" data-line-number="138"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-139" data-line-number="139"><span class="co">#' library(flowCore)</span></a>
+<a class="sourceLine" id="cb8-140" data-line-number="140"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-141" data-line-number="141"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-142" data-line-number="142"><span class="co">#'                           package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-143" data-line-number="143"><span class="co">#'  # Load the fcs file</span></a>
+<a class="sourceLine" id="cb8-144" data-line-number="144"><span class="co">#'  .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-145" data-line-number="145"><span class="co">#'                          transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-146" data-line-number="146"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-147" data-line-number="147"><span class="co">#' # Plot with all events</span></a>
+<a class="sourceLine" id="cb8-148" data-line-number="148"><span class="co">#' w_bdr &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-149" data-line-number="149"><span class="co">#' plot(w_bdr[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-150" data-line-number="150"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-151" data-line-number="151"><span class="co">#' # Remove boundary events</span></a>
+<a class="sourceLine" id="cb8-152" data-line-number="152"><span class="co">#' .flow_frame &lt;- remove_boundary_events(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-153" data-line-number="153"><span class="co">#'                           .channels = c(&quot;FSC-A&quot;, &quot;SSC-A&quot;))</span></a>
+<a class="sourceLine" id="cb8-154" data-line-number="154"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-155" data-line-number="155"><span class="co">#' wo_bdr &lt;- as.data.frame(.flow_frame@exprs)</span></a>
+<a class="sourceLine" id="cb8-156" data-line-number="156"><span class="co">#' plot(wo_bdr[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-157" data-line-number="157"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-158" data-line-number="158">remove_boundary_events &lt;-<span class="st"> </span><span class="cf">function</span>(.flow_frame, .channels){</a>
+<a class="sourceLine" id="cb8-159" data-line-number="159">  <span class="cf">if</span>(<span class="kw">is.null</span>(.channels)){</a>
+<a class="sourceLine" id="cb8-160" data-line-number="160">    <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-161" data-line-number="161">  }</a>
+<a class="sourceLine" id="cb8-162" data-line-number="162">  </a>
+<a class="sourceLine" id="cb8-163" data-line-number="163">  bf &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">boundaryFilter</span>(<span class="dt">x =</span> .channels, <span class="dt">side =</span> <span class="st">&quot;both&quot;</span>, <span class="dt">filterId =</span> <span class="st">&quot;Automatic Boundary&quot;</span>)</a>
+<a class="sourceLine" id="cb8-164" data-line-number="164">  bf &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">filter</span>(<span class="dt">x =</span> .flow_frame, <span class="dt">filter =</span> bf)</a>
+<a class="sourceLine" id="cb8-165" data-line-number="165">  flowCore<span class="op">::</span><span class="kw">Subset</span>(.flow_frame, bf)</a>
+<a class="sourceLine" id="cb8-166" data-line-number="166">}</a>
+<a class="sourceLine" id="cb8-167" data-line-number="167"></a>
+<a class="sourceLine" id="cb8-168" data-line-number="168"><span class="co">#' Subset channels</span></a>
+<a class="sourceLine" id="cb8-169" data-line-number="169"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-170" data-line-number="170"><span class="co">#' A wrapper around the application of \code{flowCore}'s \code{rectangleGate}.</span></a>
+<a class="sourceLine" id="cb8-171" data-line-number="171"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-172" data-line-number="172"><span class="co">#' @param .flow_frame A \code{flowFrame}. Usually the result of \code{read.FCS}</span></a>
+<a class="sourceLine" id="cb8-173" data-line-number="173"><span class="co">#'   from \code{flowCore}.</span></a>
+<a class="sourceLine" id="cb8-174" data-line-number="174"><span class="co">#' @param .filter An Optional list of upper and lower cutoff for individual</span></a>
+<a class="sourceLine" id="cb8-175" data-line-number="175"><span class="co">#'   channels. Default is no filtering at all.</span></a>
+<a class="sourceLine" id="cb8-176" data-line-number="176"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-177" data-line-number="177"><span class="co">#' @return A \code{FlowFrame} with border events removed.</span></a>
+<a class="sourceLine" id="cb8-178" data-line-number="178"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-179" data-line-number="179"><span class="co">#' @seealso \code{\link[flowCore]{rectangleGate}} for instructions to the</span></a>
+<a class="sourceLine" id="cb8-180" data-line-number="180"><span class="co">#'   \code{.filter} list argument</span></a>
+<a class="sourceLine" id="cb8-181" data-line-number="181"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-182" data-line-number="182"><span class="co">#' @keywords internal</span></a>
+<a class="sourceLine" id="cb8-183" data-line-number="183"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-184" data-line-number="184"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-185" data-line-number="185"><span class="co">#' \dontrun{</span></a>
+<a class="sourceLine" id="cb8-186" data-line-number="186"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-187" data-line-number="187"><span class="co">#' library(flowCore)</span></a>
+<a class="sourceLine" id="cb8-188" data-line-number="188"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-189" data-line-number="189"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-190" data-line-number="190"><span class="co">#'                             package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-191" data-line-number="191"><span class="co">#' # Load the fcs file</span></a>
+<a class="sourceLine" id="cb8-192" data-line-number="192"><span class="co">#'  .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-193" data-line-number="193"><span class="co">#'                           transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-194" data-line-number="194"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-195" data-line-number="195"><span class="co">#'  # Plot with all events</span></a>
+<a class="sourceLine" id="cb8-196" data-line-number="196"><span class="co">#'  all_events &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-197" data-line-number="197"><span class="co">#'  plot(all_events[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-198" data-line-number="198"><span class="co">#'  # Events are untransformed</span></a>
+<a class="sourceLine" id="cb8-199" data-line-number="199"><span class="co">#'  plot(all_events[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-200" data-line-number="200"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-201" data-line-number="201"><span class="co">#'  # A silly thing that does nothing</span></a>
+<a class="sourceLine" id="cb8-202" data-line-number="202"><span class="co">#'  .flow_frame &lt;- subset_channels(.flow_frame)</span></a>
+<a class="sourceLine" id="cb8-203" data-line-number="203"><span class="co">#'  filter_1 &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-204" data-line-number="204"><span class="co">#'  plot(filter_1[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-205" data-line-number="205"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-206" data-line-number="206"><span class="co">#'  # Filter on forward scatter</span></a>
+<a class="sourceLine" id="cb8-207" data-line-number="207"><span class="co">#'  .flow_frame &lt;- subset_channels(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-208" data-line-number="208"><span class="co">#'                                 .filter = list(&quot;FSC-A&quot; = c(1e3L, 2e6)))</span></a>
+<a class="sourceLine" id="cb8-209" data-line-number="209"><span class="co">#'  filter_2 &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-210" data-line-number="210"><span class="co">#'  plot(filter_2[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-211" data-line-number="211"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-212" data-line-number="212"><span class="co">#'  # Filter on forward and side scatter</span></a>
+<a class="sourceLine" id="cb8-213" data-line-number="213"><span class="co">#'  .flow_frame &lt;- subset_channels(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-214" data-line-number="214"><span class="co">#'                                 .filter = list(&quot;FSC-A&quot; = c(2e5L, 6.5e5L),</span></a>
+<a class="sourceLine" id="cb8-215" data-line-number="215"><span class="co">#'                                                 &quot;SSC-A&quot; = c(2e5, 1e6L)))</span></a>
+<a class="sourceLine" id="cb8-216" data-line-number="216"><span class="co">#'  filter_3 &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-217" data-line-number="217"><span class="co">#'  plot(filter_3[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-218" data-line-number="218"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-219" data-line-number="219"><span class="co">#'  # Filter on the unfiltered bead channels (please transform first)</span></a>
+<a class="sourceLine" id="cb8-220" data-line-number="220"><span class="co">#'  .flow_frame &lt;- subset_channels(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-221" data-line-number="221"><span class="co">#'                                 .filter = list(&quot;FL2-H&quot; = c(5e4L, 6e5L),</span></a>
+<a class="sourceLine" id="cb8-222" data-line-number="222"><span class="co">#'                                                &quot;FL6-H&quot; = c(0, 3e5L)))</span></a>
+<a class="sourceLine" id="cb8-223" data-line-number="223"><span class="co">#'  filter_4 &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-224" data-line-number="224"><span class="co">#'  plot(filter_4[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-225" data-line-number="225"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-226" data-line-number="226"><span class="co">#'  # And everything at once</span></a>
+<a class="sourceLine" id="cb8-227" data-line-number="227"><span class="co">#'  .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-228" data-line-number="228"><span class="co">#'                         transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-229" data-line-number="229"><span class="co">#' .flow_frame &lt;- subset_channels(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-230" data-line-number="230"><span class="co">#'                                .filter = list(&quot;FSC-A&quot; = c(2e5L, 6.5e5L),</span></a>
+<a class="sourceLine" id="cb8-231" data-line-number="231"><span class="co">#'                                               &quot;SSC-A&quot; = c(2e5, 1e6L),</span></a>
+<a class="sourceLine" id="cb8-232" data-line-number="232"><span class="co">#'                                               &quot;FL2-H&quot; = c(5e4L, 6e5L),</span></a>
+<a class="sourceLine" id="cb8-233" data-line-number="233"><span class="co">#'                                               &quot;FL6-H&quot; = c(0, 3e5L)))</span></a>
+<a class="sourceLine" id="cb8-234" data-line-number="234"><span class="co">#' filter_5 &lt;- .flow_frame@exprs</span></a>
+<a class="sourceLine" id="cb8-235" data-line-number="235"><span class="co">#' plot(filter_5[, c(&quot;FSC-A&quot;, &quot;SSC-A&quot;)])</span></a>
+<a class="sourceLine" id="cb8-236" data-line-number="236"><span class="co">#' plot(filter_5[, c(&quot;FL2-H&quot;, &quot;FL6-H&quot;)])</span></a>
+<a class="sourceLine" id="cb8-237" data-line-number="237"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-238" data-line-number="238">subset_channels &lt;-<span class="st"> </span><span class="cf">function</span>(.flow_frame, <span class="dt">.filter =</span> <span class="ot">NULL</span>){</a>
+<a class="sourceLine" id="cb8-239" data-line-number="239">  <span class="cf">if</span>(<span class="kw">is.null</span>(.filter)){</a>
+<a class="sourceLine" id="cb8-240" data-line-number="240">    <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-241" data-line-number="241">  }</a>
+<a class="sourceLine" id="cb8-242" data-line-number="242">  </a>
+<a class="sourceLine" id="cb8-243" data-line-number="243">  gf &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">rectangleGate</span>(.filter, <span class="dt">filterId =</span> <span class="st">&quot;Manual Boundary&quot;</span>)</a>
+<a class="sourceLine" id="cb8-244" data-line-number="244">  gf &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">filter</span>(<span class="dt">x =</span> .flow_frame, <span class="dt">filter =</span> gf)</a>
+<a class="sourceLine" id="cb8-245" data-line-number="245">  flowCore<span class="op">::</span><span class="kw">Subset</span>(.flow_frame, gf)</a>
+<a class="sourceLine" id="cb8-246" data-line-number="246">}</a>
+<a class="sourceLine" id="cb8-247" data-line-number="247"></a>
+<a class="sourceLine" id="cb8-248" data-line-number="248"><span class="co">#' Cast \code{flowFrame} to \code{data_frame}.</span></a>
+<a class="sourceLine" id="cb8-249" data-line-number="249"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-250" data-line-number="250"><span class="co">#' Extracts the flow events from the \code{flowFrame} as a \code{data_frame}</span></a>
+<a class="sourceLine" id="cb8-251" data-line-number="251"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-252" data-line-number="252"><span class="co">#' @param .flow_frame A \code{flowFrame}. Usually the result of \code{read.FCS} from \code{flowCore}.</span></a>
+<a class="sourceLine" id="cb8-253" data-line-number="253"><span class="co">#' @param .channels A character vector with the event channels to extract. Default is all channels.</span></a>
+<a class="sourceLine" id="cb8-254" data-line-number="254"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-255" data-line-number="255"><span class="co">#' @return A \code{data_frame}</span></a>
+<a class="sourceLine" id="cb8-256" data-line-number="256"><span class="co">#' @keywords internal</span></a>
+<a class="sourceLine" id="cb8-257" data-line-number="257"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-258" data-line-number="258"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-259" data-line-number="259"><span class="co">#' \dontrun{</span></a>
+<a class="sourceLine" id="cb8-260" data-line-number="260"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-261" data-line-number="261"><span class="co">#' library(flowCore)</span></a>
+<a class="sourceLine" id="cb8-262" data-line-number="262"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-263" data-line-number="263"><span class="co">#'                           package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-264" data-line-number="264"><span class="co">#' # Load the fcs file</span></a>
+<a class="sourceLine" id="cb8-265" data-line-number="265"><span class="co">#' .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-266" data-line-number="266"><span class="co">#'                         transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-267" data-line-number="267"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-268" data-line-number="268"><span class="co">#' # Get all channels</span></a>
+<a class="sourceLine" id="cb8-269" data-line-number="269"><span class="co">#' as_data_frame_flow_frame(.flow_frame)</span></a>
+<a class="sourceLine" id="cb8-270" data-line-number="270"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-271" data-line-number="271"><span class="co">#' # Just interesting</span></a>
+<a class="sourceLine" id="cb8-272" data-line-number="272"><span class="co">#' as_data_frame_flow_frame(.flow_frame,</span></a>
+<a class="sourceLine" id="cb8-273" data-line-number="273"><span class="co">#'                          .channels = c(&quot;FSC-A&quot;, &quot;SSC-A&quot;,</span></a>
+<a class="sourceLine" id="cb8-274" data-line-number="274"><span class="co">#'                                        &quot;FL2-H&quot;, &quot;FL6-H&quot;))</span></a>
+<a class="sourceLine" id="cb8-275" data-line-number="275"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-276" data-line-number="276">as_data_frame_flow_frame &lt;-<span class="st"> </span><span class="cf">function</span>(.flow_frame, <span class="dt">.channels =</span> <span class="ot">NULL</span>){</a>
+<a class="sourceLine" id="cb8-277" data-line-number="277">  <span class="cf">if</span>(<span class="kw">is.null</span>(.channels)){</a>
+<a class="sourceLine" id="cb8-278" data-line-number="278">    .channels &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">featureNames</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-279" data-line-number="279">  }</a>
+<a class="sourceLine" id="cb8-280" data-line-number="280">  </a>
+<a class="sourceLine" id="cb8-281" data-line-number="281">  .flow_frame<span class="op">@</span>exprs[, .channels] <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-282" data-line-number="282"><span class="st">    </span><span class="kw">as.data.frame.matrix</span>()</a>
+<a class="sourceLine" id="cb8-283" data-line-number="283">    <span class="co">#tibble::as_tibble()</span></a>
+<a class="sourceLine" id="cb8-284" data-line-number="284">}</a>
+<a class="sourceLine" id="cb8-285" data-line-number="285"></a>
+<a class="sourceLine" id="cb8-286" data-line-number="286"><span class="co">#' Transform parameters with bead events.</span></a>
+<a class="sourceLine" id="cb8-287" data-line-number="287"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-288" data-line-number="288"><span class="co">#' Channels with bead events are transformed using \code{flowCore}'s \code{arcsinhTransform()}.</span></a>
+<a class="sourceLine" id="cb8-289" data-line-number="289"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-290" data-line-number="290"><span class="co">#' @param .flow_frame A \code{flowFrame}. Usually the result of \code{read.FCS} from \code{flowCore}.</span></a>
+<a class="sourceLine" id="cb8-291" data-line-number="291"><span class="co">#' @param .bead_channels A character vector of the length of 2 with the names of the channels to transform.</span></a>
+<a class="sourceLine" id="cb8-292" data-line-number="292"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-293" data-line-number="293"><span class="co">#' @return A \code{flowFrame} with the beads channels transformed</span></a>
+<a class="sourceLine" id="cb8-294" data-line-number="294"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-295" data-line-number="295"><span class="co">#' @keywords internal</span></a>
+<a class="sourceLine" id="cb8-296" data-line-number="296"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-297" data-line-number="297"><span class="co">#' @seealso \code{\link[flowCore]{arcsinhTransform}} for the transformation.</span></a>
+<a class="sourceLine" id="cb8-298" data-line-number="298"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-299" data-line-number="299"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-300" data-line-number="300"><span class="co">#' \dontrun{</span></a>
+<a class="sourceLine" id="cb8-301" data-line-number="301"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-302" data-line-number="302"><span class="co">#' library(flowCore)</span></a>
+<a class="sourceLine" id="cb8-303" data-line-number="303"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-304" data-line-number="304"><span class="co">#'                           package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-305" data-line-number="305"><span class="co">#' # Load the fcs file</span></a>
+<a class="sourceLine" id="cb8-306" data-line-number="306"><span class="co">#' .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-307" data-line-number="307"><span class="co">#'                                  transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-308" data-line-number="308"><span class="co">#' # Transform channels</span></a>
+<a class="sourceLine" id="cb8-309" data-line-number="309"><span class="co">#' .flow_frame &lt;- transform_bead_channels(.flow_frame = .flow_frame,</span></a>
+<a class="sourceLine" id="cb8-310" data-line-number="310"><span class="co">#'                             .bead_channels =</span></a>
+<a class="sourceLine" id="cb8-311" data-line-number="311"><span class="co">#'                                 c(&quot;FL6-H&quot;, &quot;FL2-H&quot;))</span></a>
+<a class="sourceLine" id="cb8-312" data-line-number="312"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-313" data-line-number="313">transform_bead_channels &lt;-<span class="st"> </span><span class="cf">function</span>(.flow_frame, .bead_channels){</a>
+<a class="sourceLine" id="cb8-314" data-line-number="314">  <span class="cf">if</span>(<span class="kw">is.null</span>(.bead_channels)){</a>
+<a class="sourceLine" id="cb8-315" data-line-number="315">    <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-316" data-line-number="316">  }</a>
+<a class="sourceLine" id="cb8-317" data-line-number="317">  <span class="cf">if</span>(<span class="kw">length</span>(.bead_channels) <span class="op">&lt;</span><span class="st"> </span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb8-318" data-line-number="318">    <span class="kw">stop</span>(<span class="st">&quot;.bead_channels must at least be of length 2&quot;</span>)</a>
+<a class="sourceLine" id="cb8-319" data-line-number="319">  }</a>
+<a class="sourceLine" id="cb8-320" data-line-number="320">  <span class="co"># If any of the values in bead_channels are not found we cannot transform or</span></a>
+<a class="sourceLine" id="cb8-321" data-line-number="321">  <span class="co"># do anything</span></a>
+<a class="sourceLine" id="cb8-322" data-line-number="322">  in_fn &lt;-<span class="st"> </span>.bead_channels <span class="op">%in%</span><span class="st"> </span>flowCore<span class="op">::</span><span class="kw">featureNames</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-323" data-line-number="323">  </a>
+<a class="sourceLine" id="cb8-324" data-line-number="324">  <span class="cf">if</span>(<span class="ot">FALSE</span> <span class="op">%in%</span><span class="st"> </span>in_fn){</a>
+<a class="sourceLine" id="cb8-325" data-line-number="325">    <span class="kw">stop</span>(<span class="kw">paste</span>(<span class="kw">paste</span>(.bead_channels[<span class="op">!</span>in_fn], <span class="dt">collapse =</span> <span class="st">&quot; and &quot;</span>), <span class="st">&quot;not found in the flow frame&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>))</a>
+<a class="sourceLine" id="cb8-326" data-line-number="326">  }</a>
+<a class="sourceLine" id="cb8-327" data-line-number="327">  </a>
+<a class="sourceLine" id="cb8-328" data-line-number="328">  <span class="co"># Transform channels and return</span></a>
+<a class="sourceLine" id="cb8-329" data-line-number="329">  transformtion_list &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">transformList</span>(.bead_channels, flowCore<span class="op">::</span><span class="kw">arcsinhTransform</span>(), <span class="dt">transformationId =</span> <span class="st">&quot;defaultArcsinhTransform&quot;</span>)</a>
+<a class="sourceLine" id="cb8-330" data-line-number="330">  flowCore<span class="op">::</span><span class="kw">transform</span>(.flow_frame, transformtion_list)</a>
+<a class="sourceLine" id="cb8-331" data-line-number="331">}</a>
+<a class="sourceLine" id="cb8-332" data-line-number="332"></a>
+<a class="sourceLine" id="cb8-333" data-line-number="333"><span class="co">#' Apply compensation</span></a>
+<a class="sourceLine" id="cb8-334" data-line-number="334"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-335" data-line-number="335"><span class="co">#' A compensation matrix is applied</span></a>
+<a class="sourceLine" id="cb8-336" data-line-number="336"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-337" data-line-number="337"><span class="co">#' @param .flow_frame A \code{flowFrame}. Usually the result of \code{read.FCS}</span></a>
+<a class="sourceLine" id="cb8-338" data-line-number="338"><span class="co">#'   from \code{flowCore}.</span></a>
+<a class="sourceLine" id="cb8-339" data-line-number="339"><span class="co">#' @param .compensation A character vector, a compensation matrix, or</span></a>
+<a class="sourceLine" id="cb8-340" data-line-number="340"><span class="co">#'   \code{NULL}. See 'Details' for extended information of the argument.</span></a>
+<a class="sourceLine" id="cb8-341" data-line-number="341"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-342" data-line-number="342"><span class="co">#' @details</span></a>
+<a class="sourceLine" id="cb8-343" data-line-number="343"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-344" data-line-number="344"><span class="co">#' The \code{.compensation} argument takes a character vector or an actual</span></a>
+<a class="sourceLine" id="cb8-345" data-line-number="345"><span class="co">#' compensation matrix. In case of the latter, it must be a object of class</span></a>
+<a class="sourceLine" id="cb8-346" data-line-number="346"><span class="co">#' \code{matrix}. If an object of class \code{character} is given to the</span></a>
+<a class="sourceLine" id="cb8-347" data-line-number="347"><span class="co">#' \code{.compensation} argument, it can be the keyword 'guess' or a search</span></a>
+<a class="sourceLine" id="cb8-348" data-line-number="348"><span class="co">#' pattern matching the keyword in the fcs file that contains the compensation</span></a>
+<a class="sourceLine" id="cb8-349" data-line-number="349"><span class="co">#' matrix. If the keyword 'guess' is passed, the function looks for a matrix at</span></a>
+<a class="sourceLine" id="cb8-350" data-line-number="350"><span class="co">#' the keywords &quot;SPILL&quot; and &quot;SPILLOVER&quot;, and if none are found it takes the</span></a>
+<a class="sourceLine" id="cb8-351" data-line-number="351"><span class="co">#' first matrix which contains the parameter names as column names. Finally, the</span></a>
+<a class="sourceLine" id="cb8-352" data-line-number="352"><span class="co">#' values of \code{.compensation} can also be \code{NULL}, in which case, no</span></a>
+<a class="sourceLine" id="cb8-353" data-line-number="353"><span class="co">#' compensation is performed.</span></a>
+<a class="sourceLine" id="cb8-354" data-line-number="354"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-355" data-line-number="355"><span class="co">#' To summarize, the argument \code{.compensation} can be:</span></a>
+<a class="sourceLine" id="cb8-356" data-line-number="356"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-357" data-line-number="357"><span class="co">#' \describe{</span></a>
+<a class="sourceLine" id="cb8-358" data-line-number="358"><span class="co">#'   \item{A numerical matrix}{The compensation matrix to apply}</span></a>
+<a class="sourceLine" id="cb8-359" data-line-number="359"><span class="co">#'   \item{A character}{</span></a>
+<a class="sourceLine" id="cb8-360" data-line-number="360"><span class="co">#'     \describe{</span></a>
+<a class="sourceLine" id="cb8-361" data-line-number="361"><span class="co">#'       \item{The word 'guess'}{Looks for a matrix at the keywords &quot;SPILL&quot;</span></a>
+<a class="sourceLine" id="cb8-362" data-line-number="362"><span class="co">#'       and &quot;SPILLOVER&quot;. If none found the first matrix with parameter names is</span></a>
+<a class="sourceLine" id="cb8-363" data-line-number="363"><span class="co">#'       applied}</span></a>
+<a class="sourceLine" id="cb8-364" data-line-number="364"><span class="co">#'       \item{A search string}{The first matrix found within the keywords</span></a>
+<a class="sourceLine" id="cb8-365" data-line-number="365"><span class="co">#'       matching the given search string is applied. The search string can be a</span></a>
+<a class="sourceLine" id="cb8-366" data-line-number="366"><span class="co">#'       regular expression}</span></a>
+<a class="sourceLine" id="cb8-367" data-line-number="367"><span class="co">#'     }</span></a>
+<a class="sourceLine" id="cb8-368" data-line-number="368"><span class="co">#'   }</span></a>
+<a class="sourceLine" id="cb8-369" data-line-number="369"><span class="co">#'   \item{NULL}{Nothing is done}</span></a>
+<a class="sourceLine" id="cb8-370" data-line-number="370"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-371" data-line-number="371"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-372" data-line-number="372"><span class="co">#' @return A compensated \code{flowFrame}</span></a>
+<a class="sourceLine" id="cb8-373" data-line-number="373"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-374" data-line-number="374"><span class="co">#' @keywords internal</span></a>
+<a class="sourceLine" id="cb8-375" data-line-number="375"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-376" data-line-number="376"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-377" data-line-number="377"><span class="co">#' @seealso \code{\link[flowCore]{compensation-class}} for the compensation.</span></a>
+<a class="sourceLine" id="cb8-378" data-line-number="378"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-379" data-line-number="379"><span class="co">#' @examples</span></a>
+<a class="sourceLine" id="cb8-380" data-line-number="380"><span class="co">#' \dontrun{</span></a>
+<a class="sourceLine" id="cb8-381" data-line-number="381"><span class="co">#' library(beadplexr)</span></a>
+<a class="sourceLine" id="cb8-382" data-line-number="382"><span class="co">#' library(flowCore)</span></a>
+<a class="sourceLine" id="cb8-383" data-line-number="383"><span class="co">#' .file_name &lt;- system.file(&quot;extdata&quot;, &quot;K2-C07-A7.fcs&quot;,</span></a>
+<a class="sourceLine" id="cb8-384" data-line-number="384"><span class="co">#'                           package = &quot;beadplexr&quot;)</span></a>
+<a class="sourceLine" id="cb8-385" data-line-number="385"><span class="co">#' # Load the fcs file</span></a>
+<a class="sourceLine" id="cb8-386" data-line-number="386"><span class="co">#' .flow_frame &lt;- read.FCS(filename = .file_name,</span></a>
+<a class="sourceLine" id="cb8-387" data-line-number="387"><span class="co">#'                                  transformation = FALSE)</span></a>
+<a class="sourceLine" id="cb8-388" data-line-number="388"><span class="co">#' # Apply compensation by guessing the matrix</span></a>
+<a class="sourceLine" id="cb8-389" data-line-number="389"><span class="co">#' .flow_frame &lt;- apply_compensation(.flow_frame = .flow_frame,</span></a>
+<a class="sourceLine" id="cb8-390" data-line-number="390"><span class="co">#'                             .compensation = &quot;guess&quot;)</span></a>
+<a class="sourceLine" id="cb8-391" data-line-number="391"><span class="co">#' }</span></a>
+<a class="sourceLine" id="cb8-392" data-line-number="392"><span class="co">#'</span></a>
+<a class="sourceLine" id="cb8-393" data-line-number="393">apply_compensation &lt;-<span class="st"> </span><span class="cf">function</span>(.flow_frame, .compensation){</a>
+<a class="sourceLine" id="cb8-394" data-line-number="394">  <span class="co"># Got nothing, do nothing</span></a>
+<a class="sourceLine" id="cb8-395" data-line-number="395">  <span class="cf">if</span>(<span class="kw">is.null</span>(.compensation)){</a>
+<a class="sourceLine" id="cb8-396" data-line-number="396">    <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-397" data-line-number="397">  }</a>
+<a class="sourceLine" id="cb8-398" data-line-number="398">  </a>
+<a class="sourceLine" id="cb8-399" data-line-number="399">  <span class="cf">if</span>(<span class="kw">is.character</span>(.compensation) <span class="op">&amp;</span><span class="st"> </span><span class="kw">length</span>(.compensation) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb8-400" data-line-number="400">    <span class="kw">warning</span>(<span class="st">&quot;.compensation can only have the length of 1. I am using just the first element&quot;</span>)</a>
+<a class="sourceLine" id="cb8-401" data-line-number="401">    .compensation &lt;-<span class="st"> </span>.compensation[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb8-402" data-line-number="402">  }</a>
+<a class="sourceLine" id="cb8-403" data-line-number="403">  </a>
+<a class="sourceLine" id="cb8-404" data-line-number="404">  <span class="co"># Test if .x is a numerical matrix with the parameters</span></a>
+<a class="sourceLine" id="cb8-405" data-line-number="405">  .get_potential_comp_matrices &lt;-<span class="st"> </span><span class="cf">function</span>(.x, .p){</a>
+<a class="sourceLine" id="cb8-406" data-line-number="406">    <span class="cf">if</span>((<span class="st">&quot;matrix&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">class</span>(.x)) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.numeric</span>(.x)){</a>
+<a class="sourceLine" id="cb8-407" data-line-number="407">      <span class="ot">TRUE</span> <span class="op">%in%</span><span class="st"> </span>(.p <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(.x))</a>
+<a class="sourceLine" id="cb8-408" data-line-number="408">    }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-409" data-line-number="409">      <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb8-410" data-line-number="410">    }</a>
+<a class="sourceLine" id="cb8-411" data-line-number="411">  }</a>
+<a class="sourceLine" id="cb8-412" data-line-number="412">  </a>
+<a class="sourceLine" id="cb8-413" data-line-number="413">  <span class="co"># Search keywords and unify warning</span></a>
+<a class="sourceLine" id="cb8-414" data-line-number="414">  .search_for_keywords &lt;-<span class="st"> </span><span class="cf">function</span>(.keywords, .pattern){</a>
+<a class="sourceLine" id="cb8-415" data-line-number="415">    .matches &lt;-<span class="st"> </span><span class="kw">grepl</span>(.pattern, .keywords, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>which</a>
+<a class="sourceLine" id="cb8-416" data-line-number="416">    <span class="cf">if</span>(<span class="kw">length</span>(.matches) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb8-417" data-line-number="417">      <span class="kw">warning</span>(<span class="st">&quot;Found more than one potential compensation matrix. Applying the first.&quot;</span>)</a>
+<a class="sourceLine" id="cb8-418" data-line-number="418">      .matches &lt;-<span class="st"> </span>.matches[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb8-419" data-line-number="419">    }</a>
+<a class="sourceLine" id="cb8-420" data-line-number="420">    .matches</a>
+<a class="sourceLine" id="cb8-421" data-line-number="421">  }</a>
+<a class="sourceLine" id="cb8-422" data-line-number="422">  </a>
+<a class="sourceLine" id="cb8-423" data-line-number="423">  <span class="co"># We get either a character or something which can be turned into a numerical matrix</span></a>
+<a class="sourceLine" id="cb8-424" data-line-number="424">  <span class="cf">if</span>(<span class="kw">is.character</span>(.compensation)){</a>
+<a class="sourceLine" id="cb8-425" data-line-number="425">    ff_keywords &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">keyword</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-426" data-line-number="426">    ff_parameters &lt;-<span class="st"> </span>flowCore<span class="op">::</span><span class="kw">colnames</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-427" data-line-number="427">    </a>
+<a class="sourceLine" id="cb8-428" data-line-number="428">    <span class="co"># No matter if we guess or were given a search word, we need a numerical</span></a>
+<a class="sourceLine" id="cb8-429" data-line-number="429">    <span class="co"># matrix where the parameters are in the column names. Otherwise, the actual</span></a>
+<a class="sourceLine" id="cb8-430" data-line-number="430">    <span class="co"># compensation application will fail.</span></a>
+<a class="sourceLine" id="cb8-431" data-line-number="431">    num_matrix &lt;-<span class="st"> </span>ff_keywords <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-432" data-line-number="432"><span class="st">      </span>purrr<span class="op">::</span><span class="kw">map_lgl</span>(.get_potential_comp_matrices, <span class="dt">.p =</span> ff_parameters)</a>
+<a class="sourceLine" id="cb8-433" data-line-number="433">    num_matrix &lt;-<span class="st"> </span>ff_keywords[num_matrix]</a>
+<a class="sourceLine" id="cb8-434" data-line-number="434">    </a>
+<a class="sourceLine" id="cb8-435" data-line-number="435">    <span class="co"># If we found nothing we cannot do nothing - except give a warning</span></a>
+<a class="sourceLine" id="cb8-436" data-line-number="436">    <span class="cf">if</span>(<span class="kw">length</span>(num_matrix) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb8-437" data-line-number="437">      <span class="kw">warning</span>(<span class="st">&quot;No compensation applied. I could not find an appropriate matrix in the flow frame.&quot;</span>)</a>
+<a class="sourceLine" id="cb8-438" data-line-number="438">      <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-439" data-line-number="439">    }</a>
+<a class="sourceLine" id="cb8-440" data-line-number="440">    </a>
+<a class="sourceLine" id="cb8-441" data-line-number="441">    <span class="cf">if</span>(.compensation <span class="op">==</span><span class="st"> &quot;guess&quot;</span>){</a>
+<a class="sourceLine" id="cb8-442" data-line-number="442">      <span class="co"># Do the numerical matricies have names that we could expect?</span></a>
+<a class="sourceLine" id="cb8-443" data-line-number="443">      match_names &lt;-<span class="st"> </span><span class="kw">names</span>(num_matrix) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">.search_for_keywords</span>(<span class="dt">.pattern =</span> <span class="st">&quot;SPILL&quot;</span>)</a>
+<a class="sourceLine" id="cb8-444" data-line-number="444">      </a>
+<a class="sourceLine" id="cb8-445" data-line-number="445">      <span class="cf">if</span>(<span class="kw">length</span>(match_names) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb8-446" data-line-number="446">        comp_matrix &lt;-<span class="st"> </span>num_matrix[[match_names]]</a>
+<a class="sourceLine" id="cb8-447" data-line-number="447">      }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-448" data-line-number="448">        <span class="co"># We found no standard keywords. If we have more than one potential</span></a>
+<a class="sourceLine" id="cb8-449" data-line-number="449">        <span class="co"># matrix, we warn</span></a>
+<a class="sourceLine" id="cb8-450" data-line-number="450">        <span class="cf">if</span>(<span class="kw">length</span>(num_matrix) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb8-451" data-line-number="451">          <span class="kw">warning</span>(<span class="st">&quot;Found more than one potential compensation matrix. Applying the first.&quot;</span>)</a>
+<a class="sourceLine" id="cb8-452" data-line-number="452">        }</a>
+<a class="sourceLine" id="cb8-453" data-line-number="453">        comp_matrix &lt;-<span class="st"> </span>num_matrix[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb8-454" data-line-number="454">      }</a>
+<a class="sourceLine" id="cb8-455" data-line-number="455">    }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-456" data-line-number="456">      <span class="co"># A search we have</span></a>
+<a class="sourceLine" id="cb8-457" data-line-number="457">      match_names &lt;-<span class="st"> </span><span class="kw">names</span>(num_matrix) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">.search_for_keywords</span>(<span class="dt">.pattern =</span> .compensation)</a>
+<a class="sourceLine" id="cb8-458" data-line-number="458">      <span class="cf">if</span>(<span class="kw">length</span>(match_names) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb8-459" data-line-number="459">        comp_matrix &lt;-<span class="st"> </span>num_matrix[[match_names]]</a>
+<a class="sourceLine" id="cb8-460" data-line-number="460">      }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-461" data-line-number="461">        <span class="kw">warning</span>(<span class="st">&quot;Your search word gave no match. No compensation applied&quot;</span>)</a>
+<a class="sourceLine" id="cb8-462" data-line-number="462">        <span class="kw">return</span>(.flow_frame)</a>
+<a class="sourceLine" id="cb8-463" data-line-number="463">      }</a>
+<a class="sourceLine" id="cb8-464" data-line-number="464">      </a>
+<a class="sourceLine" id="cb8-465" data-line-number="465">    }</a>
+<a class="sourceLine" id="cb8-466" data-line-number="466">  }</a>
+<a class="sourceLine" id="cb8-467" data-line-number="467">  <span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-468" data-line-number="468">    <span class="cf">if</span>(<span class="kw">is.numeric</span>(.compensation)){</a>
+<a class="sourceLine" id="cb8-469" data-line-number="469">      comp_matrix &lt;-<span class="st"> </span>.compensation</a>
+<a class="sourceLine" id="cb8-470" data-line-number="470">    }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-471" data-line-number="471">      <span class="kw">stop</span>(<span class="st">&quot;I don't know how to deal with what you gave me. Please check the documentation.&quot;</span>)</a>
+<a class="sourceLine" id="cb8-472" data-line-number="472">    }</a>
+<a class="sourceLine" id="cb8-473" data-line-number="473">  }</a>
+<a class="sourceLine" id="cb8-474" data-line-number="474">  </a>
+<a class="sourceLine" id="cb8-475" data-line-number="475">  flowCore<span class="op">::</span><span class="kw">compensate</span>(.flow_frame, comp_matrix)</a>
+<a class="sourceLine" id="cb8-476" data-line-number="476">}</a></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

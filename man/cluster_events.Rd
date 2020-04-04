@@ -9,27 +9,36 @@
 \alias{bp_density_cut}
 \title{Clustering with trimming}
 \usage{
-bp_kmeans(.data, .parameter, .column_name, .k, .trim = 0, ...)
+bp_kmeans(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...)
 
-bp_clara(.data, .parameter, .column_name, .k, .trim = 0, ...)
+bp_clara(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...)
 
-bp_dbscan(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50, ...)
+bp_dbscan(
+  df,
+  .parameter,
+  .column_name,
+  .eps = 0.2,
+  .MinPts = 50,
+  .data = NULL,
+  ...
+)
 
 bp_mclust(
-  .data,
+  df,
   .parameter,
   .column_name,
   .k,
   .trim = 0,
   .sample_frac = 0.05,
   .max_subset = 500,
+  .data = NULL,
   ...
 )
 
-bp_density_cut(.data, .parameter, .column_name, .k, .trim = 0, ...)
+bp_density_cut(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...)
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.parameter}{A character giving the name of column(s) where populations
 are identified.}
@@ -42,6 +51,8 @@ cluster centers.}
 
 \item{.trim}{A numeric between 0 and 1, giving the fraction of points to
 remove by marking them NA.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{...}{Additional arguments passed to appropriate methods, see below.}
 
@@ -56,7 +67,7 @@ to use in initialisation of \code{Mclust()}.}
 initialisation of \code{Mclust()}, see below.}
 }
 \value{
-The data.frame in \code{.data} with the cluster classification added in
+The data.frame in \code{df} with the cluster classification added in
 the column given by \code{.column_name}.
 }
 \description{

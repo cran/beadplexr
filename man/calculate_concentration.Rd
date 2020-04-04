@@ -5,14 +5,15 @@
 \title{Calculate concentration.}
 \usage{
 calculate_concentration(
-  .data,
+  df,
   .model,
   .parameter = "FL2.H",
-  .value = "Calc.conc"
+  .value = "Calc.conc",
+  .data = NULL
 )
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.model}{An object of class \code{drc} with the fitted dose-response model.}
 
@@ -20,9 +21,11 @@ calculate_concentration(
 are identified.}
 
 \item{.value}{A character giving the name of the column to store the calculated concentration}
+
+\item{.data}{Deprecated. Use \code{df}.}
 }
 \value{
-The \code{.data} with the calculated concentration and error added in two columns.
+The \code{df} with the calculated concentration and error added in two columns.
 }
 \description{
 Calculate the concentration in a sample
@@ -34,12 +37,12 @@ library(drc)
 data(ryegrass)
 
 ryegrass_m <-
-  fit_standard_curve(.data = ryegrass,
+  fit_standard_curve(df = ryegrass,
                      .parameter = "rootl",
                      .concentration = "conc")
 
 sample_data <-
-  calculate_concentration(.data = ryegrass[sample(1:nrow(ryegrass), 5),],
+  calculate_concentration(df = ryegrass[sample(1:nrow(ryegrass), 5),],
                           .model = ryegrass_m,
                           .parameter = "rootl")
 }

@@ -4,16 +4,18 @@
 \alias{despeckle}
 \title{Despeckle parameters}
 \usage{
-despeckle(.data, .parameters, .bins = 256L, .neighbours = 4L, ...)
+despeckle(df, .parameters, .bins = 256L, .neighbours = 4L, .data = NULL, ...)
 }
 \arguments{
-\item{.data}{A tidy data.frame}
+\item{df}{A tidy data.frame}
 
 \item{.parameters}{A character of the length of two giving the parameters to despeckle.}
 
 \item{.bins}{A numeric giving the resolution of the raster matrix.}
 
 \item{.neighbours}{A numeric giving the minimum number of neighbors. Points with fewer neighbors are removed.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{...}{Additional parameters passed to \code{\link[raster:clump]{raster::clump()}}}
 }
@@ -32,7 +34,7 @@ columns, and combinations are marked by \code{1}.
 This matrix is turned into a \code{RasterLayer} by \code{\link[raster:raster]{raster::raster()}} and the
 number of neighbors are calculated by \code{\link[raster:clump]{raster::clump()}}.
 
-The rows of the \code{.data} where lonely points are found in \code{.parameters} are removed.
+The rows of the \code{df} where lonely points are found in \code{.parameters} are removed.
 }
 \note{
 This function requires that the \code{igraph} package is available.

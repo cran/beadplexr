@@ -7,7 +7,7 @@ library(beadplexr)
 data("lplex")
 data("simplex")
 
-.data <- lplex[[1]]
+df <- lplex[[1]]
 
 args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
                                      .column_name = "Bead group",
@@ -22,42 +22,42 @@ test_that("ident_bead_pop() works",{
 
   expect_is(beadplexr:::ident_bead_pop(.analytes = names(panel_info$analytes),
                            .call_args = args_ident_analyte[[1]],
-                           .data = .data), "data.frame")
+                           df = df), "data.frame")
 
   expect_is(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                            .call_args = args_ident_analyte[[1]],
-                           .data = .data), "data.frame")
+                           df = df), "data.frame")
 
 
   annot_events <- beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                                  .call_args = args_ident_analyte[[1]],
-                                 .data = .data)
+                                 df = df)
 
   expect_equal(names(annot_events), c("FSC-A", "SSC-A", "FL6-H", "FL2-H", "Bead group"))
 
-  .tmp_data <- .data
-  .tmp_data$BeadID <- c("A", "B")
+  .tmp_data <- df
+  .tmp_data$BeadID <- rep(c("A", "B"), nrow(.tmp_data)/2)
 
   expect_is(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                               .column_name = "BeadID",
                               .cluster = c("A", "B"),
                               .call_args = args_ident_analyte[[1]],
-                              .data = .tmp_data), "data.frame")
+                              df = .tmp_data), "data.frame")
 
   expect_error(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                            .column_name = "a column",
                            .cluster = c("A", "B"),
                            .call_args = args_ident_analyte[[1]],
-                           .data = .data))
+                           df = df))
 
   expect_error(beadplexr:::ident_bead_pop(.analytes = names(panel_info$analytes),
                                 .column_name = "XXX",
                                 .call_args = args_ident_analyte[[1]],
-                                .data = .data))
+                                df = df))
   expect_error(beadplexr:::ident_bead_pop(.analytes = names(panel_info$analytes),
                               .cluster = "XXX",
                               .call_args = args_ident_analyte[[1]],
-                              .data = .data))
+                              df = df))
 })
 
 # get_col_names_args() ----------------------------------------------------
@@ -70,11 +70,11 @@ test_that(".column_name is identified in method argument list",{
 
 # identify_legendplex_analyte() -------------------------------------------
 test_that("Legendplex works with column_names in .method_args",{
-  expect_is(identify_legendplex_analyte(.data = .data,
+  expect_is(identify_legendplex_analyte(df = df,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
-  annot_events <- identify_legendplex_analyte(.data = .data,
+  annot_events <- identify_legendplex_analyte(df = df,
                                               .analytes = panel_info$analytes,
                                               .method_args = args_ident_analyte)
 
@@ -95,11 +95,11 @@ test_that("Legendplex works without column_names in .method_args",{
                                        .trim = 0.2),
                              analytes = list(.parameter = "FL6-H"))
 
-  expect_is(identify_legendplex_analyte(.data = .data,
+  expect_is(identify_legendplex_analyte(df = df,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
-  annot_events <- identify_legendplex_analyte(.data = .data,
+  annot_events <- identify_legendplex_analyte(df = df,
                                               .analytes = panel_info$analytes,
                                               .method_args = args_ident_analyte)
 
@@ -118,8 +118,8 @@ test_that("Legendplex works without column_names in .method_args",{
 })
 
 # dbscan works as expected ------------------------------------------------
-dbscan_num_clusters <- function(.data, eps, MinPts){
-  dbc <- fpc::dbscan(.data, eps = eps, MinPts = MinPts)
+dbscan_num_clusters <- function(df, eps, MinPts){
+  dbc <- fpc::dbscan(df, eps = eps, MinPts = MinPts)
   dbc <- dbc$cluster
   max(dbc)
 }
@@ -128,10 +128,10 @@ test_that("dbscan works as expected", {
   if(exclude_dbscan){
     skip("In-depth test of bp_dbscan")
   }else{
-    expect_warning(identify_analyte(.data, .parameter = c("FSC-A", "SSC-A"),
+    expect_warning(identify_analyte(df, .parameter = c("FSC-A", "SSC-A"),
                                     .analyte_id = c("A"), .method = "dbscan"))
 
-    expect_is(.analyte_set <- identify_analyte(.data, .parameter = c("FSC-A", "SSC-A"),
+    expect_is(.analyte_set <- identify_analyte(df, .parameter = c("FSC-A", "SSC-A"),
                                                .analyte_id = c("A", "B"), .method = "dbscan",
                                                .column_name = "Bead group"), "data.frame")
 
@@ -156,7 +156,7 @@ test_that("dbscan works as expected", {
                                    .eps = 0.12,
                                    .MinPts = 110, scale = FALSE))
 
-    expect_silent(identify_analyte(.data = .bead_b, .parameter = c("FL6-H", "FL2-H"),
+    expect_silent(identify_analyte(df = .bead_b, .parameter = c("FL6-H", "FL2-H"),
                                    .analyte_id = names(panel_info$analytes$B),
                                    .method = "dbscan",
                                    .column_name = "Analyte ID",
@@ -168,14 +168,14 @@ test_that("dbscan works as expected", {
 # Legendplex recalculation ------------------------------------------------
 
 test_that("Recalculation is possible", {
-  annot_events <- identify_legendplex_analyte(.data = .data,
+  annot_events <- identify_legendplex_analyte(df = df,
                                               .analytes = panel_info$analytes,
                                               .method_args = args_ident_analyte)
-  expect_is(identify_legendplex_analyte(.data = annot_events,
+  expect_is(identify_legendplex_analyte(df = annot_events,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
-  annot_events <- identify_legendplex_analyte(.data = .data,
+  annot_events <- identify_legendplex_analyte(df = df,
                                               .analytes = panel_info$analytes,
                                               .method_args = args_ident_analyte)
 
@@ -194,17 +194,17 @@ test_that("Recalculation is possible", {
 })
 
 # identify_cba_macsplex_analyte() --------------------------------------------------
-.data <- simplex[["cba"]]
+df <- simplex[["cba"]]
 analytes <- vector("list", 30) %>% setNames(as.character(c(1:30)))
 args_ident_analyte <- list(.parameter = c("APC", "APC-Cy7"),
                            .column_name = "Analyte ID",
                            .method = "clara")
 test_that("CBS/MACSplex works -- no FS trimming",{
-  expect_is(identify_cba_macsplex_analyte(.data = .data,
+  expect_is(identify_cba_macsplex_analyte(df = df,
                                  .analytes = analytes,
                                  .method_args = args_ident_analyte), "data.frame")
 
-  annot_events <- identify_cba_macsplex_analyte(.data = .data,
+  annot_events <- identify_cba_macsplex_analyte(df = df,
                                               .analytes = analytes,
                                               .method_args = args_ident_analyte)
   annot_events %>% head
@@ -218,12 +218,12 @@ test_that("CBS/MACSplex works -- no FS trimming",{
 })
 
 test_that("CBS/MACSplex works -- with FS trimming",{
-  expect_is(identify_cba_macsplex_analyte(.data = .data,
+  expect_is(identify_cba_macsplex_analyte(df = df,
                                  .analytes = analytes,
                                  .method_args = args_ident_analyte,
                                  .trim_fs = 0.1, .parameter_fs = c("FSC", "SSC")), "data.frame")
 
-  annot_events <- identify_cba_macsplex_analyte(.data = .data,
+  annot_events <- identify_cba_macsplex_analyte(df = df,
                                        .analytes = analytes,
                                        .method_args = args_ident_analyte,
                                        .trim_fs = 0.1, .parameter_fs = c("FSC", "SSC"))
@@ -239,22 +239,22 @@ test_that("CBS/MACSplex works -- with FS trimming",{
 })
 
 test_that("CBS/MACSplex fails",{
-  expect_is(identify_cba_macsplex_analyte(.data = .data,
+  expect_is(identify_cba_macsplex_analyte(df = df,
                                           .analytes = analytes,
                                           .method_args = args_ident_analyte,
                                           .trim_fs = NULL, .parameter_fs = c("FSC", "SSC")), "data.frame")
 
-  expect_error(identify_cba_macsplex_analyte(.data = .data,
+  expect_error(identify_cba_macsplex_analyte(df = df,
                                              .analytes = analytes,
                                              .method_args = args_ident_analyte,
                                              .trim_fs = 0.1, .parameter_fs = NULL))
 
-  expect_error(identify_cba_macsplex_analyte(.data = .data,
+  expect_error(identify_cba_macsplex_analyte(df = df,
                                              .analytes = analytes,
                                              .method_args = args_ident_analyte,
                                              .trim_fs = 0.1, .parameter_fs = c("FSC")))
 
-  expect_error(identify_cba_macsplex_analyte(.data = .data,
+  expect_error(identify_cba_macsplex_analyte(df = df,
                                              .analytes = analytes,
                                              .method_args = args_ident_analyte,
                                              .trim_fs = 0.1, .parameter_fs = c("FSCx", "SSCx")))

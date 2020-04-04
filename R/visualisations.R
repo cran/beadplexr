@@ -3,7 +3,7 @@
 #' Wrappers around building a ggplot with \code{geom_point},
 #' \code{geom_density_2d}, and \code{geom_hex}.
 #'
-#' @param .data The data to be plotted in a \code{data.frame}.
+#' @param df The data to be plotted in a \code{data.frame}.
 #' @param .x,.y Character vector with the column name for the variable to plot
 #'   on the x or y-axis.
 #' @param .beads Character vector to with the column name with identification of
@@ -16,6 +16,7 @@
 #'   horizontal directions. Set to 75 by default.
 #' @param .type Character vector giving the type of plot being used. Options are
 #'   one of \code{"scatter", "density", "hexbin"}.
+#' @param .data Deprecated. Use `df`.
 #' @param ... Arguments passed to the individual functions.
 #'
 #' @details
@@ -25,8 +26,6 @@
 #' @return A \code{ggplot}
 #' @export
 #'
-#' @importFrom magrittr "%>%"
-#'
 #' @examples
 #' \dontrun{
 #' library(beadplexr)
@@ -34,71 +33,77 @@
 #' .file_name <- system.file("extdata", "K2-C07-A7.fcs",
 #'                           package = "beadplexr")
 #'
-#' .data <- read_fcs(.file_name = .file_name,
+#' df <- read_fcs(.file_name = .file_name,
 #'                   .filter = list("FSC-A" = c(2e5L, 6.3e5L),
 #'                                  "SSC-A" = c(2e5, 1e6L)))
-#' .data$bead_group <- ifelse(.data$`FSC-A` < 4e5L, "A", "B")
+#' df$bead_group <- ifelse(df$`FSC-A` < 4e5L, "A", "B")
 #'
 #' # Using facs_plot
-#' facs_plot(.data, .type = "scatter")
-#' facs_plot(.data, .type = "density1d")
-#' facs_plot(.data, .type = "density2d")
-#' facs_plot(.data, .type = "hexbin")
+#' facs_plot(df, .type = "scatter")
+#' facs_plot(df, .type = "density1d")
+#' facs_plot(df, .type = "density2d")
+#' facs_plot(df, .type = "hexbin")
 #'
-#' facs_plot(.data, .type = "scatter", .beads = "bead_group")
-#' facs_plot(.data, .type = "density1d", .beads = "bead_group")
-#' facs_plot(.data, .type = "hexbin", .bins = 50)
+#' facs_plot(df, .type = "scatter", .beads = "bead_group")
+#' facs_plot(df, .type = "density1d", .beads = "bead_group")
+#' facs_plot(df, .type = "hexbin", .bins = 50)
 #'
-#' facs_plot(.data, .x = "FL2-H", .type = "scatter", .beads = "bead_group")
+#' facs_plot(df, .x = "FL2-H", .type = "scatter", .beads = "bead_group")
 #'
 #' # Individual functions
-#' facs_scatter(.data)
+#' facs_scatter(df)
 #'
-#' facs_scatter(.data, .beads = "bead_group", .plot_distinct = FALSE)
-#' facs_scatter(.data, .beads = "bead_group")
+#' facs_scatter(df, .beads = "bead_group", .plot_distinct = FALSE)
+#' facs_scatter(df, .beads = "bead_group")
 #'
-#' facs_scatter(.data, .x = "FL2-H", .y = "FL6-H", .beads = "bead_group")
+#' facs_scatter(df, .x = "FL2-H", .y = "FL6-H", .beads = "bead_group")
 #'
-#' facs_density1d(.data)
-#' facs_density1d(.data, .beads = "bead_group")
+#' facs_density1d(df)
+#' facs_density1d(df, .beads = "bead_group")
 #'
-#' facs_density2d(.data)
-#' facs_density2d(.data, .beads = "bead_group")
+#' facs_density2d(df)
+#' facs_density2d(df, .beads = "bead_group")
 #'
-#' facs_hexbin(.data)
-#' facs_hexbin(.data, .bins = 30)
+#' facs_hexbin(df)
+#' facs_hexbin(df, .bins = 30)
 #' }
-facs_plot <- function(.data, .x = "FSC-A", .y = "SSC-A", .type = c("scatter", "density1d", "density2d", "hexbin"), ...){
+facs_plot <- function(df, .x = "FSC-A", .y = "SSC-A", .type = c("scatter", "density1d", "density2d", "hexbin"), .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "facs_plot")
+    df <- .data
+  }
   .type <- match.arg(.type)
   switch(.type,
-         scatter = facs_scatter(.data = .data, .x = .x, .y = .y, ...),
-         density1d = facs_density1d(.data = .data, .x = .x, ...),
-         density2d = facs_density2d(.data = .data, .x = .x, .y = .y, ...),
-         hexbin = facs_hexbin(.data = .data, .x = .x, .y = .y, ...))
+         scatter = facs_scatter(df = df, .x = .x, .y = .y, ...),
+         density1d = facs_density1d(df = df, .x = .x, ...),
+         density2d = facs_density2d(df = df, .x = .x, .y = .y, ...),
+         hexbin = facs_hexbin(df = df, .x = .x, .y = .y, ...))
 }
 
 #' @rdname facs_plot
 #' @export
-facs_scatter <- function(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .plot_distinct = TRUE){
+facs_scatter <- function(df, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .plot_distinct = TRUE, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "facs_scatter")
+    df <- .data
+  }
 
-  .data <- .data %>% dplyr::ungroup()
+  df <- df %>% dplyr::ungroup()
 
   if(.plot_distinct){
     if(!is.null(.beads)){
-      .data <- .data %>%
-        dplyr::distinct_(as.name(.x), as.name(.y), as.name(.beads))
+      df <- df %>%
+        dplyr::distinct(!!rlang::sym(.x), !!rlang::sym(.y), !!rlang::sym(.beads))
     }else{
-      .data <- .data %>%
-        dplyr::distinct_(as.name(.x), as.name(.y))
+      df <- df %>%
+        dplyr::distinct(!!rlang::sym(.x), !!rlang::sym(.y))
     }
-
   }
 
-  tmp_plot <- .data %>%
+  tmp_plot <- df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
     ggplot2::geom_point(size = 0.5)
-    # geom_density2d() +
 
   if(!is.null(.beads)){
     tmp_plot <- tmp_plot + ggplot2::aes_(colour = as.name(.beads))
@@ -108,11 +113,15 @@ facs_scatter <- function(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .plot
 
 #' @rdname facs_plot
 #' @export
-facs_density2d <- function(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL){
+facs_density2d <- function(df, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "facs_density2d")
+    df <- .data
+  }
 
-  .data <- .data %>% dplyr::ungroup()
+  df <- df %>% dplyr::ungroup()
 
-  tmp_plot <- .data %>%
+  tmp_plot <- df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
     ggplot2::geom_density_2d()
@@ -125,11 +134,15 @@ facs_density2d <- function(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL){
 
 #' @rdname facs_plot
 #' @export
-facs_density1d <- function(.data, .x = "FSC-A", .beads = NULL){
+facs_density1d <- function(df, .x = "FSC-A", .beads = NULL, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "facs_density1d")
+    df <- .data
+  }
 
-  .data <- .data %>% dplyr::ungroup()
+  df <- df %>% dplyr::ungroup()
 
-  tmp_plot <- .data %>%
+  tmp_plot <- df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.x)) +
     ggplot2::geom_density()
@@ -142,9 +155,14 @@ facs_density1d <- function(.data, .x = "FSC-A", .beads = NULL){
 
 #' @rdname facs_plot
 #' @export
-facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
-  .data <- .data %>% dplyr::ungroup()
-  .data %>%
+facs_hexbin <- function(df, .x = "FSC-A", .y = "SSC-A", .bins = 75, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "facs_hexbin")
+    df <- .data
+  }
+
+  df <- df %>% dplyr::ungroup()
+  df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
     ggplot2::geom_hex(bins = .bins) +
@@ -154,7 +172,7 @@ facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
 
 #' Plot concentrations
 #'
-#' @param .data A `data.frame` with the data to be plotted.
+#' @param df A `data.frame` with the data to be plotted.
 #' @param .sample_data A `data.frame` with the calculated sample concentrations.
 #' @param .standard_data A `data.frame` with the calculated standard
 #'   concentrations.
@@ -163,11 +181,11 @@ facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
 #' @param .parameter A character giving the name of the column with the MFI
 #' @param .concentration  A character giving the name of the column with the with the calculated concentrations.
 #' @param .std_concentration A character giving the name of the column with the standard concentration.
+#' @param .data Deprecated. Use `df`.
 #'
 #' @return A \code{ggplot}
 #' @export
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @name plot_concentrations
 #'
@@ -178,15 +196,15 @@ facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
 #' data(ryegrass)
 #'
 #' ryegrass_m <-
-#'   fit_standard_curve(.data = ryegrass,
+#'   fit_standard_curve(df = ryegrass,
 #'                      .parameter = "rootl",
 #'                      .concentration = "conc")
 #' recalc_std <-
-#'   calculate_concentration(.data = ryegrass,
+#'   calculate_concentration(df = ryegrass,
 #'                           .model = ryegrass_m,
 #'                           .parameter = "rootl")
 #' sample_data <-
-#'   calculate_concentration(.data = ryegrass[sample(1:nrow(ryegrass), 5),],
+#'   calculate_concentration(df = ryegrass[sample(1:nrow(ryegrass), 5),],
 #'                           .model = ryegrass_m,
 #'                           .parameter = "rootl")
 #'
@@ -195,7 +213,7 @@ facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
 #'                .parameter = "rootl",
 #'                .concentration = "conc")
 #'
-#' plot_target_est_conc(.data = recalc_std,
+#' plot_target_est_conc(df = recalc_std,
 #'                      .concentration = "Calc.conc",
 #'                      .std_concentration = "conc")
 #' plot_estimate(
@@ -205,17 +223,19 @@ facs_hexbin <- function(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75){
 #'   .parameter = "rootl",
 #'   .concentration = "conc")
 #'
-plot_std_curve <- function(.data, .model, .title = NULL,
+plot_std_curve <- function(df, .model, .title = NULL,
                            .parameter = "FL2.H",
-                           .concentration = "Concentration"){
+                           .concentration = "Concentration",
+                           .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "plot_std_curve")
+    df <- .data
+  }
 
-  # Create date for displaying fit line and interval
-  .filter_criteria <- lazyeval::interp(~ !is.infinite(conc_column) &
-                                         !is.infinite(param_column),
-                                       conc_column = as.name(.concentration),
-                                       param_column = as.name(.parameter))
-  fit_line_range <- .data %>%
-    dplyr::filter_(.filter_criteria) %>%
+  # Create data for displaying fit line and interval
+  fit_line_range <- df %>%
+    dplyr::filter_at(.vars = c(.parameter, .concentration),
+                     dplyr::all_vars(!is.infinite(.))) %>%
     dplyr::select(dplyr::one_of(.concentration)) %>%
     purrr::flatten_dbl() %>%
     range()
@@ -228,7 +248,7 @@ plot_std_curve <- function(.data, .model, .title = NULL,
                                        as.data.frame) %>%
     stats::setNames(c(.concentration, .parameter, "Lower", "Upper"))
 
-  .data %>%
+  df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.concentration),
                         y = as.name(.parameter)) +
@@ -241,22 +261,22 @@ plot_std_curve <- function(.data, .model, .title = NULL,
 
 #' @rdname plot_concentrations
 #' @export
-plot_target_est_conc <- function(.data, .title = NULL,
+plot_target_est_conc <- function(df, .title = NULL,
                                  .concentration = "Calc.conc",
-                                 .std_concentration = "Concentration"){
-  filter_fun <- function(.p){
-    lazyeval::interp(~ !is.infinite(.col) &
-                       !is.na(.col) &
-                       !is.nan(.col), .col = as.name(.p))
+                                 .std_concentration = "Concentration",
+                                 .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "plot_target_est_conc")
+    df <- .data
   }
 
-  .data <- .data %>%
-    dplyr::filter_(filter_fun(.std_concentration)) %>%
-    dplyr::filter_(filter_fun(.concentration))
+  df <- df %>%
+    dplyr::filter_at(.vars = c(.std_concentration, .concentration),
+                     dplyr::all_vars(!is.nan(.) & !is.infinite(.) & !is.na(.)))
 
   .fit_formula <- stats::as.formula(paste(.concentration, .std_concentration, sep = "~"))
 
-  lm_res <- stats::lm(formula = .fit_formula, data = .data)
+  lm_res <- stats::lm(formula = .fit_formula, data = df)
   lm_res_summary <- summary(lm_res)
   r_squared <- lm_res_summary$r.squared
   p_value <- 1 - stats::pf(lm_res_summary$fstatistic[1],
@@ -264,22 +284,21 @@ plot_target_est_conc <- function(.data, .title = NULL,
                     lm_res_summary$fstatistic[3])
   slope <- stats::coef(lm_res_summary)[2]
 
-  .filter_criteria <- lazyeval::interp(~ !is.infinite(est_col) &
-                                         !is.infinite(target_col),
-                                       est_col = as.name(.concentration),
-                                       target_col = as.name(.std_concentration))
-  .get_min_x <- lazyeval::interp(~ min(x, na.rm = TRUE), x = as.name(.std_concentration))
-  .get_max_y <- lazyeval::interp(~ max(y, na.rm = TRUE), y = as.name(.concentration))
+  conc_min <-
+    df %>%
+    dplyr::summarise_at(.vars = .std_concentration, .funs = min)
 
-  fit_text <- .data %>%
-    dplyr::filter_(.filter_criteria) %>%
-    dplyr::summarise_(.dots = stats::setNames(list(.get_min_x, .get_max_y),
-                                c(.std_concentration, .concentration))) %>%
+  conc_max <-
+    df %>%
+    dplyr::summarise_at(.vars = .concentration, .funs = max)
+
+  fit_text <-
+    dplyr::bind_cols(conc_min, conc_max) %>%
     dplyr::mutate(label = paste("R2:", format(r_squared, digits = 3), "\n",
-                         "Slope:", format(slope, digits = 3), "\n",
-                         "p:", format.pval(p_value, digits = 3)))
+                                "Slope:", format(slope, digits = 3), "\n",
+                                "p:", format.pval(p_value, digits = 3)))
 
-  .data %>%
+  df %>%
     ggplot2::ggplot() +
     ggplot2::aes_(x = as.name(.std_concentration), y = as.name(.concentration)) +
     ggplot2::geom_point() +
@@ -297,14 +316,11 @@ plot_estimate <- function(.sample_data, .standard_data, .model, .title = NULL,
                           .concentration = "Concentration"){
 
 
-  # Create date for displaying fit line and interval
-  .filter_criteria <- lazyeval::interp(~ !is.infinite(conc_column) &
-                                         !is.infinite(param_column),
-                                       conc_column = as.name(.concentration),
-                                       param_column = as.name(.parameter))
+  # Create data for displaying fit line and interval
 
   fit_line_range <- .standard_data %>%
-    dplyr::filter_(.filter_criteria) %>%
+    dplyr::filter_at(.vars = c(.parameter, .concentration),
+                     dplyr::all_vars(!is.infinite(.))) %>%
     dplyr::select(dplyr::one_of(.concentration)) %>%
     purrr::flatten_dbl() %>%
     range()

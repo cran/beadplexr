@@ -49,28 +49,28 @@ test_that("Fitting a standard curve is possible", {
   # Parameters
   # The warning "NaNs produced" is procuded only when running devtols::test(), not when running the functions individually.
   # I gave up trying to fix things nicely, and just added the `suppressWarnings`. Now everything is dandy.
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2-H", .concentration = "Concentration")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2-H", .concentration = "Conc entra")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Concentration")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Conc entra")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Concentration")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Conc entra")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Concentration")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Conc entra")), "drc")
 
-  expect_error(fit_standard_curve(.data = mfi_data, .parameter = "FL", .concentration = "Concentration"))
-  expect_error(fit_standard_curve(.data = mfi_data, .parameter = "FL2.H", .concentration = "Conc"))
+  expect_error(fit_standard_curve(df = mfi_data, .parameter = "FL", .concentration = "Concentration"))
+  expect_error(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Conc"))
 
   # Different fit methods
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .fct = "LL.4")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.3")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .fct = "LL.4")), "drc")
+  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL.3")), "drc")
 
   # Not sure why all these fail...
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL3"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.2.2"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "LL.2.5"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "AR.2"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "AR.3"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "MM.2"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "MM.3"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "W1.3"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "W1.4"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "BC.4"))
-  expect_error(fit_standard_curve(.data = mfi_data, .concentration = "Conc entra", .fct = "BC.5"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL3"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL.2.2"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL.2.5"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "AR.2"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "AR.3"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "MM.2"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "MM.3"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "W1.3"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "W1.4"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "BC.4"))
+  expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "BC.5"))
 })

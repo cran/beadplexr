@@ -20,21 +20,26 @@
 #'
 #' data("lplex")
 #'
-#' .data <- lplex[[1]] %>%
+#' df <- lplex[[1]] %>%
 #'   filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) %>%
 #'   identify_analyte(.parameter = "FL6-H",
 #'                    .analyte_id = as.character(c(1:7)))
 #'
-#' .data %>%
+#' df %>%
 #'   calc_analyte_mfi(.parameter = "FL2-H")
 #'
-#' .data %>%
+#' df %>%
 #'   calc_analyte_mfi(.parameter = "FL2-H",
 #'               .mean_fun = "harmonic")
-calc_analyte_mfi <- function(.data,
+calc_analyte_mfi <- function(df,
                               .parameter,
                               .column_name = "analyte",
-                              .mean_fun = c("geometric", "harmonic", "arithmetic")){
+                              .mean_fun = c("geometric", "harmonic", "arithmetic"),
+                             .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "calc_analyte_mfi")
+    df <- .data
+  }
   .mean_fun <- match.arg(.mean_fun)
 
   .mean_fun <- switch(.mean_fun,
@@ -43,15 +48,9 @@ calc_analyte_mfi <- function(.data,
     arithmetic = mean
   )
 
-  .create_summarise_fun <- function(.parameter){
-    lazyeval::interp(~.mean_fun(.the_parameter), .the_parameter = as.name(.parameter))
-  }
-
-  .summarise_fun <- lapply(.parameter, .create_summarise_fun) %>% stats::setNames(.parameter)
-
-  .data %>%
-    dplyr::group_by_(as.name(.column_name)) %>%
-    dplyr::summarise_(.dots = .summarise_fun)
+  df %>%
+    dplyr::group_by(!!!rlang::syms(.column_name)) %>%
+    dplyr::summarise_at(.parameter,.funs = .mean_fun)
 }
 
 #' Calculate harmonic mean

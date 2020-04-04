@@ -5,15 +5,16 @@
 \title{Fit a standard curve}
 \usage{
 fit_standard_curve(
-  .data,
+  df,
   .parameter = "FL2.H",
   .concentration = "Concentration",
   .fct = "LL.5",
+  .data = NULL,
   ...
 )
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.parameter}{A character giving the name of column(s) where populations
 are identified.}
@@ -23,6 +24,8 @@ standard concentration.}
 
 \item{.fct}{A character giving the name of the logistic function to use in
 the fit, see \code{\link[drc:drm]{drc::drm()}} for details.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{...}{Other arguments to \code{\link[drc:drm]{drc::drm()}}}
 }
@@ -39,7 +42,7 @@ library(drc)
 data(ryegrass)
 
 ryegrass_m <-
-  fit_standard_curve(.data = ryegrass,
+  fit_standard_curve(df = ryegrass,
                      .parameter = "rootl",
                      .concentration = "conc")
 

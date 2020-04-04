@@ -29,7 +29,6 @@
 #'
 #' @return A data.frame
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @name identify_assay_analyte
 #'
@@ -37,10 +36,11 @@ NULL
 
 #' @rdname identify_assay_analyte
 #'
-#' @param .data A tidy data.frame.
+#' @param df A tidy data.frame.
 #' @param .analytes A vector or list giving the IDs of the analytes. The
 #'   **order** is important and must match the expected order of analytes.
 #' @param .method_args A list giving the parameters passed on to `identify_analyte()`.
+#' @param .data Deprecated. Use `df`.
 #'
 #' @export
 #'
@@ -49,7 +49,7 @@ NULL
 #' library(beadplexr)
 #' library(dplyr)
 #' data("lplex")
-#' .data <- lplex[[1]]
+#' df <- lplex[[1]]
 #'
 #' panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 #'
@@ -62,7 +62,7 @@ NULL
 #'                                            .trim = 0,
 #'                                            .method = "clara"))
 #'
-#' annot_events <- identify_legendplex_analyte(.data = .data,
+#' annot_events <- identify_legendplex_analyte(df = df,
 #'                                             .analytes = panel_info$analytes,
 #'                                             .method_args = args_ident_analyte)
 #'
@@ -76,12 +76,17 @@ NULL
 #'   filter(`Bead group` == "B") %>%
 #'   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 #' }
-identify_legendplex_analyte <- function(.data, .analytes, .method_args){
+identify_legendplex_analyte <- function(df, .analytes, .method_args, .data = NULL){
+
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "identify_legendplex_analyte")
+    df <- .data
+  }
 
   # ## Identify A and B ##
   #
   # Do bead identification
-  .data <- ident_bead_pop(.analytes = names(.analytes),.call_args = .method_args[[1]], .data = .data)
+  df <- ident_bead_pop(.analytes = names(.analytes), .call_args = .method_args[[1]], df = df)
 
   # To be able to subset on the beads A abd B, we need to know the name of the
   # column with identification of the two bead populations, but it is not
@@ -98,7 +103,7 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
     purrr::map2_df(.y = names(.analytes), .f = ident_bead_pop,
                    .column_name =.ab_col_name,
                    .call_args = .method_args[[length(.method_args)]],
-                   .data = .data)
+                   df = df)
 
   # ## Add trimmed data points ##
   # We need to add the excluded points of the forward side scatter back, we need
@@ -109,12 +114,8 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
     .id_col_name <- "analyte"
   }
 
-  .ab_filter <- lazyeval::interp(~ is.na(the_column), the_column = as.name(.ab_col_name))
-  .id_mutate <- lazyeval::interp(~as.character(NA))
-  .id_mutate <- stats::setNames(list(.id_mutate), .id_col_name)
-
-  .data %>% dplyr::filter_(.ab_filter) %>%
-    dplyr::mutate_(.dots = .id_mutate) %>%
+  df %>% dplyr::filter(is.na(!!rlang::sym(.ab_col_name))) %>%
+    dplyr::mutate(!!.id_col_name := as.character(NA)) %>%
     dplyr::bind_rows(.analyte_gr12)
 }
 
@@ -132,7 +133,7 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
 #' library(beadplexr)
 #' data(simplex)
 #'
-#' .data <- simplex[["cba"]]
+#' df <- simplex[["cba"]]
 #'
 #' analytes <- vector("list", 30) %>% setNames(as.character(c(1:30)))
 #'
@@ -140,7 +141,7 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
 #'                            .column_name = "Analyte ID",
 #'                            .trim = 0.1,
 #'                            .method = "clara")
-#' annot_events <- identify_cba_analyte(.data = .data,
+#' annot_events <- identify_cba_analyte(df = df,
 #'                      .analytes = analytes,
 #'                      .method_args = args_ident_analyte)
 #'
@@ -149,7 +150,7 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
 #' annot_events %>%
 #'   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 #'
-#' annot_events <- identify_cba_analyte(.data = .data,
+#' annot_events <- identify_cba_analyte(df = df,
 #'                      .analytes = analytes,
 #'                      .method_args = args_ident_analyte,
 #'                      .trim_fs = 0.1,
@@ -162,8 +163,13 @@ identify_legendplex_analyte <- function(.data, .analytes, .method_args){
 #' annot_events %>%
 #'   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 #' }
-identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL){
-  identify_cba_macsplex_analyte(.data = .data,
+identify_cba_analyte <- function(df, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "identify_cba_analyte")
+    df <- .data
+  }
+
+  identify_cba_macsplex_analyte(df = df,
                                 .analytes = .analytes,
                                 .method_args = .method_args,
                                 .trim_fs = .trim_fs,
@@ -179,7 +185,7 @@ identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL
 #' library(beadplexr)
 #' data(simplex)
 #'
-#' .data <- simplex[["mplex"]]
+#' df <- simplex[["mplex"]]
 #' analytes <- vector("list", 10) %>% setNames(as.character(c(1:10)))
 #'
 #' args_ident_analyte <- list(.parameter = c("FITC", "PE"),
@@ -187,7 +193,7 @@ identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL
 #'                            .trim = 0.1,
 #'                            .method = "clara")
 #'
-#' annot_events <- identify_macsplex_analyte(.data = .data,
+#' annot_events <- identify_macsplex_analyte(df = df,
 #'                                      .analytes = analytes,
 #'                                      .method_args = args_ident_analyte)
 #'
@@ -196,7 +202,7 @@ identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL
 #' annot_events %>%
 #'   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 #'
-#' annot_events <- identify_macsplex_analyte(.data = .data,
+#' annot_events <- identify_macsplex_analyte(df = df,
 #'                                      .analytes = analytes,
 #'                                      .method_args = args_ident_analyte,
 #'                                      .trim_fs = 0.1,
@@ -208,8 +214,12 @@ identify_cba_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL
 #' annot_events %>%
 #'   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 #' }
-identify_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL){
-  identify_cba_macsplex_analyte(.data = .data,
+identify_macsplex_analyte <- function(df, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "identify_macsplex_analyte")
+    df <- .data
+  }
+  identify_cba_macsplex_analyte(df = df,
                                 .analytes = .analytes,
                                 .method_args = .method_args,
                                 .trim_fs = .trim_fs,
@@ -217,7 +227,11 @@ identify_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_fs =
 }
 
 #' @keywords internal
-identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL){
+identify_cba_macsplex_analyte <- function(df, .analytes, .method_args, .trim_fs = NULL, .parameter_fs = NULL, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "identify_cba_macsplex_analyte")
+    df <- .data
+  }
   if(!is.null(.trim_fs) & is.null(.parameter_fs)){
     stop("To trim on forward/side scatter I need to know the names of the parameters.")
   }
@@ -228,27 +242,24 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 
   # Register non-accepted events
   .fs_col_name <- "Bead events"
-  .data[[.fs_col_name]] <- "1"
+  df[[.fs_col_name]] <- "1"
 
   if(!is.null(.trim_fs)){
-    .data <- .data %>%
+    df <- df %>%
       trim_population(.parameter = .parameter_fs, .column_name = .fs_col_name, .trim = .trim_fs)
   }
 
   # Extract non-accepted events
-  .filter_criteria <- lazyeval::interp(~ is.na(the_column),
-                                       the_column = as.name(.fs_col_name))
+  .na_events  <- df %>%
+    dplyr::filter(is.na(!!rlang::sym(.fs_col_name)))
 
-  .na_events  <- .data %>% dplyr::filter_(.filter_criteria)
 
   # Get just real events
-  .filter_criteria <- lazyeval::interp(~ !is.na(the_column),
-                                       the_column = as.name(.fs_col_name))
-
-  .data <- .data %>% dplyr::filter_(.filter_criteria)
+  df <- df %>%
+    dplyr::filter(!is.na(!!rlang::sym(.fs_col_name)))
 
   # Do bead identification
-  .data <- ident_bead_pop(.analytes = names(.analytes),.call_args = .method_args, .data = .data)
+  df <- ident_bead_pop(.analytes = names(.analytes),.call_args = .method_args, df = df)
 
   # Find the column with the bead identification
   .analyte_col_name <- get_col_names_args(.method_args)
@@ -261,15 +272,15 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
   if(nrow(.na_events) > 0){
     .na_events[[.analyte_col_name]] <- NA
 
-    .data <- .data %>%
+    df <- df %>%
       dplyr::bind_rows(.na_events)
   }
 
   if(is.null(.trim_fs)){
-    .data[[.fs_col_name]] <- NULL
+    df[[.fs_col_name]] <- NULL
   }
 
-  .data
+  df
 }
 
 #' Identify analyte
@@ -300,7 +311,6 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'
 #' @export
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -310,8 +320,8 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'
 #' data("lplex")
 #'
-#' .data <- lplex[[1]]
-#' .data %>%
+#' df <- lplex[[1]]
+#' df %>%
 #'   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
 #'                       .analyte_id = c("A", "B"),
 #'                       .column_name = "analyte",
@@ -320,7 +330,7 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
 #'   geom_point()
 #'
-#' .data %>%
+#' f
 #'   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
 #'                       .analyte_id = c("A", "B"),
 #'                       .column_name = "analyte",
@@ -329,7 +339,7 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
 #'   geom_point()
 #'
-#' .data %>%
+#' df %>%
 #'   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
 #'                       .analyte_id = c("A", "B"),
 #'                       .column_name = "analyte",
@@ -338,7 +348,7 @@ identify_cba_macsplex_analyte <- function(.data, .analytes, .method_args, .trim_
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
 #'   geom_point()
 #' }
-identify_analyte <-  function(.data,
+identify_analyte <-  function(df,
                                 .parameter,
                                 .analyte_id,
                                 .column_name = "analyte",
@@ -346,7 +356,13 @@ identify_analyte <-  function(.data,
                                 .trim = 0,
                                 .desc = FALSE,
                                 .method = c("clara", "kmeans", "dbscan", "mclust", "density_cut"),
+                              .data = NULL,
                                 ...) {
+
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "identify_analyte")
+    df <- .data
+  }
 
   .method <- match.arg(.method)
   # Suggestions for further improvement
@@ -358,11 +374,11 @@ identify_analyte <-  function(.data,
   .cluster_column_name <- paste0("cluster_", .column_name)
 
   .clust_res <- switch(.method,
-         clara = bp_clara(.data, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
-         kmeans = bp_kmeans(.data, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
-         mclust = bp_mclust(.data, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
-         density_cut = bp_density_cut(.data, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k),
-         dbscan = bp_dbscan(.data, .parameter, .column_name = .cluster_column_name, ...)
+         clara = bp_clara(df, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
+         kmeans = bp_kmeans(df, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
+         mclust = bp_mclust(df, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k, ...),
+         density_cut = bp_density_cut(df, .parameter, .column_name = .cluster_column_name, .trim = .trim, .k = .k),
+         dbscan = bp_dbscan(df, .parameter, .column_name = .cluster_column_name, ...)
   )
 
   .num_clust_found <- .clust_res[[.cluster_column_name]]
@@ -370,12 +386,10 @@ identify_analyte <-  function(.data,
 
   if(.num_clust_found != length(.analyte_id)){
     warning("The number of identified and expected clusters did not match. Setting everything to NA")
-    .cluster_names <- lazyeval::interp(~as.character(NA))
-    .cluster_names <- stats::setNames(list(.cluster_names), .column_name)
 
     .clust_res <- .clust_res %>%
       dplyr::select(-dplyr::one_of(.cluster_column_name)) %>%
-      dplyr::mutate_(.dots = .cluster_names)
+      dplyr::mutate(!!.column_name := as.character(NA))
 
     return(.clust_res)
   }
@@ -391,7 +405,7 @@ identify_analyte <-  function(.data,
 #'
 #' Replace internal cluster IDs with informative analyte IDs
 #'
-#' @param .data The tidy data.frame, with indication of clusters
+#' @param df The tidy data.frame, with indication of clusters
 #' @param .parameter The parameter to order the cluster centers by
 #' @param .analyte_id A character vector giving the name of the clusters.
 #'   The **order** is important and must match the expected order of clusters.
@@ -400,12 +414,12 @@ identify_analyte <-  function(.data,
 #' @param .cluster_column_name A character giving the name of the column where
 #'   the clusters are identified. Will be dropped from the data.frame.
 #' @param .desc A boolean giving whether the sort order is descending.
+#' @param .data Deprecated. Use `df`.
 #'
 #' @return A _data.frame_ with cluster names instead of cluster ids.
 #'
 #' @keywords internal
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -415,10 +429,10 @@ identify_analyte <-  function(.data,
 #'
 #' data("lplex")
 #'
-#' .data <- lplex[[1]] %>%
+#' df <- lplex[[1]] %>%
 #'   bp_clara(.parameter = c("FSC-A", "SSC-A"), .column_name = "analyte", .k = 2)
 #'
-#' .data %>%
+#' df %>%
 #'   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
 #'                                    .analyte_id = c("A", "B"),
 #'                                    .column_name = "pop name",
@@ -427,7 +441,7 @@ identify_analyte <-  function(.data,
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
 #'   geom_point()
 #'
-#' .data %>%
+#' df %>%
 #'   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
 #'                                    .analyte_id = c("A", "B"),
 #'                                    .column_name = "pop name",
@@ -436,41 +450,51 @@ identify_analyte <-  function(.data,
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
 #'   geom_point()
 #' }
-assign_analyte_id <- function(.data, .parameter,
-                                 .analyte_id,
-                                 .column_name,
-                                 .cluster_column_name = paste0("cluster_", .column_name), .desc = FALSE){
-
-
-  if(.column_name %in% names(.data)){
-    .data <- .data %>% dplyr::select(-dplyr::one_of(.column_name))
+#'
+assign_analyte_id <- function(df,
+                              .parameter,
+                              .analyte_id,
+                              .column_name,
+                              .cluster_column_name = paste0("cluster_", .column_name),
+                              .desc = FALSE,
+                              .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "assign_analyte_id")
+    df <- .data
   }
 
-  .filter_criteria <- lazyeval::interp(~ !is.na(which_column), which_column = as.name(.cluster_column_name))
+  col_names_present <- colnames(df)
+  expected_col_names <- c(.parameter, .cluster_column_name)
+  col_name_present <- expected_col_names %in% col_names_present
 
-  .create_arrange_criteria <- function(.param){
-    if(.desc){
-      lazyeval::interp(~desc(.the_parameter), .the_parameter = as.name(.param))
-    }else{
-      lazyeval::interp(~.the_parameter, .the_parameter = as.name(.param))
-    }
-
+  if(FALSE %in% col_name_present){
+    missing_cols <- paste(expected_col_names[!col_name_present], collapse = ", ")
+    err_str <- paste("I could not find the column(s):", missing_cols)
+    stop(err_str)
   }
-  .arrange_criteria <- lapply(.parameter, .create_arrange_criteria)
 
-  .cluster_names <- lazyeval::interp(~.analyte_id)
-  .cluster_names <- stats::setNames(list(.cluster_names), .column_name)
+  if(.column_name %in% col_names_present){
+    df <- df %>%
+      dplyr::select(-dplyr::one_of(.column_name))
+  }
 
-  .clust_order <-.data %>%
-    dplyr::filter_(.filter_criteria) %>%
-    dplyr::group_by_(as.name(.cluster_column_name)) %>%
+  clust_order <- df %>%
+    dplyr::filter(!is.na(!!rlang::sym(.cluster_column_name))) %>%
+    dplyr::group_by(!!rlang::sym(.cluster_column_name)) %>%
     dplyr::summarise_at(dplyr::vars(dplyr::one_of(.parameter)), mean) %>%
-    dplyr::arrange_(.dots = .arrange_criteria) %>%
-    dplyr::mutate_(.dots= .cluster_names) %>%
-    dplyr::select_(as.name(.cluster_column_name), as.name(.column_name))
+    dplyr::arrange(!!!rlang::syms(.parameter)) %>%
+    {if(.desc){
+      .[nrow(.):1, ]
+    }else{
+      .
+    }} %>%
+    dplyr::mutate(!!.column_name := .analyte_id)
 
-  .data %>%
-    dplyr::left_join(.clust_order, by = .cluster_column_name) %>%
+  clust_order <- clust_order %>%
+    dplyr::select(!!rlang::sym(.cluster_column_name), !!.column_name)
+
+  df %>%
+    dplyr::left_join(clust_order, by = .cluster_column_name) %>%
     dplyr::select(-dplyr::one_of(.cluster_column_name))
 }
 
@@ -483,7 +507,8 @@ assign_analyte_id <- function(.data, .parameter,
 #' @param .cluster A character of the length of one giving the element to subset
 #'   by.
 #' @param .call_args A list giving the parameters passed on to `identify_analyte()`.
-#' @param .data A tidy data.frame.
+#' @param df A tidy data.frame.
+#' @param .data Deprecated. Use `df`.
 #'
 #' @description
 #' This is a convenience function which allows to subset the data before calling
@@ -497,7 +522,11 @@ assign_analyte_id <- function(.data, .parameter,
 #'
 #' @examples
 #' x <- "a"
-ident_bead_pop <- function(.analytes, .column_name = NULL, .cluster = NULL, .call_args, .data){
+ident_bead_pop <- function(.analytes, .column_name = NULL, .cluster = NULL, .call_args, df, .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "ident_bead_pop")
+    df <- .data
+  }
 
   if((!is.null(.cluster) & is.null(.column_name)) | (is.null(.cluster) & !is.null(.column_name))){
     stop("Both .cluster and .column_name must be NULL or have a value")
@@ -512,15 +541,11 @@ ident_bead_pop <- function(.analytes, .column_name = NULL, .cluster = NULL, .cal
   }
 
   if(!is.null(.cluster)){
-    .filter_criteria <- lazyeval::interp(~ the_column == the_cluster,
-                                         the_column = as.name(.column_name),
-                                         the_cluster = .cluster)
-
-    .data  <- .data %>% dplyr::filter_(.filter_criteria)
+    df  <- df %>% dplyr::filter(!!rlang::sym(.column_name) == .cluster)
   }
 
   .call_args[[".analyte_id"]] <- .analytes
-  .call_args[[".data"]] <- .data
+  .call_args[["df"]] <- df
 
   do.call(identify_analyte, .call_args)
 }

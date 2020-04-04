@@ -1,12 +1,12 @@
 ---
-title: "Analysis of LEGENDplex data with beadplexr"
+title: "Analysis of LEGENDplex data with `beadplexr`"
 author: "Ulrik Stervbo"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{LEGENDplex-beadplexr}
+  %\VignetteIndexEntry{Analysis of LEGENDplex data with beadplexr}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -33,7 +33,7 @@ All multiplex systems come with their own analysis software. The analysis soluti
 
 Here the general usage of the **beadplexr** package is introduced. It will be demonstrated how to load the FACS-files, identify bead populations, draw standard curves and calculate concentrations of analytes.
 
-# Naming LEGENDplex data-files
+## Naming LEGENDplex data-files
 
 Each sample in the LEGENDplex experiment must have a unique and meaningful name. I suggest that the file name includes indication of the kit and the standard or experimental sample. For the indication of kit I use 'K' followed by a number, for the indication of the standard sample I use 'C' followed by a number -- just as in the kit manual --  and for the experimental sample, I use 'S' followed by a number. The different parts of the file name should be separated by a character not used in the IDs; this will make for easy parsing of the file names. It is not strictly needed, but adding a leading '0' to all values below 10 will result in expected order when the files are sorted. If might be useful to include a 'P' followed by a number to indicate the plate number.
 
@@ -47,100 +47,16 @@ With this outlined nomenclature I can have the following FACS-files:
 
 Single letter abbreviations gives short file names and thereby reducing the chance of copy problems because of file paths being too long. The drawback is that a table must be kept which associates the kit ID with the actual kit name, and the sample ID with the actual sample name. However, in my experience, this is necessary when preparing for the experiment and does not bring much added work.
 
-# Reading FACS data
+## Reading FACS data
 
-The output of a LEGENDplex experiment is a series of Flow Cytometry Standard (FCS) files. The exact version of the fcs-files produced, depends on the flow cytometer used. However, getting data into R should be the same irrespective of the cytometer used.
+See the vignette [Preparing flow-data for use with with `beadplexr`](preparing_flow_data.html).
 
-The **beadplexr** provides the function `read_fcs()` to read in a fcs file. It is a wrapper around the functionality provided by the [**flowCore**](http://bioconductor.org/packages/flowCore/) package and performs the following steps:
-
-  1. Read the file with `flowCore::read.FCS()`
-  2. Apply an *arcsinh* transformation of the APC and PE channels 
-  3. Remove boundary events of of the forward and side scatter channels
-  4. Optionally subset the channels to contain just bead events -- this might improve identification of the beads
-  5. Convert the FACS-data to a `data.frame`
-  
-```{r read-fcs-defaults}
-library(beadplexr)
-
-.file_name <- system.file("extdata", "K2-C07-A7.fcs", package = "beadplexr")
-
-# Load the fcs file with all defaults
-.data <- read_fcs(.file_name = .file_name)
-
-```
-
-The **beadplexr** package also comes with some simple plot functions to help visualize the FACS-data. The functions are wrappers around [**ggplot2**](https://ggplot2.tidyverse.org/), and are meant to provide an easy view of the data. For more control it is probably better to use **ggplot2** directly.
-
-```{r raw-events, fig.show='hold'}
-facs_plot(.data)
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-```
-
-<!-- A LEGENDplex experiment exists of several FACS files and the function `read_fcs_files()` makes it easy to read all the files into a list. The function is a wrapper around a combination of the **purrr** function `map()` and `read_fcs()`, and returns a list where each element is the bead events of the FACS-file. The names of the elements are taken from the given file names. -->
-
-<!-- ```{r read-fcs-files, eval=FALSE} -->
-<!-- .files <- system.file("extdata", c("K2-C07-A7.fcs", "K2-C07-A7.fcs"), package = "beadplexr") -->
-<!-- # Using internal function -->
-<!-- plex_data <- read_fcs_files(.files) -->
-<!-- plex_data -->
-<!-- ``` -->
-
-## Applying the event filter
-In the above example we used the default filter settings. These settings fit nicely with the settings of our flow cytometer, but might not work so well for yours, so the following demonstrates the arguments to the `read_fcs()`.
-
-Here we apply no filter at all:
-```{r read-fcs-no-filter, fig.show='hold', eval=FALSE}
-.data <- read_fcs(.file_name = .file_name, .filter = NULL)
-
-facs_plot(.data)
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-```
-
-And here we look at the beads with the larger forward and side scatter, but using the height parameter in stead of the area parameter:
-```{r fcs-h-filter, fig.show='hold'}
-.data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"), 
-                  .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
-                                 "SSC-H" = c(4e5, 1e6),
-                                 "FL6-H" = c(7L, Inf)))
-
-facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-```
-
-If you insist, you can also filter the PE channel, but that is probably not such a good idea:
-
-```{r read-fcs-fl2-filter, fig.show='hold', eval=FALSE}
-.data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"), 
-                  .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
-                                 "SSC-H" = c(4e5, 1e6),
-                                 "FL6-H" = c(7L, Inf),
-                                 "FL2-H" = c(8, 10)))
-
-facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-```
-
-## Pseudo-color plots
-
-If you prefer, and have **hexbin** installed, you can view the FACS data with the commonly used pseudo-color.
-
-```{r pseudo-color, fig.show='hold'}
-.data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
-                  .filter = list("FSC-A" = c(4e5, 6e5L),
-                                 "SSC-A" = c(4e5, 1e6),
-                                 "FL6-H" = c(7L, Inf)))
-
-# We have relatively few events (around 2500), so decreasing the number of bins
-# make the scale more visible
-facs_plot(.data, .type = "hexbin", .bins = 50)
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H", .type = "hexbin")
-```
-
-# Load panel information
+## Load panel information
 
 Each LEGENDplex panel measures different analytes, and the start concentration of the standards occasionally have different initial concentrations. The **beadplexr** package comes with all the required information for the LEGENDplex panels from BioLegend. These panels are loaded easily by passing the name or a name pattern to the `load_panel()` function:
 
 ```{r load-panel-name}
+library(beadplexr)
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 panel_info$panel_name
 
@@ -162,12 +78,12 @@ The panel information files bundled in the package are found in the directory `/
 system.file(package = "beadplexr")
 ```
 
-# Get analyte MFI
+## Get analyte MFI
 The first step of the experiment analysis is to get the mean fluorescence intensity (MFI) of each analyte. This requires the identification of each analyte per size and APC intensity and the MFI of in the PE channel.
 
 The **beadplexr** package comes with a small experiment already read into a list of `data.frame`. The data are from a "Human Growth Factor Panel (13-plex)" LEGENDplex experiment, with 8 controls and 1 human serum sample, all in duplicates. The beads were measured on a CytoFLEX cytometer, and the fcs-files were processed using `read_fcs()`, with default settings.
 
-## Finding the analysis settings
+### Finding the analysis settings
 
 It might get a bit of trying to get the settings correct for an experiment, but once established it should remain stable, provided that there are no change of cytometer, and that there is no particular drift in the used cytometer. 
 
@@ -185,7 +101,7 @@ data(lplex)
 <!-- facs_plot(plex_sub_sample, .x = "FL2-H", .y = "FL6-H") -->
 <!-- ``` -->
 
-### Bead groups A and B
+#### Bead groups A and B
 First task is to identify the two bead populations in the forward-side scatter. The package comes with a convenience function called `identify_analyte()`, which is a wrapper around
 
   * Finding analyte clusters
@@ -220,7 +136,7 @@ plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SS
 facs_plot(plex_sub_sample, .x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
 ```
 
-### Bead IDs
+#### Bead IDs
 
 The next task is to identify the individual beads within each of the bead groups. The analyte IDs for the "Human Growth Factor Panel (13-plex)" bead group A are `r names(panel_info$analytes$A)` and for group B `r names(panel_info$analytes$B)`. In this case, the beads are arranged from low to high, that is the lowest analyte ID has lowest intensity in the APC channel. 
 
@@ -272,9 +188,9 @@ bead_b %>% split(.$`Analyte ID`) %>%
   facs_scatter(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 ```
 
-## Putting it all together
+### Putting it all together
 
-It is tiresome to perform the above on each element of the FACS-data list, and though you could wrap the code in a function to apply to each element of the FACSdata list, it is much easier to use the built-in `identify_legendplex_analyte()`.
+It is tiresome to perform the above on each element of the FACS data list, and though you could wrap the code in a function to apply to each element of the FACS data list, it is much easier to use the built-in `identify_legendplex_analyte()`.
 
 ```{r, fig.show='hold', cache=TRUE}
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
@@ -286,7 +202,7 @@ args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
                            analytes = list(.parameter = "FL6-H",
                                            .column_name = "Analyte ID"))
 
-analytes_identified <- identify_legendplex_analyte(.data = lplex[[1]],
+analytes_identified <- identify_legendplex_analyte(df = lplex[[1]],
                                                 .analytes = panel_info$analytes,
                                                 .method_args = args_ident_analyte) %>%
   group_by(`Analyte ID`) %>% 
@@ -310,8 +226,8 @@ This we can apply to the whole list, but before we start we create a little help
 
 ```{r find-analytes}
 
-find_and_trim <- function(.data){
-  identify_legendplex_analyte(.data, .analytes = panel_info$analytes,
+find_and_trim <- function(df){
+  identify_legendplex_analyte(df, .analytes = panel_info$analytes,
                  .method_args = args_ident_analyte) %>% 
     group_by(`Analyte ID`) %>% 
     do(trim_population(., .parameter = c("FL6-H", "FL2-H"), 
@@ -327,18 +243,18 @@ The FACS data is best visualized when the three dot-plots are side by side.
 ```{r visualize-analytes, message=FALSE, fig.width=7}
 library(gridExtra)
 
-plot_side_by_side <- function(.data, .cur_sample){
+plot_side_by_side <- function(df, .cur_sample){
   
-  plot_all_beads <- .data %>% 
+  plot_all_beads <- df %>% 
     facs_plot(.x = "FSC-A", .y = "SSC-A", .beads = "Bead group") +
     ggtitle("All events")
   
-  plot_a_beads <- .data %>%
+  plot_a_beads <- df %>%
     filter(`Bead group` == "A") %>% 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group A")
   
-  plot_b_beads <- .data %>%
+  plot_b_beads <- df %>%
     filter(`Bead group` == "B") %>% 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group B")
@@ -364,7 +280,7 @@ ggsave(filename = "dot_plot.pdf", plot = all_plots, width = 8.27, height = 11.69
 
 ```
 
-Now with the analytes identified and the bead populations documented we can finally calculate the MFI of each analyte. **beadplexr** provides the possibility to calculate geometric, harmonic, and arithmetic mean. We combine the list of FACS-data to a `data.frame` with Sample, Analyte ID, and the MFI because the creation of a standard curve in the next steps needs the MFI of several standard samples.
+Now with the analytes identified and the bead populations documented we can finally calculate the MFI of each analyte. **beadplexr** provides the possibility to calculate geometric, harmonic, and arithmetic mean. We combine the list of FACS data to a `data.frame` with Sample, Analyte ID, and the MFI because the creation of a standard curve in the next steps needs the MFI of several standard samples.
 
 ```{r calculate-mfi}
 analyte_mfi <- analytes_identified %>% 
@@ -377,7 +293,7 @@ analyte_mfi <- analytes_identified %>%
   filter(!is.na(`Analyte ID`))
 ```
 
-# Calculate analyte concentration 
+## Calculate analyte concentration 
 
 The calculation of the analytes requires two steps: 
 
@@ -451,7 +367,7 @@ plex_data <-
 
 ```
 
-## Fit the standard curve
+### Fit the standard curve
 
 With everything in a neatly arranged `data.frame` we can now focus on the actual task at hand, namely calculation of the standard curve for each analyte. For this we use the function `fit_standard()`.
 
@@ -476,7 +392,7 @@ plex_data <- plex_data %>%
 plex_data[2, "Std curve"][[1]][[1]]
 ```
 
-## Estimate sample analyte concentration
+### Estimate sample analyte concentration
 
 With the standard curve created we can estimate the concentrations of the samples, but also of the standards. The latter is to help us verify that the standard measurements were all fine, and that we can trust the estimation of the sample concentrations.
 
@@ -554,7 +470,7 @@ plex_data %>%
   mutate(Calc.conc = 10^Calc.conc, `Calc.conc error` = 10^`Calc.conc error`) 
 ```
 
-# Session info
+## Session info
 ```{r,results='markup', echo=FALSE}
 sessionInfo()
 ```

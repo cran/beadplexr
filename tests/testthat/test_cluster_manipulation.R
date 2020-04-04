@@ -3,8 +3,8 @@ context("Cluster manipulation")
 # Preparation -------------------------------------------------------------
 library(beadplexr)
 data("lplex")
-.data <- lplex[[1]]
-.nrow_data <- nrow(.data)
+df <- lplex[[1]]
+.nrow_data <- nrow(df)
 .parameters <- c("FSC-A", "SSC-A")
 
 # Calculate distance ------------------------------------------------------
@@ -25,19 +25,19 @@ test_that("Calculation fails", {
 })
 
 # Trim clusters -----------------------------------------------------------
-.data$population <- 1L
+df$population <- 1L
 test_that("Clusters are trimmed", {
-  expect_is(trim_population(.data, .parameter = .parameters, .column_name = "population", .trim = 0.1), "data.frame")
-  expect_equal(nrow(trim_population(.data, .parameter = .parameters, .column_name = "population", .trim = 0.1)), .nrow_data)
+  expect_is(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0.1), "data.frame")
+  expect_equal(nrow(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0.1)), .nrow_data)
 
-  expect_is(trim_population(.data, .parameter = .parameters, .column_name = "population", .trim = 0), "data.frame")
-  expect_equal(nrow(trim_population(.data, .parameter = .parameters, .column_name = "population", .trim = 0)), .nrow_data)
+  expect_is(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0), "data.frame")
+  expect_equal(nrow(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0)), .nrow_data)
 
-  expect_is(trim_population(.data, .parameter = .parameters[1], .column_name = "population", .trim = 0), "data.frame")
-  expect_equal(nrow(trim_population(.data, .parameter = .parameters[2], .column_name = "population", .trim = 0)), .nrow_data)
+  expect_is(trim_population(df, .parameter = .parameters[1], .column_name = "population", .trim = 0), "data.frame")
+  expect_equal(nrow(trim_population(df, .parameter = .parameters[2], .column_name = "population", .trim = 0)), .nrow_data)
 })
 
 test_that("Clusters fail", {
-  expect_error(trim_population(.data, .parameter = .parameters, .column_name = "xxx", .trim = 0.1))
-  expect_error(trim_population(.data, .parameter = "xxx", .column_name = "population", .trim = 0.1))
+  expect_error(trim_population(df, .parameter = .parameters, .column_name = "xxx", .trim = 0.1))
+  expect_error(trim_population(df, .parameter = "xxx", .column_name = "population", .trim = 0.1))
 })

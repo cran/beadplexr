@@ -4,7 +4,8 @@
 \name{simplex}
 \alias{simplex}
 \title{Simulated beadplex data}
-\format{A list with three elements. Each element is a \code{data.frame} of 3000 to 9000 rows. The exact format depends on the assay simulated:
+\format{
+A list with three elements. Each element is a \code{data.frame} of 3000 to 9000 rows. The exact format depends on the assay simulated:
 \describe{
 \item{lplex}{
 Simulated LEGENDplex data. A single \code{data.frame} with the columns:
@@ -35,7 +36,8 @@ Simulated CBA data. A single \code{data.frame} with the columns:
 \item{PE}{Intensity in the PE channel}
 }
 }
-}}
+}
+}
 \source{
 Artificial
 }

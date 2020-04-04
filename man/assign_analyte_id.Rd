@@ -5,16 +5,17 @@
 \title{Assign analyte ID}
 \usage{
 assign_analyte_id(
-  .data,
+  df,
   .parameter,
   .analyte_id,
   .column_name,
   .cluster_column_name = paste0("cluster_", .column_name),
-  .desc = FALSE
+  .desc = FALSE,
+  .data = NULL
 )
 }
 \arguments{
-\item{.data}{The tidy data.frame, with indication of clusters}
+\item{df}{The tidy data.frame, with indication of clusters}
 
 \item{.parameter}{The parameter to order the cluster centers by}
 
@@ -28,6 +29,8 @@ analyte ID. If the column exists it will be silently dropped.}
 the clusters are identified. Will be dropped from the data.frame.}
 
 \item{.desc}{A boolean giving whether the sort order is descending.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 }
 \value{
 A \emph{data.frame} with cluster names instead of cluster ids.
@@ -43,10 +46,10 @@ library(ggplot2)
 
 data("lplex")
 
-.data <- lplex[[1]] \%>\%
+df <- lplex[[1]] \%>\%
   bp_clara(.parameter = c("FSC-A", "SSC-A"), .column_name = "analyte", .k = 2)
 
-.data \%>\%
+df \%>\%
   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
                                    .analyte_id = c("A", "B"),
                                    .column_name = "pop name",
@@ -55,7 +58,7 @@ data("lplex")
   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
   geom_point()
 
-.data \%>\%
+df \%>\%
   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
                                    .analyte_id = c("A", "B"),
                                    .column_name = "pop name",
@@ -64,5 +67,6 @@ data("lplex")
   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
   geom_point()
 }
+
 }
 \keyword{internal}

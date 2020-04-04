@@ -4,7 +4,8 @@
 \name{lplex}
 \alias{lplex}
 \title{LEGENDplex example data}
-\format{A list with 18 elements. Each element is a data.frame about 5000 rows
+\format{
+A list with 18 elements. Each element is a data.frame about 5000 rows
 and 4 columns (the exact number varies a little due to the data
 acquisition):
 \describe{
@@ -18,7 +19,8 @@ The list contains 8 standard samples in duplicates, and one serum
 sample, also in duplicate. The names of each element have the
 format K3 (internal panel shorthand), C:number: for standards and
 S:number: for serum sample, and a number indicating the replicate
-(1 or 2).}
+(1 or 2).
+}
 \source{
 Ulrik Stervbo, 2016, Unpublished
 }

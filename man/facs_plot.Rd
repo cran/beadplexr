@@ -9,35 +9,39 @@
 \title{Plot FACS data.}
 \usage{
 facs_plot(
-  .data,
+  df,
   .x = "FSC-A",
   .y = "SSC-A",
   .type = c("scatter", "density1d", "density2d", "hexbin"),
+  .data = NULL,
   ...
 )
 
 facs_scatter(
-  .data,
+  df,
   .x = "FSC-A",
   .y = "SSC-A",
   .beads = NULL,
-  .plot_distinct = TRUE
+  .plot_distinct = TRUE,
+  .data = NULL
 )
 
-facs_density2d(.data, .x = "FSC-A", .y = "SSC-A", .beads = NULL)
+facs_density2d(df, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .data = NULL)
 
-facs_density1d(.data, .x = "FSC-A", .beads = NULL)
+facs_density1d(df, .x = "FSC-A", .beads = NULL, .data = NULL)
 
-facs_hexbin(.data, .x = "FSC-A", .y = "SSC-A", .bins = 75)
+facs_hexbin(df, .x = "FSC-A", .y = "SSC-A", .bins = 75, .data = NULL)
 }
 \arguments{
-\item{.data}{The data to be plotted in a \code{data.frame}.}
+\item{df}{The data to be plotted in a \code{data.frame}.}
 
 \item{.x, .y}{Character vector with the column name for the variable to plot
 on the x or y-axis.}
 
 \item{.type}{Character vector giving the type of plot being used. Options are
 one of \code{"scatter", "density", "hexbin"}.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{...}{Arguments passed to the individual functions.}
 
@@ -70,38 +74,38 @@ library(beadplexr)
 .file_name <- system.file("extdata", "K2-C07-A7.fcs",
                           package = "beadplexr")
 
-.data <- read_fcs(.file_name = .file_name,
+df <- read_fcs(.file_name = .file_name,
                   .filter = list("FSC-A" = c(2e5L, 6.3e5L),
                                  "SSC-A" = c(2e5, 1e6L)))
-.data$bead_group <- ifelse(.data$`FSC-A` < 4e5L, "A", "B")
+df$bead_group <- ifelse(df$`FSC-A` < 4e5L, "A", "B")
 
 # Using facs_plot
-facs_plot(.data, .type = "scatter")
-facs_plot(.data, .type = "density1d")
-facs_plot(.data, .type = "density2d")
-facs_plot(.data, .type = "hexbin")
+facs_plot(df, .type = "scatter")
+facs_plot(df, .type = "density1d")
+facs_plot(df, .type = "density2d")
+facs_plot(df, .type = "hexbin")
 
-facs_plot(.data, .type = "scatter", .beads = "bead_group")
-facs_plot(.data, .type = "density1d", .beads = "bead_group")
-facs_plot(.data, .type = "hexbin", .bins = 50)
+facs_plot(df, .type = "scatter", .beads = "bead_group")
+facs_plot(df, .type = "density1d", .beads = "bead_group")
+facs_plot(df, .type = "hexbin", .bins = 50)
 
-facs_plot(.data, .x = "FL2-H", .type = "scatter", .beads = "bead_group")
+facs_plot(df, .x = "FL2-H", .type = "scatter", .beads = "bead_group")
 
 # Individual functions
-facs_scatter(.data)
+facs_scatter(df)
 
-facs_scatter(.data, .beads = "bead_group", .plot_distinct = FALSE)
-facs_scatter(.data, .beads = "bead_group")
+facs_scatter(df, .beads = "bead_group", .plot_distinct = FALSE)
+facs_scatter(df, .beads = "bead_group")
 
-facs_scatter(.data, .x = "FL2-H", .y = "FL6-H", .beads = "bead_group")
+facs_scatter(df, .x = "FL2-H", .y = "FL6-H", .beads = "bead_group")
 
-facs_density1d(.data)
-facs_density1d(.data, .beads = "bead_group")
+facs_density1d(df)
+facs_density1d(df, .beads = "bead_group")
 
-facs_density2d(.data)
-facs_density2d(.data, .beads = "bead_group")
+facs_density2d(df)
+facs_density2d(df, .beads = "bead_group")
 
-facs_hexbin(.data)
-facs_hexbin(.data, .bins = 30)
+facs_hexbin(df)
+facs_hexbin(df, .bins = 30)
 }
 }

@@ -1,53 +1,5 @@
-## ----read-fcs-defaults--------------------------------------------------------
-library(beadplexr)
-
-.file_name <- system.file("extdata", "K2-C07-A7.fcs", package = "beadplexr")
-
-# Load the fcs file with all defaults
-.data <- read_fcs(.file_name = .file_name)
-
-
-## ----raw-events, fig.show='hold'----------------------------------------------
-facs_plot(.data)
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-
-## ----read-fcs-no-filter, fig.show='hold', eval=FALSE--------------------------
-#  .data <- read_fcs(.file_name = .file_name, .filter = NULL)
-#  
-#  facs_plot(.data)
-#  facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-
-## ----fcs-h-filter, fig.show='hold'--------------------------------------------
-.data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"), 
-                  .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
-                                 "SSC-H" = c(4e5, 1e6),
-                                 "FL6-H" = c(7L, Inf)))
-
-facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-
-## ----read-fcs-fl2-filter, fig.show='hold', eval=FALSE-------------------------
-#  .data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-H", "SSC-H"),
-#                    .filter = list("FSC-H" = c(3.75e5L, 5.5e5L),
-#                                   "SSC-H" = c(4e5, 1e6),
-#                                   "FL6-H" = c(7L, Inf),
-#                                   "FL2-H" = c(8, 10)))
-#  
-#  facs_plot(.data, .x = "FSC-H", .y = "SSC-H")
-#  facs_plot(.data, .x = "FL2-H", .y = "FL6-H")
-
-## ----pseudo-color, fig.show='hold'--------------------------------------------
-.data <- read_fcs(.file_name = .file_name, .fsc_ssc = c("FSC-A", "SSC-A"),
-                  .filter = list("FSC-A" = c(4e5, 6e5L),
-                                 "SSC-A" = c(4e5, 1e6),
-                                 "FL6-H" = c(7L, Inf)))
-
-# We have relatively few events (around 2500), so decreasing the number of bins
-# make the scale more visible
-facs_plot(.data, .type = "hexbin", .bins = 50)
-facs_plot(.data, .x = "FL2-H", .y = "FL6-H", .type = "hexbin")
-
 ## ----load-panel-name----------------------------------------------------------
+library(beadplexr)
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 panel_info$panel_name
 
@@ -140,7 +92,7 @@ args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
                            analytes = list(.parameter = "FL6-H",
                                            .column_name = "Analyte ID"))
 
-analytes_identified <- identify_legendplex_analyte(.data = lplex[[1]],
+analytes_identified <- identify_legendplex_analyte(df = lplex[[1]],
                                                 .analytes = panel_info$analytes,
                                                 .method_args = args_ident_analyte) %>%
   group_by(`Analyte ID`) %>% 
@@ -161,8 +113,8 @@ analytes_identified %>%
 
 ## ----find-analytes------------------------------------------------------------
 
-find_and_trim <- function(.data){
-  identify_legendplex_analyte(.data, .analytes = panel_info$analytes,
+find_and_trim <- function(df){
+  identify_legendplex_analyte(df, .analytes = panel_info$analytes,
                  .method_args = args_ident_analyte) %>% 
     group_by(`Analyte ID`) %>% 
     do(trim_population(., .parameter = c("FL6-H", "FL2-H"), 
@@ -175,18 +127,18 @@ analytes_identified <- lplex %>% lapply(find_and_trim)
 ## ----visualize-analytes, message=FALSE, fig.width=7---------------------------
 library(gridExtra)
 
-plot_side_by_side <- function(.data, .cur_sample){
+plot_side_by_side <- function(df, .cur_sample){
   
-  plot_all_beads <- .data %>% 
+  plot_all_beads <- df %>% 
     facs_plot(.x = "FSC-A", .y = "SSC-A", .beads = "Bead group") +
     ggtitle("All events")
   
-  plot_a_beads <- .data %>%
+  plot_a_beads <- df %>%
     filter(`Bead group` == "A") %>% 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group A")
   
-  plot_b_beads <- .data %>%
+  plot_b_beads <- df %>%
     filter(`Bead group` == "B") %>% 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group B")

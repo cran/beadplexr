@@ -5,14 +5,15 @@
 \title{Calculate the analyte intensity}
 \usage{
 calc_analyte_mfi(
-  .data,
+  df,
   .parameter,
   .column_name = "analyte",
-  .mean_fun = c("geometric", "harmonic", "arithmetic")
+  .mean_fun = c("geometric", "harmonic", "arithmetic"),
+  .data = NULL
 )
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.parameter}{A character giving the name of column(s) where populations
 are identified.}
@@ -21,6 +22,8 @@ are identified.}
 population information.}
 
 \item{.mean_fun}{A character giving the mean function to use.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 }
 \value{
 A summarized \code{data.frame}
@@ -61,15 +64,15 @@ library(dplyr)
 
 data("lplex")
 
-.data <- lplex[[1]] \%>\%
+df <- lplex[[1]] \%>\%
   filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) \%>\%
   identify_analyte(.parameter = "FL6-H",
                    .analyte_id = as.character(c(1:7)))
 
-.data \%>\%
+df \%>\%
   calc_analyte_mfi(.parameter = "FL2-H")
 
-.data \%>\%
+df \%>\%
   calc_analyte_mfi(.parameter = "FL2-H",
               .mean_fun = "harmonic")
 }

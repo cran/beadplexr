@@ -1,3 +1,20 @@
+# beadplexr version 0.4.0
+
+## Breaking changes
+
+ + All functionality to prepare flow-data has been removed due to license issues
+
+## Major changes
+
+ + The parameter `.data` is deprecated and `data.frames` are now passed by the parameter `df`. This is to avoid potential conflicts with the `dplyr` pronoun `.data`
+ + All deprecated `tidyverse` functions are replaced with their stable counterparts
+
+## Minor changes
+
++ Fix problems related to `tibble` version 3.0.0
++ Package now imports magrittr's pipe operator (%>%)
++ Package now imports rlang's walrus operator (:=)
+
 # beadplexr version 0.3.0
 
 ## Minor changes

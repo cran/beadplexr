@@ -8,19 +8,19 @@ data(simplex)
 mplex_data <- simplex[["mplex"]]
 
 mplex_data %>% 
-facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
+  facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
 mplex_data %>% 
-facs_plot(.x = "FITC", .y = "PE", .type = "hex")
+  facs_plot(.x = "FITC", .y = "PE", .type = "hex")
 
 ## ---- fig.show='hold'---------------------------------------------------------
 cba_data <- simplex[["cba"]]
 
 cba_data %>% 
-facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
+  facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
 cba_data %>% 
-facs_plot(.x = "APC", .y = "APC-Cy7", .type = "hex")
+  facs_plot(.x = "APC", .y = "APC-Cy7", .type = "hex")
 
 ## ---- fig.width=7-------------------------------------------------------------
 mplex_analyte <- mplex_data %>% 

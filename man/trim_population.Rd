@@ -4,10 +4,16 @@
 \alias{trim_population}
 \title{Trim cluster.}
 \usage{
-trim_population(.data, .parameter, .column_name = "population", .trim = 0.1)
+trim_population(
+  df,
+  .parameter,
+  .column_name = "population",
+  .trim = 0.1,
+  .data = NULL
+)
 }
 \arguments{
-\item{.data}{The tidy data.frame with clusters to be modified.}
+\item{df}{The tidy data.frame with clusters to be modified.}
 
 \item{.parameter}{A character giving the name of dimensions to calculate
 distance on.}
@@ -17,6 +23,8 @@ cluster information.}
 
 \item{.trim}{A numeric between 0 and 1, giving the fraction of points to
 remove.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 }
 \value{
 A data.frame

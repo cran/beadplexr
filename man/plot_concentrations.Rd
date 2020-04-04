@@ -8,18 +8,20 @@
 \title{Plot concentrations}
 \usage{
 plot_std_curve(
-  .data,
+  df,
   .model,
   .title = NULL,
   .parameter = "FL2.H",
-  .concentration = "Concentration"
+  .concentration = "Concentration",
+  .data = NULL
 )
 
 plot_target_est_conc(
-  .data,
+  df,
   .title = NULL,
   .concentration = "Calc.conc",
-  .std_concentration = "Concentration"
+  .std_concentration = "Concentration",
+  .data = NULL
 )
 
 plot_estimate(
@@ -32,7 +34,7 @@ plot_estimate(
 )
 }
 \arguments{
-\item{.data}{A \code{data.frame} with the data to be plotted.}
+\item{df}{A \code{data.frame} with the data to be plotted.}
 
 \item{.model}{An object of class \code{drc} with the fitted dose-response model.}
 
@@ -41,6 +43,8 @@ plot_estimate(
 \item{.parameter}{A character giving the name of the column with the MFI}
 
 \item{.concentration}{A character giving the name of the column with the with the calculated concentrations.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{.std_concentration}{A character giving the name of the column with the standard concentration.}
 
@@ -62,15 +66,15 @@ library(drc)
 data(ryegrass)
 
 ryegrass_m <-
-  fit_standard_curve(.data = ryegrass,
+  fit_standard_curve(df = ryegrass,
                      .parameter = "rootl",
                      .concentration = "conc")
 recalc_std <-
-  calculate_concentration(.data = ryegrass,
+  calculate_concentration(df = ryegrass,
                           .model = ryegrass_m,
                           .parameter = "rootl")
 sample_data <-
-  calculate_concentration(.data = ryegrass[sample(1:nrow(ryegrass), 5),],
+  calculate_concentration(df = ryegrass[sample(1:nrow(ryegrass), 5),],
                           .model = ryegrass_m,
                           .parameter = "rootl")
 
@@ -79,7 +83,7 @@ plot_std_curve(ryegrass,
                .parameter = "rootl",
                .concentration = "conc")
 
-plot_target_est_conc(.data = recalc_std,
+plot_target_est_conc(df = recalc_std,
                      .concentration = "Calc.conc",
                      .std_concentration = "conc")
 plot_estimate(

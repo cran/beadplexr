@@ -31,10 +31,10 @@ The data from the CBA system is similar to the data from the MACSPlex system: th
 mplex_data <- simplex[["mplex"]]
 
 mplex_data %>% 
-facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
+  facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
 mplex_data %>% 
-facs_plot(.x = "FITC", .y = "PE", .type = "hex")
+  facs_plot(.x = "FITC", .y = "PE", .type = "hex")
 ```
 
 ## The CBA-like data
@@ -45,10 +45,10 @@ There is a single bead population in the forward-side scatter and up to 30 bead 
 cba_data <- simplex[["cba"]]
 
 cba_data %>% 
-facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
+  facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
 cba_data %>% 
-facs_plot(.x = "APC", .y = "APC-Cy7", .type = "hex")
+  facs_plot(.x = "APC", .y = "APC-Cy7", .type = "hex")
 ```
 
 # Analyte identification

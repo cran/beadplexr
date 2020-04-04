@@ -7,31 +7,35 @@
 \alias{identify_macsplex_analyte}
 \title{Identify multiplex assay analytes}
 \usage{
-identify_legendplex_analyte(.data, .analytes, .method_args)
+identify_legendplex_analyte(df, .analytes, .method_args, .data = NULL)
 
 identify_cba_analyte(
-  .data,
+  df,
   .analytes,
   .method_args,
   .trim_fs = NULL,
-  .parameter_fs = NULL
+  .parameter_fs = NULL,
+  .data = NULL
 )
 
 identify_macsplex_analyte(
-  .data,
+  df,
   .analytes,
   .method_args,
   .trim_fs = NULL,
-  .parameter_fs = NULL
+  .parameter_fs = NULL,
+  .data = NULL
 )
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.analytes}{A vector or list giving the IDs of the analytes. The
 \strong{order} is important and must match the expected order of analytes.}
 
 \item{.method_args}{A list giving the parameters passed on to \code{identify_analyte()}.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{.trim_fs}{A numeric between 0 and 1, giving the fraction of points to
 remove from the forward side scatter.}
@@ -77,7 +81,7 @@ The parameter \code{.method_args} is a list of key-value pairs passed to \code{\
 library(beadplexr)
 library(dplyr)
 data("lplex")
-.data <- lplex[[1]]
+df <- lplex[[1]]
 
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 
@@ -90,7 +94,7 @@ args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
                                            .trim = 0,
                                            .method = "clara"))
 
-annot_events <- identify_legendplex_analyte(.data = .data,
+annot_events <- identify_legendplex_analyte(df = df,
                                             .analytes = panel_info$analytes,
                                             .method_args = args_ident_analyte)
 
@@ -108,7 +112,7 @@ annot_events \%>\%
 library(beadplexr)
 data(simplex)
 
-.data <- simplex[["cba"]]
+df <- simplex[["cba"]]
 
 analytes <- vector("list", 30) \%>\% setNames(as.character(c(1:30)))
 
@@ -116,7 +120,7 @@ args_ident_analyte <- list(.parameter = c("APC", "APC-Cy7"),
                            .column_name = "Analyte ID",
                            .trim = 0.1,
                            .method = "clara")
-annot_events <- identify_cba_analyte(.data = .data,
+annot_events <- identify_cba_analyte(df = df,
                      .analytes = analytes,
                      .method_args = args_ident_analyte)
 
@@ -125,7 +129,7 @@ annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC")
 annot_events \%>\%
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 
-annot_events <- identify_cba_analyte(.data = .data,
+annot_events <- identify_cba_analyte(df = df,
                      .analytes = analytes,
                      .method_args = args_ident_analyte,
                      .trim_fs = 0.1,
@@ -142,7 +146,7 @@ annot_events \%>\%
 library(beadplexr)
 data(simplex)
 
-.data <- simplex[["mplex"]]
+df <- simplex[["mplex"]]
 analytes <- vector("list", 10) \%>\% setNames(as.character(c(1:10)))
 
 args_ident_analyte <- list(.parameter = c("FITC", "PE"),
@@ -150,7 +154,7 @@ args_ident_analyte <- list(.parameter = c("FITC", "PE"),
                            .trim = 0.1,
                            .method = "clara")
 
-annot_events <- identify_macsplex_analyte(.data = .data,
+annot_events <- identify_macsplex_analyte(df = df,
                                      .analytes = analytes,
                                      .method_args = args_ident_analyte)
 
@@ -159,7 +163,7 @@ annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC")
 annot_events \%>\%
   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 
-annot_events <- identify_macsplex_analyte(.data = .data,
+annot_events <- identify_macsplex_analyte(df = df,
                                      .analytes = analytes,
                                      .method_args = args_ident_analyte,
                                      .trim_fs = 0.1,

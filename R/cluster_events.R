@@ -2,7 +2,7 @@
 #'
 #' Cluster identification with various algorithms and subsequent trimming of each cluster
 #'
-#' @param .data A tidy data.frame.
+#' @param df A tidy data.frame.
 #' @param .parameter A character giving the name of column(s) where populations
 #'   are identified.
 #' @param .column_name A character giving the name of the column to store the
@@ -17,12 +17,12 @@
 #'   to use in initialisation of `Mclust()`.
 #' @param .max_subset A numeric giving the maximum of events to use in
 #'   initialisation of `Mclust()`, see below.
+#' @param .data Deprecated. Use `df`.
 #' @param ... Additional arguments passed to appropriate methods, see below.
 #'
-#' @return The data.frame in `.data` with the cluster classification added in
+#' @return The data.frame in `df` with the cluster classification added in
 #'   the column given by `.column_name`.
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @section Additional parameters:
 #' Information on additional arguments passed, can be found here:
@@ -64,10 +64,14 @@
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-bp_kmeans <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
+bp_kmeans <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "bp_kmeans")
+    df <- .data
+  }
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
-  .all_args <- list(x = .data[, .parameter], centers = .k)
+  .all_args <- list(x = df[, .parameter], centers = .k)
 
   if("centers" %in% names(.ellipsis)){
     .all_args[["centers"]] <- NULL
@@ -77,24 +81,24 @@ bp_kmeans <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 
   # It is much faster to just trim if needed at all
   if(.all_args[["centers"]] == 1){
-    .data[[.column_name]] <- "1"
+    df[[.column_name]] <- "1"
 
     if(.trim > 0){
-      return(trim_population(.data = .data, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
+      return(trim_population(df = df, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
     }
-    return(.data)
+    return(df)
   }
 
   # Do kmeans clustering
   .clust_res <- do.call(stats::kmeans, .all_args)
-  .data[[.column_name]] <- .clust_res$cluster %>% as.character()
+  df[[.column_name]] <- .clust_res$cluster %>% as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(.data, factor(.data[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) %>%
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
-    .data
+    df
   }
 }
 
@@ -137,10 +141,14 @@ bp_kmeans <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-bp_clara <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
+bp_clara <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "bp_clara")
+    df <- .data
+  }
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
-  .all_args <- list(x = .data[, .parameter], k = .k)
+  .all_args <- list(x = df[, .parameter], k = .k)
 
   if(! "samples" %in% names(.ellipsis)){
     .ellipsis[["samples"]] <- 100
@@ -156,23 +164,23 @@ bp_clara <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 
   # It is much faster to just trim if needed at all
   if(.all_args[["k"]] == 1){
-    .data[[.column_name]] <- "1"
+    df[[.column_name]] <- "1"
 
     if(.trim > 0){
-      return(trim_population(.data = .data, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
+      return(trim_population(df = df, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
     }
-    return(.data)
+    return(df)
   }
 
   .clust_res <- do.call(cluster::clara, .all_args)
-  .data[[.column_name]] <- .clust_res$cluster %>% as.character()
+  df[[.column_name]] <- .clust_res$cluster %>% as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(.data, factor(.data[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) %>%
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
-    .data
+    df
   }
 }
 
@@ -227,11 +235,14 @@ bp_clara <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #'     eps = 0.2, MinPts = 50, scale = FALSE) %>%
 #'   .$population %>% unique
 #' }
-bp_dbscan <- function(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50, ...){
-  # Give function arguments useful values, if they are not set by the user
+bp_dbscan <- function(df, .parameter, .column_name, .eps = 0.2, .MinPts = 50 , .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "bp_dbscan")
+    df <- .data
+  }
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
-  .all_args <- list(data = .data[, .parameter],
+  .all_args <- list(data = df[, .parameter],
                     eps = .eps,
                     MinPts = .MinPts)
 
@@ -251,8 +262,8 @@ bp_dbscan <- function(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50,
   .clust_res <- do.call(fpc::dbscan, .all_args)
   .clust_res <- .clust_res$cluster
   .clust_res <- ifelse(.clust_res == 0, NA, .clust_res)
-  .data[[.column_name]] <- .clust_res %>% as.character()
-  .data
+  df[[.column_name]] <- .clust_res %>% as.character()
+  df
 }
 
 #' @rdname cluster_events
@@ -280,17 +291,21 @@ bp_dbscan <- function(.data, .parameter, .column_name, .eps = 0.2, .MinPts = 50,
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
-bp_mclust <- function(.data, .parameter, .column_name, .k, .trim = 0, .sample_frac = 0.05, .max_subset = 500, ...){
+bp_mclust <- function(df, .parameter, .column_name, .k, .trim = 0, .sample_frac = 0.05, .max_subset = 500, .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "bp_mclust")
+    df <- .data
+  }
   # Need to load the mclust because it failes with:
   # Error: 'MclustBIC' is not an exported object from 'namespace:mclust'
   # Give function arguments useful values, if they are not set by the user
   .ellipsis <- list(...)
 
-  init_subset <-  round(nrow(.data), .sample_frac)
+  init_subset <-  round(nrow(df), .sample_frac)
   init_subset <- if(init_subset >= .max_subset) 500
-  init_subset <- sample(1:nrow(.data), size = init_subset)
+  init_subset <- sample(1:nrow(df), size = init_subset)
 
-  .all_args <- list(data = .data[, .parameter], G = .k, initialization = list(subset = init_subset))
+  .all_args <- list(data = df[, .parameter], G = .k, initialization = list(subset = init_subset))
 
   if("G" %in% names(.ellipsis)){
     .all_args[["G"]] <- NULL
@@ -304,23 +319,23 @@ bp_mclust <- function(.data, .parameter, .column_name, .k, .trim = 0, .sample_fr
 
   # It is much faster to just trim if needed at all
   if(.all_args[["G"]] == 1){
-    .data[[.column_name]] <- "1"
+    df[[.column_name]] <- "1"
 
     if(.trim > 0){
-      return(trim_population(.data = .data, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
+      return(trim_population(df = df, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
     }
-    return(.data)
+    return(df)
   }
 
   .clust_res <- do.call(mclust::Mclust, .all_args)
-  .data[[.column_name]] <- .clust_res$classification %>% as.character()
+  df[[.column_name]] <- .clust_res$classification %>% as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(.data, factor(.data[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) %>%
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
-    .data
+    df
   }
 }
 
@@ -389,10 +404,14 @@ density_cut <- function(.x, .k, .lower = 0.1, .upper = 2, .step = 0.1){
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-bp_density_cut <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
+bp_density_cut <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, ...){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "bp_density_cut")
+    df <- .data
+  }
   .p <-  .parameter[1]
   call_cut_parameter <- function(.p){
-    density_cut(.x = .data[[.p]], .k = .k)
+    density_cut(.x = df[[.p]], .k = .k)
   }
   compare_vec_elements <- function(x, y){
     ifelse(x == y, x, NA)
@@ -400,24 +419,24 @@ bp_density_cut <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 
   # It is much faster to just trim if needed at all
   if(.k == 1){
-    .data[[.column_name]] <- "1"
+    df[[.column_name]] <- "1"
 
     if(.trim > 0){
-      return(trim_population(.data = .data, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
+      return(trim_population(df = df, .parameter = .parameter, .column_name = .column_name, .trim = .trim))
     }
-    return(.data)
+    return(df)
   }
 
   .clusters <- .parameter %>% purrr::map(call_cut_parameter) %>% stats::setNames(.parameter)
 
-  .data[[.column_name]] <- Reduce(compare_vec_elements, .clusters) %>% as.character
+  df[[.column_name]] <- Reduce(compare_vec_elements, .clusters) %>% as.character
 
   # Do trimming
   if(.trim > 0){
-    split(.data, factor(.data[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) %>%
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
-    .data
+    df
   }
 }
 
@@ -433,7 +452,6 @@ bp_density_cut <- function(.data, .parameter, .column_name, .k, .trim = 0, ...){
 #'
 #' @keywords internal
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' \dontrun{
@@ -468,13 +486,14 @@ calc_centre <- function(.x, .method = "density"){
 #'
 #' Remove the points furthest form the center of the cluster.
 #'
-#' @param .data The tidy data.frame with clusters to be modified.
+#' @param df The tidy data.frame with clusters to be modified.
 #' @param .parameter A character giving the name of dimensions to calculate
 #'   distance on.
 #' @param .column_name A character giving the name of the column with the
 #'   cluster information.
 #' @param .trim A numeric between 0 and 1, giving the fraction of points to
 #'   remove.
+#' @param .data Deprecated. Use `df`.
 #'
 #' @details The euclidean distance is calculated for each point defined by
 #'   \code{.parameter} to the center of the cluster. The cluster designation of
@@ -482,7 +501,6 @@ calc_centre <- function(.x, .method = "density"){
 #'
 #' @return A data.frame
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @export
 #'
@@ -509,21 +527,26 @@ calc_centre <- function(.x, .method = "density"){
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
-trim_population <- function(.data,
+trim_population <- function(df,
                             .parameter,
                             .column_name = "population",
-                            .trim = 0.1){
-
-  if(FALSE %in% (.parameter %in% names(.data))){
-    stop(".parameter must all be valid column names of .data")
+                            .trim = 0.1,
+                            .data = NULL){
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "trim_population")
+    df <- .data
   }
-  if(FALSE %in% (.column_name %in% names(.data))){
-    stop(".column_name must be valid column names of .data")
+
+  if(FALSE %in% (.parameter %in% names(df))){
+    stop(".parameter must all be valid column names of df")
+  }
+  if(FALSE %in% (.column_name %in% names(df))){
+    stop(".column_name must be valid column names of df")
   }
 
   # It is much faster to to calculate per row of the matrix, than dplyrs rowwise
   # so we create the matrix now and calculate using this
-  .data_matrix <- .data %>%
+  .data_matrix <- df %>%
     dplyr::ungroup() %>%
     dplyr::select(dplyr::one_of(.parameter)) %>%
     as.matrix()
@@ -536,6 +559,6 @@ trim_population <- function(.data,
 
   .in_cluster <- .distances  <  stats::quantile(.distances, probs = (1 - .trim))
 
-  .data[[.column_name]] <- ifelse(.in_cluster, as.character(.data[[.column_name]]), NA)
-  .data
+  df[[.column_name]] <- ifelse(.in_cluster, as.character(df[[.column_name]]), NA)
+  df
   }

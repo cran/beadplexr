@@ -139,13 +139,14 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
 #'
 #' Fit a logistic function to the standard concentrations.
 #'
-#' @param .data A tidy data.frame.
+#' @param df A tidy data.frame.
 #' @param .parameter A character giving the name of column(s) where populations
 #'   are identified.
 #' @param .concentration A character giving the name of the column with the
 #'   standard concentration.
 #' @param .fct A character giving the name of the logistic function to use in
 #'   the fit, see [drc::drm()] for details.
+#' @param .data Deprecated. Use `df`.
 #' @param ... Other arguments to [drc::drm()]
 #'
 #' @return An object of class `drc`
@@ -158,24 +159,26 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
 #' data(ryegrass)
 #'
 #' ryegrass_m <-
-#'   fit_standard_curve(.data = ryegrass,
+#'   fit_standard_curve(df = ryegrass,
 #'                      .parameter = "rootl",
 #'                      .concentration = "conc")
 #'
 #' summary(ryegrass_m)
 #'
-fit_standard_curve <- function(.data,
+fit_standard_curve <- function(df,
                                .parameter = "FL2.H",
                                .concentration = "Concentration",
-                               .fct = "LL.5", ...){
+                               .fct = "LL.5",
+                               .data = NULL, ...){
 
-  .filter_criteria <- lazyeval::interp(~ !is.infinite(conc_column) &
-                                         !is.infinite(param_column),
-                                       conc_column = as.name(.concentration),
-                                       param_column = as.name(.parameter))
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "fit_standard_curve")
+    df <- .data
+  }
 
-  .data <- .data %>%
-    dplyr::filter_(.filter_criteria) %>%
+  df <- df %>%
+    dplyr::filter_at(.vars = c(.parameter, .concentration),
+                     dplyr::all_vars(!is.infinite(.))) %>%
     dplyr::select(dplyr::one_of(.parameter, .concentration)) %>%
     stats::setNames(c("y", "x"))
 
@@ -202,7 +205,7 @@ fit_standard_curve <- function(.data,
 
   .fit_formula <- stats::as.formula(y ~ x)
 
-  .all_args <- list(formula = .fit_formula, data = .data, fct = fct)
+  .all_args <- list(formula = .fit_formula, data = df, fct = fct)
 
   if("fct" %in% names(.ellipsis)){
     .all_args[["fct"]] <- NULL
@@ -217,13 +220,14 @@ fit_standard_curve <- function(.data,
 #'
 #' Calculate the concentration in a sample
 #'
-#' @param .data A tidy data.frame.
+#' @param df A tidy data.frame.
 #' @param .model An object of class `drc` with the fitted dose-response model.
 #' @param .parameter A character giving the name of column(s) where populations
 #'   are identified.
 #' @param .value A character giving the name of the column to store the calculated concentration
+#' @param .data Deprecated. Use `df`.
 #'
-#' @return The `.data` with the calculated concentration and error added in two columns.
+#' @return The `df` with the calculated concentration and error added in two columns.
 #' @export
 #'
 #' @examples
@@ -233,19 +237,25 @@ fit_standard_curve <- function(.data,
 #' data(ryegrass)
 #'
 #' ryegrass_m <-
-#'   fit_standard_curve(.data = ryegrass,
+#'   fit_standard_curve(df = ryegrass,
 #'                      .parameter = "rootl",
 #'                      .concentration = "conc")
 #'
 #' sample_data <-
-#'   calculate_concentration(.data = ryegrass[sample(1:nrow(ryegrass), 5),],
+#'   calculate_concentration(df = ryegrass[sample(1:nrow(ryegrass), 5),],
 #'                           .model = ryegrass_m,
 #'                           .parameter = "rootl")
-calculate_concentration <- function(.data, .model,
+calculate_concentration <- function(df, .model,
                                     .parameter = "FL2.H",
-                                    .value = "Calc.conc"){
+                                    .value = "Calc.conc",
+                                    .data = NULL){
 
-  .response_values <- .data %>%
+  if(!is.null(.data)){
+    raise_deprecated(old = ".data", new = "df", caller = "calculate_concentration")
+    df <- .data
+  }
+
+  .response_values <- df %>%
     dplyr::select(dplyr::one_of(.parameter)) %>%
     purrr::flatten_dbl()
 
@@ -253,10 +263,10 @@ calculate_concentration <- function(.data, .model,
                                      type = "absolute",
                                      od = TRUE,
                                      display = FALSE)) %>%
-    as.data.frame %>%
+    tibble::as_tibble() %>%
     stats::setNames(c(.value, paste(.value, "error")))
 
-  .data %>%
+  df %>%
     dplyr::bind_cols(ed_res)
 }
 

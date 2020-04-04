@@ -1,14 +1,14 @@
 # beadplexr <img src="man/figures/logo.png" width="120px" align="right" />
 
-[![pipeline status](https://gitlab.com/ustervbo/beadplexr/badges/master/pipeline.svg)](https://gitlab.com/ustervbo/beadplexr/commits/master)
-[![coverage report](https://gitlab.com/ustervbo/beadplexr/badges/master/coverage.svg)](https://gitlab.com/ustervbo/beadplexr/commits/master)
-[![CRAN status](https://www.r-pkg.org/badges/version/beadplexr)](https://cran.r-project.org/package=beadplexr)
-[![DOI](https://img.shields.io/badge/doi-10.7717%2Fpeerj.5794-blue.svg)](http://doi.org/10.7717/peerj.5794)
+<!-- [![pipeline status](https://gitlab.com/ustervbo/beadplexr/badges/master/pipeline.svg)](https://gitlab.com/ustervbo/beadplexr/commits/master) -->
+<!-- [![coverage report](https://gitlab.com/ustervbo/beadplexr/badges/master/coverage.svg)](https://gitlab.com/ustervbo/beadplexr/commits/master) -->
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/beadplexr)](https://cran.r-project.org/package=beadplexr) -->
+<!-- [![DOI](https://img.shields.io/badge/doi-10.7717%2Fpeerj.5794-blue.svg)](http://doi.org/10.7717/peerj.5794) -->
 
 
 Reproducible and easy analysis and evaluation of LEGENDplex, CBA, and MACSPlex experiments.
 
-The companies behind the above beadplex systems, provide their own software for the analysis of the generated data. However, the strong dependence on manual interaction make the respective solutions labour insensitive and above all not always reproducible.
+The companies behind the above beadplex systems, provide their own software for the analysis of the generated data. However, the strong dependence on manual interaction make the respective solutions labor-intensive and above all not always reproducible.
 
 ## Installation
 

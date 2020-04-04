@@ -5,7 +5,7 @@
 \title{Identify analyte}
 \usage{
 identify_analyte(
-  .data,
+  df,
   .parameter,
   .analyte_id,
   .column_name = "analyte",
@@ -13,11 +13,12 @@ identify_analyte(
   .trim = 0,
   .desc = FALSE,
   .method = c("clara", "kmeans", "dbscan", "mclust", "density_cut"),
+  .data = NULL,
   ...
 )
 }
 \arguments{
-\item{.data}{A tidy data.frame.}
+\item{df}{A tidy data.frame.}
 
 \item{.parameter}{A character giving the name of column(s) where populations
 are identified.}
@@ -38,6 +39,8 @@ remove by marking them NA.}
 arranged in a descending fashion before assigning the names.}
 
 \item{.method}{A character giving the clustering method to use.}
+
+\item{.data}{Deprecated. Use \code{df}.}
 
 \item{...}{Additional arguments passed to appropriate methods, see below.}
 }
@@ -80,8 +83,8 @@ library(ggplot2)
 
 data("lplex")
 
-.data <- lplex[[1]]
-.data \%>\%
+df <- lplex[[1]]
+df \%>\%
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
@@ -90,7 +93,7 @@ data("lplex")
   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
   geom_point()
 
-.data \%>\%
+f
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
@@ -99,7 +102,7 @@ data("lplex")
   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
   geom_point()
 
-.data \%>\%
+df \%>\%
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
