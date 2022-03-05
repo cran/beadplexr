@@ -15,7 +15,7 @@ editor_options:
 
 ## Introduction
 
-Because of potential license problems with some dependencies in the `flowCore`-package, the functionality of reading and preparing flow-data for `beadplexr` is removed. This vignette described how to quickly achieve the same functionality as before the issues.
+Because of potential license problems with some dependencies in the `flowCore`-package, the functionality of reading and preparing flow-data for `beadplexr` is removed. This vignette describes how to quickly achieve the same functionality as before the issues.
 
 The following will not be executed when the vignette is built, but should work when executed manually, providing all packages are installed.
 
@@ -229,6 +229,25 @@ read_fcs <- function(.file_name, .fsc_ssc = c("FSC-A", "SSC-A"), .bead_channels 
     }
   }
   
+  if(!is.null(.filter)){
+    filter_names <- names(.filter)
+    filter_names <- filter_names[which(!filter_names %in% c(.fsc_ssc, .bead_channels))]
+    
+    if(length(filter_names) > 0){
+      warn_str <-
+        paste(
+          "The filter parameters",
+          paste(filter_names, collapse = ", "),
+          "were not found in '.fsc_ssc' or '.bead_channels', and have been removed"
+        )
+      warning(warn_str)
+      
+      .filter[filter_names] <- NULL
+      if(length(.filter) == 0){
+        .filter <-  NULL
+      }
+    }
+  }
   
   flowCore::read.FCS(filename = .file_name, transformation = FALSE, ...) %>%
     transform_bead_channels(.bead_channels = .bead_channels) %>%
@@ -521,7 +540,7 @@ apply_compensation <- function(.flow_frame, .compensation){
   
   # Test if .x is a numerical matrix with the parameters
   .get_potential_comp_matrices <- function(.x, .p){
-    if(("matrix" %in% class(.x)) & is.numeric(.x)){
+    if(inherits(.x, "matrix") & is.numeric(.x)){
       TRUE %in% (.p %in% colnames(.x))
     }else{
       FALSE

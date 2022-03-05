@@ -93,7 +93,7 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
     warning(paste(8 - length(.standard_sample), "standard samples are missing. The result might not be correct"))
   }
 
-  if("numeric" %in% class(".standard_sample")){
+  if(inherits(.standard_sample, "numeric")){
     .standard_sample <- .standard_sample %>% sort(decreasing = TRUE)
 
     # Get the difference between each sample.

@@ -167,6 +167,25 @@
 #      }
 #    }
 #  
+#    if(!is.null(.filter)){
+#      filter_names <- names(.filter)
+#      filter_names <- filter_names[which(!filter_names %in% c(.fsc_ssc, .bead_channels))]
+#  
+#      if(length(filter_names) > 0){
+#        warn_str <-
+#          paste(
+#            "The filter parameters",
+#            paste(filter_names, collapse = ", "),
+#            "were not found in '.fsc_ssc' or '.bead_channels', and have been removed"
+#          )
+#        warning(warn_str)
+#  
+#        .filter[filter_names] <- NULL
+#        if(length(.filter) == 0){
+#          .filter <-  NULL
+#        }
+#      }
+#    }
 #  
 #    flowCore::read.FCS(filename = .file_name, transformation = FALSE, ...) %>%
 #      transform_bead_channels(.bead_channels = .bead_channels) %>%
@@ -459,7 +478,7 @@
 #  
 #    # Test if .x is a numerical matrix with the parameters
 #    .get_potential_comp_matrices <- function(.x, .p){
-#      if(("matrix" %in% class(.x)) & is.numeric(.x)){
+#      if(inherits(.x, "matrix") & is.numeric(.x)){
 #        TRUE %in% (.p %in% colnames(.x))
 #      }else{
 #        FALSE

@@ -205,14 +205,14 @@ dist_chebyshev <- function(x, diag = FALSE, upper =FALSE) {
 #'
 #' as_data_frame_analyte(.analytes)
 as_data_frame_analyte <- function(.analytes, .id_bead = "Bead group", .id_analyte = "Analyte ID"){
-  if(! "list" %in% class(.analytes)){
+  if(! inherits(.analytes, "list")){
     stop("I expect .analytes to be a list")
   }
 
   .analytes %>%
     purrr::map_df(function(.l){
       .l %>% purrr::map_df(function(.x){
-        tibble::data_frame(name = .x$name, concentration = .x$concentration)
+        tibble::tibble(name = .x$name, concentration = .x$concentration)
       }, .id = .id_analyte)
     }, .id = .id_bead)
 

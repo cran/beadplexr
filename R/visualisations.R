@@ -305,7 +305,7 @@ plot_target_est_conc <- function(df, .title = NULL,
     ggplot2::geom_text(data = fit_text,
                        ggplot2::aes_string(label = "label"),
                        vjust = 1, hjust = 0) +
-    ggplot2::stat_smooth(method = "lm") +
+    ggplot2::stat_smooth(method = "lm", formula = y ~ x) +
     ggplot2::labs(title = .title)
 }
 

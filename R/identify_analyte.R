@@ -536,7 +536,7 @@ ident_bead_pop <- function(.analytes, .column_name = NULL, .cluster = NULL, .cal
     .cluster <- .cluster[1]
   }
 
-  if(class(.analytes) == "list"){
+  if(inherits(.analytes, "list")){
     .analytes <- names(.analytes)
   }
 
@@ -579,7 +579,7 @@ get_col_names_args <- function(.list){
              purrr::flatten_chr())
   }else{
     .list <- .list %>% unlist(recursive = FALSE)
-    if("list" %in% class(.list)){
+    if(inherits(.list, "list")){
       get_col_names_args(.list)
     }else{
       return(c())

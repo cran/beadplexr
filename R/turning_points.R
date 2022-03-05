@@ -110,7 +110,7 @@ turning_point <- function(.x,
   .which <- match.arg(.which)
   .return <- match.arg(.return)
 
-  if(!"list" %in% class(.x)){
+  if(!inherits(.x, "list")){
     .x <- list(.x)
   }
 

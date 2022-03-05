@@ -1,7 +1,7 @@
 Package: beadplexr
 Type: Package
 Title: Analysis of Multiplex Cytometric Bead Assays
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c( person(given = "Ulrik", 
                      family = "Stervbo", 
                      email = "ulrik.stervbo@gmail.com", 
@@ -19,20 +19,20 @@ Description: Reproducible and automated analysis of multiplex bead assays such
     analyte concentration.
 License: MIT + file LICENSE
 URL: https://gitlab.com/ustervbo/beadplexr
-BugReports: https://gitlab.com/ustervbo/beadplexr/issues
+BugReports: https://gitlab.com/ustervbo/beadplexr/-/issues
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6)
-Suggests: spelling, gridExtra, hexbin, igraph, knitr, rmarkdown,
-        stringr, testthat
+Depends: R (>= 4.1)
+Suggests: spelling, flowCore, gridExtra, hexbin, igraph, knitr,
+        rmarkdown, stringr, testthat
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 Imports: cluster, dplyr, drc, fpc, ggplot2, magrittr, mclust, purrr,
         raster, tibble, tidyr, yaml, rlang
 Language: en-US
 NeedsCompilation: no
-Packaged: 2020-04-04 10:29:33 UTC; ulrik
+Packaged: 2022-03-04 16:23:57 UTC; ulrik
 Author: Ulrik Stervbo [aut, cre] (<https://orcid.org/0000-0002-2831-8868>)
 Maintainer: Ulrik Stervbo <ulrik.stervbo@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-04-04 11:00:02 UTC
+Date/Publication: 2022-03-05 13:50:02 UTC

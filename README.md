@@ -28,11 +28,11 @@ devtools::install_git("https://gitlab.com/ustervbo/beadplexr")
 # devtools::install_git("https://gitlab.com/ustervbo/beadplexr", build_vignettes = TRUE)
 ```
 
-`beadplexr` depends on the `nloptr` package. During the installation of `nloptr` on an Unix/Linux system, the `nlopt` library should be automatically downloaded and installed. If this fails, installing the library with 
+`beadplexr` depends on the `nloptr` and the `terra` packages. During the installation of `nloptr` on an Unix/Linux system, the `nlopt` and `libgdal-dev` libraries should be automatically downloaded and installed. If this fails, installing the library with 
 
 
 ```
-sudo apt-get install libnlopt-dev
+sudo apt-get install libnlopt-dev libgdal-dev
 ```
 
 should make it possible to complete the installation of `beadplexr`.
@@ -47,16 +47,16 @@ library(beadplexr)
 The package comes with a comprehensive example in the vignette 'Analysis of LEGENDplex data with beadplexr':
 
 ```
-vignette("legendplex-analysis", package = "beadplexr")
+vignette("legendplex_analysis", package = "beadplexr")
 ```
 
-Or read the vignette [here](https://CRAN.R-project.org/package=beadplexr/vignettes/legendplex-analysis.html).
+Or read the vignette [here](https://CRAN.R-project.org/package=beadplexr/vignettes/legendplex_analysis.html).
 
 ## Citing the package
 
 Please cite as:
 
 Stervbo U, Westhoff TH, Babel N (2018). “beadplexr: Reproducible and automated analysis of multiplex bead assays.” _PeerJ_, *6*, e5794.
-ISSN 2167-8359, doi: [10.7717/peerj.5794](http://doi.org/10.7717/peerj.5794)
+ISSN 2167-8359, doi: [10.7717/peerj.5794](https://doi.org/10.7717/peerj.5794)
 
 Get the reference [BibTex format here](./inst/CITATION).

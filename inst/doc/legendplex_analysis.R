@@ -21,7 +21,7 @@ library(purrr)
 
 data(lplex)
 
-## ----fsc-ssc-ident-1, fig.width=6---------------------------------------------
+## ----fsc-ssc-ident-1, fig.width=4---------------------------------------------
 plex_sub_sample <- lplex[[1]]
 plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SSC-A"), 
                                .analyte_id = c("A", "B"),
@@ -29,7 +29,7 @@ plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SS
 facs_plot(plex_sub_sample, .x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
 
 
-## ----fsc-ssc-ident-2, fig.width=6---------------------------------------------
+## ----fsc-ssc-ident-2, fig.width=4---------------------------------------------
 plex_sub_sample$`Bead group` <- NULL
 
 plex_sub_sample <- identify_analyte(plex_sub_sample, .parameter = c("FSC-A", "SSC-A"), 
@@ -43,8 +43,8 @@ library(ggplot2)
 
 panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 
-bead_a <- plex_sub_sample %>% filter(`Bead group` == "A")
-bead_b <- plex_sub_sample %>% filter(`Bead group` == "B")
+bead_a <- plex_sub_sample |> filter(`Bead group` == "A")
+bead_b <- plex_sub_sample |> filter(`Bead group` == "B")
 
 bead_a <- identify_analyte(bead_a, .parameter = c("FL6-H"), 
                            .analyte_id = names(panel_info$analytes$A), 
@@ -66,20 +66,26 @@ facs_density1d(bead_b, .x = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 facs_scatter(bead_b, .x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 
 ## ----trim-analyte, fig.show='hold', eval=FALSE--------------------------------
-#  bead_a %>% split(list(.$`Analyte ID`)) %>%
+#  bead_a |> (
+#    function(x)
+#      split(x, list(x$`Analyte ID`))
+#    )() |>
 #    map_df(trim_population, .parameter = c("FL6-H", "FL2-H"),
 #           .column_name = "Analyte ID",
-#           .trim = 0.1) %>%
+#           .trim = 0.1) |>
 #    # The trim_population removes all factors
-#    mutate(`Analyte ID` = factor(`Analyte ID`, levels = names(panel_info$analytes$A))) %>%
+#    mutate(`Analyte ID` = factor(`Analyte ID`, levels = names(panel_info$analytes$A))) |>
 #    facs_scatter(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group A")
 #  
-#  bead_b %>% split(.$`Analyte ID`) %>%
+#  bead_b |> (
+#    function(x)
+#      split(x, list(x$`Analyte ID`))
+#    )() |>
 #    map_df(trim_population, .parameter = c("FL6-H", "FL2-H"),
 #           .column_name = "Analyte ID",
-#           .trim = 0.1) %>%
+#           .trim = 0.1) |>
 #    # The trim_population removes all factors
-#    mutate(`Analyte ID` = factor(`Analyte ID`, levels = names(panel_info$analytes$B))) %>%
+#    mutate(`Analyte ID` = factor(`Analyte ID`, levels = names(panel_info$analytes$B))) |>
 #    facs_scatter(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") + ggtitle("Group B")
 
 ## ---- fig.show='hold', cache=TRUE---------------------------------------------
@@ -94,20 +100,20 @@ args_ident_analyte <- list(fs = list(.parameter = c("FSC-A", "SSC-A"),
 
 analytes_identified <- identify_legendplex_analyte(df = lplex[[1]],
                                                 .analytes = panel_info$analytes,
-                                                .method_args = args_ident_analyte) %>%
-  group_by(`Analyte ID`) %>% 
+                                                .method_args = args_ident_analyte) |>
+  group_by(`Analyte ID`) |> 
   do(trim_population(., .parameter = c("FL6-H", "FL2-H"), 
                      .column_name = "Analyte ID", 
                      .trim = 0.1)) 
 
-analytes_identified %>% facs_plot(.x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
+analytes_identified |> facs_plot(.x = "FSC-A", .y = "SSC-A", .beads = "Bead group")
 
-analytes_identified %>%
-  filter(`Bead group` == "A") %>% 
+analytes_identified |>
+  filter(`Bead group` == "A") |> 
   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 
-analytes_identified %>%
-  filter(`Bead group` == "B") %>% 
+analytes_identified |>
+  filter(`Bead group` == "B") |> 
   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 
 
@@ -115,31 +121,31 @@ analytes_identified %>%
 
 find_and_trim <- function(df){
   identify_legendplex_analyte(df, .analytes = panel_info$analytes,
-                 .method_args = args_ident_analyte) %>% 
-    group_by(`Analyte ID`) %>% 
+                 .method_args = args_ident_analyte) |> 
+    group_by(`Analyte ID`) |> 
     do(trim_population(., .parameter = c("FL6-H", "FL2-H"), 
                        .column_name = "Analyte ID", 
                        .trim = 0.1))
 }
 
-analytes_identified <- lplex %>% lapply(find_and_trim) 
+analytes_identified <- lplex |> lapply(find_and_trim) 
 
 ## ----visualize-analytes, message=FALSE, fig.width=7---------------------------
 library(gridExtra)
 
 plot_side_by_side <- function(df, .cur_sample){
   
-  plot_all_beads <- df %>% 
+  plot_all_beads <- df |> 
     facs_plot(.x = "FSC-A", .y = "SSC-A", .beads = "Bead group") +
     ggtitle("All events")
   
-  plot_a_beads <- df %>%
-    filter(`Bead group` == "A") %>% 
+  plot_a_beads <- df |>
+    filter(`Bead group` == "A") |> 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group A")
   
-  plot_b_beads <- df %>%
-    filter(`Bead group` == "B") %>% 
+  plot_b_beads <- df |>
+    filter(`Bead group` == "B") |> 
     facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID") +
     ggtitle("Bead group B")
   
@@ -147,60 +153,64 @@ plot_side_by_side <- function(df, .cur_sample){
               nrow = 1, ncol = 3, top = .cur_sample)
 }
 
-analytes_identified[1] %>% 
-  map2(names(.), plot_side_by_side) %>% 
+analytes_identified[1] |> (
+  function(x)
+    map2(x, names(x), plot_side_by_side)
+  )() |> 
   walk(grid.arrange)
 
 ## ----save-plots, eval=FALSE---------------------------------------------------
 #  
-#  all_plots <- analytes_identified %>%
-#    map2(names(.), plot_side_by_side) %>%
+#  all_plots <- analytes_identified |> (
+#    function(x)
+#      map2(x, names(x), plot_side_by_side)
+#    )() |>
 #    marrangeGrob(ncol = 1, nrow = 4, top = NA)
 #  
 #  ggsave(filename = "dot_plot.pdf", plot = all_plots, width = 8.27, height = 11.69)
 #  
 
 ## ----calculate-mfi------------------------------------------------------------
-analyte_mfi <- analytes_identified %>% 
+analyte_mfi <- analytes_identified |> 
   map_df(calc_analyte_mfi, 
          .parameter = "FL2-H", 
          .column_name = "Analyte ID", 
          .mean_fun = "geometric", 
-         .id = "Sample") %>% 
-  mutate(`FL2-H` = log10(`FL2-H`)) %>% 
+         .id = "Sample") |> 
+  mutate(`FL2-H` = log10(`FL2-H`)) |> 
   filter(!is.na(`Analyte ID`))
 
 ## ----split-data---------------------------------------------------------------
 library(stringr)
 # All standard samples have the pattern C[number]
-standard_data <- analyte_mfi %>% 
+standard_data <- analyte_mfi |> 
   filter(str_detect(Sample, "C[0-9]"))
 
 # All non standards are samples... we could also filter on S[number]
-sample_data <- analyte_mfi %>% 
+sample_data <- analyte_mfi |> 
   filter(!str_detect(Sample, "C[0-9]")) 
 
 ## ----calc-std-conc------------------------------------------------------------
 # Helper function to extract the sample number
 as_numeric_standard_id <- function(.s){
-  .s %>% 
-    str_extract("C[0-9]") %>% 
-    str_sub(start = -1L) %>% 
+  .s |> 
+    str_extract("C[0-9]") |> 
+    str_sub(start = -1L) |> 
     as.numeric()
 }
 
-standard_data <- standard_data %>%
-  mutate(`Sample number` = as_numeric_standard_id(Sample)) %>%
-  left_join(as_data_frame_analyte(panel_info$analytes), by = "Analyte ID") %>%
-  group_by(`Analyte ID`) %>%
+standard_data <- standard_data |>
+  mutate(`Sample number` = as_numeric_standard_id(Sample)) |>
+  left_join(as_data_frame_analyte(panel_info$analytes), by = "Analyte ID") |>
+  group_by(`Analyte ID`) |>
   mutate(
     Concentration = calc_std_conc(
       `Sample number`,
       concentration,
       .dilution_factor = panel_info$std_dilution
     )
-  ) %>% 
-  mutate(Concentration = log10(Concentration)) %>% 
+  ) |> 
+  mutate(Concentration = log10(Concentration)) |> 
   select(-concentration, -`Bead group`)
 
 
@@ -208,15 +218,19 @@ standard_data <- standard_data %>%
 library(tidyr)
 # It seems that tidyr::nest has problems with non-standard names, so the names 
 # must all be concerted to syntactically valid column names.
-standard_data <- standard_data %>% 
-  ungroup() %>% 
-  setNames(make.names(names(.))) %>%
-  nest(-`Analyte.ID`, -name, .key = "Standard data")
+standard_data <- standard_data |> 
+  ungroup() |> (
+    function(x)
+      setNames(x, make.names(names(x)))
+      )() |>
+  nest(`Standard data` = c(-`Analyte.ID`, -name))
 
-sample_data <- sample_data %>% 
-  ungroup() %>% 
-  setNames(make.names(names(.))) %>% 
-  nest(-`Analyte.ID`, .key = "Sample data")
+sample_data <- sample_data |> 
+  ungroup() |> (
+    function(x)
+      setNames(x, make.names(names(x)))
+      )() |>
+  nest(`Sample data` = c(-`Analyte.ID`))
 
 plex_data <- 
   inner_join(standard_data, sample_data, by = "Analyte.ID")
@@ -229,28 +243,28 @@ library(purrr)
 # background (an unfortunate necessity). The mclust package also has a function
 # called `map`, so an unlucky side effect of clustering with mclust, is that we
 # need to be specify which map function we use
-plex_data <- plex_data %>% 
-  group_by(Analyte.ID) %>% 
+plex_data <- plex_data |> 
+  group_by(Analyte.ID) |> 
   mutate(`Model fit` = purrr::map(`Standard data`, fit_standard_curve))
 
 ## ----example-std-curve, echo=FALSE--------------------------------------------
-plex_data <- plex_data %>% 
+plex_data <- plex_data |> 
   mutate(`Std curve` = purrr::map2(`Standard data`, `Model fit`, plot_std_curve))
 
 plex_data[2, "Std curve"][[1]][[1]]
 
 ## ----calc-conc----------------------------------------------------------------
-plex_data <- plex_data %>% 
-  group_by(Analyte.ID) %>% 
+plex_data <- plex_data |> 
+  group_by(Analyte.ID) |> 
   mutate(`Standard data` = 
            purrr::map2(`Standard data`, `Model fit`, 
-                       calculate_concentration)) %>% 
+                       calculate_concentration)) |> 
   mutate(`Sample data` = 
            purrr::map2(`Sample data`, `Model fit`, 
-                       calculate_concentration)) %>% 
+                       calculate_concentration)) |> 
   mutate(`Std conc` = 
            purrr::map(`Standard data`, 
-                      plot_target_est_conc)) %>%
+                      plot_target_est_conc)) |>
   mutate(`Est curve` = 
            purrr::pmap(list(`Sample data`, `Standard data`, `Model fit`, name), 
                        plot_estimate))
@@ -266,16 +280,16 @@ comb_plots <- function(..., .title, .ncol, .nrow = 1){
   gridExtra::marrangeGrob(grobs = .grobs, ncol = .ncol, nrow = .nrow, top = .title)
 }
 
-plex_data <- plex_data %>% 
+plex_data <- plex_data |> 
    mutate(`Std plots` = pmap(list(`Std curve`, `Std conc`, .title = name), comb_plots))
 
 
-## ----example-std-plots, echo=FALSE, fig.show='hold'---------------------------
+## ----example-std-plots, fig.width=3, echo=FALSE, fig.show='hold'--------------
 plex_data[2, "Std plots"][[1]][[1]]
 plex_data[2, "Est curve"][[1]][[1]]
 
 ## ----example-save-std-plot, eval=FALSE----------------------------------------
-#  plots_to_save <- gridExtra::marrangeGrob(plex_data$`Std plots` %>% flatten(),
+#  plots_to_save <- gridExtra::marrangeGrob(plex_data$`Std plots` |> flatten(),
 #                                           ncol = 1, nrow = 6)
 #  
 #  ggsave("std_plots.pdf", plot = plots_to_save,
@@ -291,8 +305,8 @@ plex_data[2, "Est curve"][[1]][[1]]
 #         title = "Samples on std curve")
 
 ## ----example-extract-conc, eval=FALSE-----------------------------------------
-#  plex_data %>%
-#    unnest(`Sample data`) %>%
+#  plex_data |>
+#    unnest(`Sample data`) |>
 #    mutate(Calc.conc = 10^Calc.conc, `Calc.conc error` = 10^`Calc.conc error`)
 
 ## ----results='markup', echo=FALSE---------------------------------------------

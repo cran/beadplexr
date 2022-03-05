@@ -1,3 +1,12 @@
+# beadplexr version 0.4.1
+
+## Minor changes
+
++ Bumped R-dependency to 4.1
++ Fix problems related to `person()`
++ Fix minor problems due to general upgrade
+
+
 # beadplexr version 0.4.0
 
 ## Breaking changes

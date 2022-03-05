@@ -5,6 +5,8 @@ date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc: true
+    fig_width: 2.5
+    fig_height: 2.5
 vignette: >
   %\VignetteIndexEntry{CBA-MACSPlex-beadplexr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -30,10 +32,10 @@ The data from the CBA system is similar to the data from the MACSPlex system: th
 ```{r, fig.show='hold',}
 mplex_data <- simplex[["mplex"]]
 
-mplex_data %>% 
+mplex_data |> 
   facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
-mplex_data %>% 
+mplex_data |> 
   facs_plot(.x = "FITC", .y = "PE", .type = "hex")
 ```
 
@@ -44,10 +46,10 @@ There is a single bead population in the forward-side scatter and up to 30 bead 
 ```{r, fig.show='hold',}
 cba_data <- simplex[["cba"]]
 
-cba_data %>% 
+cba_data |> 
   facs_plot(.x = "FSC", .y = "SSC", .type = "hex")
 
-cba_data %>% 
+cba_data |> 
   facs_plot(.x = "APC", .y = "APC-Cy7", .type = "hex")
 ```
 
@@ -62,27 +64,27 @@ We use the `identify_analyte()` to annotate the correct analytes in the MACSPlex
 
 The function also allows for removing events that are far from the center of the analyte clusters. This is done by the parameter `.trim`. Here we set the value to `0.1` which means that 10% of the events are removed from the clusters. Excluded events are given the analyte ID `NA` and can easily be excluded from further processing.
 
-```{r, fig.width=7}
-mplex_analyte <- mplex_data %>% 
+```{r, fig.width=4}
+mplex_analyte <- mplex_data |> 
   identify_analyte(.parameter = c("FITC", "PE"), .analyte_id = as.character(c(1:10)))
 
-mplex_analyte %>% 
+mplex_analyte |> 
   facs_plot(.x = "FITC", .y = "PE", .beads = "analyte")
 
-mplex_analyte <- mplex_data %>% 
+mplex_analyte <- mplex_data |> 
   identify_analyte(.parameter = c("FITC", "PE"), .analyte_id = as.character(c(1:10)), .trim = 0.1)
 
-mplex_analyte %>% 
+mplex_analyte |> 
   facs_plot(.x = "FITC", .y = "PE", .beads = "analyte")
 ```
 
 We can now look at the intensity of the APC channel, to find the relative amount of analyte bound to each bead. In this case it makes very little sense, but we'll do it for the purpose of completeness
 
-```{r, fig.width=7}
+```{r, fig.width=5, fig.height=3}
 
-mplex_analyte %>% 
-  filter(!is.na(analyte)) %>% 
-  mutate(analyte = factor(analyte, levels = c(1:10))) %>% 
+mplex_analyte |> 
+  filter(!is.na(analyte)) |> 
+  mutate(analyte = factor(analyte, levels = c(1:10))) |> 
   ggplot() +
   aes(x = APC, fill = analyte) +
   geom_density()+
@@ -91,13 +93,13 @@ mplex_analyte %>%
 ```
 
 The trimming can also be done on the identified analytes. Here we remove 5% of the events.
-```{r, fig.width=7}
-mplex_analyte %>% 
-  # filter(!is.na(analyte)) %>% 
-  group_by(analyte) %>% 
-  trim_population(.parameter = "APC", .column_name = "analyte", .trim = 0.05) %>% 
-  ungroup() %>% 
-  mutate(analyte = factor(analyte, levels = c(1:10))) %>%
+```{r, fig.width=5, fig.height=3}
+mplex_analyte |> 
+  # filter(!is.na(analyte)) |> 
+  group_by(analyte) |> 
+  trim_population(.parameter = "APC", .column_name = "analyte", .trim = 0.05) |> 
+  ungroup() |> 
+  mutate(analyte = factor(analyte, levels = c(1:10))) |>
   ggplot() +
   aes(x = APC, fill = analyte) +
   geom_density() +
@@ -109,11 +111,11 @@ mplex_analyte %>%
 ### CBA-like
 For the CBA assay system, the approach is quite similar to the MACSPlex:
 
-```{r,fig.width=7}
-cba_analyte <- cba_data %>% 
+```{r, fig.width=5, fig.height=4}
+cba_analyte <- cba_data |> 
   identify_analyte(.parameter = c("APC", "APC-Cy7"), .analyte_id = as.character(c(1:30)), .trim = 0.1)
 
-cba_analyte %>% 
+cba_analyte |> 
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "analyte")
 ```
 
@@ -124,11 +126,11 @@ The analyte ID is assigned to each cluster, based on the order of the center of 
 For the simulated MACSPlex-like data the IDs are assigned as below.
 
 ```{r}
-mplex_analyte %>% 
-  filter(!is.na(analyte)) %>% 
-  group_by(analyte) %>% 
-  summarise(`FITC mean` = mean(FITC), `PE mean` = mean(PE)) %>% 
-  arrange(`FITC mean`, `PE mean`) %>% 
+mplex_analyte |> 
+  filter(!is.na(analyte)) |> 
+  group_by(analyte) |> 
+  summarise(`FITC mean` = mean(FITC), `PE mean` = mean(PE)) |> 
+  arrange(`FITC mean`, `PE mean`) |> 
   knitr::kable()
 ```
 
@@ -136,12 +138,12 @@ mplex_analyte %>%
 
 For the CBA-like data, some clusters are still a bit too wide, while the trimming of `0.1` made others look quite fine. The simulated data contains a bit of noise hat might interfere the the cluster identification. This noise might not be present in the a true experiment, but is included to demonstrate the removal of lonely, noisy events by the `despeckel()` functionality of **beadplexr**.
 
-```{r, warning=FALSE, fig.width=7}
-cba_analyte <- cba_data %>% 
-  despeckle(.parameter = c("APC", "APC-Cy7"), .neighbours = 2) %>% 
+```{r, warning=FALSE, fig.width=5, fig.height=4}
+cba_analyte <- cba_data |> 
+  despeckle(.parameter = c("APC", "APC-Cy7"), .neighbours = 2) |> 
   identify_analyte(.parameter = c("APC", "APC-Cy7"), .analyte_id = as.character(c(1:30)), .trim = 0.01)
 
-cba_analyte %>% 
+cba_analyte |> 
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "analyte")
 ```
 
