@@ -1,5 +1,3 @@
-context("Deprecation warnings")
-
 test_that("Deprecation waring is raised", {
   expect_warning(raise_deprecated("XX", "YY"), regexp = "'XX' is deprecated, use 'YY' instead")
   expect_warning(

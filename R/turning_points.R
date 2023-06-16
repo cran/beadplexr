@@ -119,9 +119,9 @@ turning_point <- function(.x,
       approx_adjust(.x = .x, .k = .k)
     }
 
-    .adjust <- .x %>%
-      purrr::map(find_approx_adjust) %>%
-      purrr::flatten_dbl()
+    .adjust <- .x |>
+      purrr::map(find_approx_adjust) |>
+      purrr::list_c()
     .adjust <- .adjust[!is.na(.adjust)]
 
     if(length(.adjust) == 0){
@@ -142,8 +142,8 @@ turning_point <- function(.x,
     apply(do.call(rbind, x), 2, as.list)
   }
 
-  rtn_lst <- .x %>% purrr::map2(.adjust, map_turning_point) %>% stats::setNames(names(.x)) %>%
-  revert_list() %>% purrr::map(function(x){do.call(cbind, x) %>% as.data.frame()})
+  rtn_lst <- .x |> purrr::map2(.adjust, map_turning_point) |> stats::setNames(names(.x)) |>
+  revert_list() |> purrr::map(function(x){do.call(cbind, x) |> as.data.frame()})
 
   if(.which == "maxima"){
     rtn_lst$minima <-NULL
@@ -210,7 +210,7 @@ approx_adjust <- function(.x, .k, .lower = 0.4, .upper = 2, .step = 0.2){
     .all_args$.adjust <- cur_adjust
 
     turn_points <- do.call(turning_point, .all_args)
-    num_maxima <- turn_points$maxima %>% nrow
+    num_maxima <- turn_points$maxima |> nrow()
 
     if(num_maxima < .k){
       cur_adjust <- cur_adjust - .step

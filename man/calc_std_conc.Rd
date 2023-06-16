@@ -31,7 +31,9 @@ Given a start concentration and dilution factor, the concentration of the given 
 }
 \details{
 In the manuals to the LEGENDplex system, standard are labeled 0 to 8, where 8
-indicate the highest concentration and 0 the background (no analyte). The standard is diluted at 1:4 so that\preformatted{[s7] = [start]
+indicate the highest concentration and 0 the background (no analyte). The standard is diluted at 1:4 so that
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{[s7] = [start]
 [s6] = [s7]/4
 [s5] = [s6]/4
 [s4] = [s5]/4
@@ -39,7 +41,7 @@ indicate the highest concentration and 0 the background (no analyte). The standa
 [s2] = [s3]/4
 [s1] = [s2]/4
 [s0] = 0
-}
+}\if{html}{\out{</div>}}
 
 It might happen, that a dilution step is missing in which case the dilution
 is corrected to accommodate the missing step. However, since it is inspired
@@ -63,9 +65,13 @@ appropriately and combined, see Examples.
 
 calc_std_conc(.standard_sample = c(7:0),
                                  .start_concentration = 5000)
-# Sample 5 is missing
+
+suppressWarnings(
+# Sample 5 is missing - raises a warning
 calc_std_conc(.standard_sample = c(7, 6, 4, 3, 2, 1, 0),
                                  .start_concentration = 5000)
+)
+
 calc_std_conc(.standard_sample = rep(c(7:0), 2),
                                  .start_concentration = 5000)
 calc_std_conc(.standard_sample = c(9:0),

@@ -72,7 +72,10 @@
 #' panel_info <- load_panel(.file_name = .file_name, .panel_name = .panel_name)
 #' panel_info$panel_name
 #'
+#' suppressWarnings(
+#' # The pattern matches several files, which raises a warning
 #' panel_info <- load_panel(.panel_pattern = "panel_2_13-plex")
+#' )
 #' panel_info$panel_name
 #'
 load_panel <- function(.file_name = NULL, .panel_name = NULL, .panel_pattern = NULL){
@@ -107,9 +110,8 @@ load_panel <- function(.file_name = NULL, .panel_name = NULL, .panel_pattern = N
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#'   panel_name_file(.panel_name = "Human Th Cytokine Panel (13-plex)")
-#' }
+#' beadplexr:::panel_name_file(.panel_name = "Human Th Cytokine Panel (13-plex)")
+#'
 panel_name_file <- function(.panel_name){
   switch(
     .panel_name,

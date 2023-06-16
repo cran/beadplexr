@@ -1,5 +1,3 @@
-context("Structure of panel information files")
-
 # Preparation -------------------------------------------------------------
 library(beadplexr)
 
@@ -9,7 +7,7 @@ info_files <- list.files(file.path(info_files, "resources"), pattern = "*.yml$",
 test_file <- function(.file_path){
   # File can be loaded
   test_that(paste(basename(.file_path), "can be loaded"), {
-    expect_is(panel_info <- load_panel(.file_name = .file_path), "list")
+    expect_type(panel_info <- load_panel(.file_name = .file_path), "list")
   })
 
   # Stil here?
@@ -26,7 +24,7 @@ test_file <- function(.file_path){
 
   # Analyte can be converted to data frame
   test_that(paste(basename(.file_path), "as_data_frame_analyte"), {
-    expect_is(as_data_frame_analyte(panel_info$analytes), "data.frame")
+    expect_s3_class(as_data_frame_analyte(panel_info$analytes), "data.frame")
   })
 }
 
@@ -34,5 +32,4 @@ test_file <- function(.file_path){
 for(.file_path in info_files){
   test_file(.file_path)
 }
-
 

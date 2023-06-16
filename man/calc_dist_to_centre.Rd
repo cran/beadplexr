@@ -22,8 +22,7 @@ This function does mot make use of the base function dist, as that
 dist-function is about twice as slow as the implementation here.
 }
 \examples{
-\dontrun{
-calc_dist_to_centre(.x = c(10, 15), .c = c(1, 2))
-}
+beadplexr:::calc_dist_to_centre(.x = c(10, 15), .c = c(1, 2))
+
 }
 \keyword{internal}

@@ -44,19 +44,19 @@ library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
-  filter(`FSC-A` > 3.2e5L) \%>\%
-  mutate(population = "1") \%>\%
-  trim_population(.parameter = c("FSC-A", "SSC-A"), .column_name = "population", .trim = 0.1) \%>\%
+lplex[[1]] |>
+  filter(`FSC-A` > 3.2e5L) |>
+  mutate(population = "1") |>
+  trim_population(.parameter = c("FSC-A", "SSC-A"), .column_name = "population", .trim = 0.1) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
 
-lplex[[1]] \%>\%
-  filter(`FSC-A` > 3.2e5L) \%>\%
-  mutate(population = as.character(1)) \%>\%
+lplex[[1]] |>
+  filter(`FSC-A` > 3.2e5L) |>
+  mutate(population = "1") |>
   trim_population(.parameter = c("FSC-A", "SSC-A"),
-                  .column_name = "population", .trim = 0.8) \%>\%
+                  .column_name = "population", .trim = 0.8) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()

@@ -1,5 +1,3 @@
-context("Identify assay analytes")
-
 exclude_dbscan <- FALSE
 
 # Preparation -------------------------------------------------------------
@@ -20,11 +18,11 @@ panel_info <- load_panel(.panel_name = "Human Growth Factor Panel (13-plex)")
 # ident_bead_pop() --------------------------------------------------------
 test_that("ident_bead_pop() works",{
 
-  expect_is(beadplexr:::ident_bead_pop(.analytes = names(panel_info$analytes),
+  expect_s3_class(beadplexr:::ident_bead_pop(.analytes = names(panel_info$analytes),
                            .call_args = args_ident_analyte[[1]],
                            df = df), "data.frame")
 
-  expect_is(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
+  expect_s3_class(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                            .call_args = args_ident_analyte[[1]],
                            df = df), "data.frame")
 
@@ -38,7 +36,7 @@ test_that("ident_bead_pop() works",{
   .tmp_data <- df
   .tmp_data$BeadID <- rep(c("A", "B"), nrow(.tmp_data)/2)
 
-  expect_is(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
+  expect_s3_class(beadplexr:::ident_bead_pop(.analytes = panel_info$analytes,
                               .column_name = "BeadID",
                               .cluster = c("A", "B"),
                               .call_args = args_ident_analyte[[1]],
@@ -70,7 +68,7 @@ test_that(".column_name is identified in method argument list",{
 
 # identify_legendplex_analyte() -------------------------------------------
 test_that("Legendplex works with column_names in .method_args",{
-  expect_is(identify_legendplex_analyte(df = df,
+  expect_s3_class(identify_legendplex_analyte(df = df,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
@@ -95,7 +93,7 @@ test_that("Legendplex works without column_names in .method_args",{
                                        .trim = 0.2),
                              analytes = list(.parameter = "FL6-H"))
 
-  expect_is(identify_legendplex_analyte(df = df,
+  expect_s3_class(identify_legendplex_analyte(df = df,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
@@ -131,7 +129,7 @@ test_that("dbscan works as expected", {
     expect_warning(identify_analyte(df, .parameter = c("FSC-A", "SSC-A"),
                                     .analyte_id = c("A"), .method = "dbscan"))
 
-    expect_is(.analyte_set <- identify_analyte(df, .parameter = c("FSC-A", "SSC-A"),
+    expect_s3_class(.analyte_set <- identify_analyte(df, .parameter = c("FSC-A", "SSC-A"),
                                                .analyte_id = c("A", "B"), .method = "dbscan",
                                                .column_name = "Bead group"), "data.frame")
 
@@ -171,7 +169,7 @@ test_that("Recalculation is possible", {
   annot_events <- identify_legendplex_analyte(df = df,
                                               .analytes = panel_info$analytes,
                                               .method_args = args_ident_analyte)
-  expect_is(identify_legendplex_analyte(df = annot_events,
+  expect_s3_class(identify_legendplex_analyte(df = annot_events,
                                         .analytes = panel_info$analytes,
                                         .method_args = args_ident_analyte), "data.frame")
 
@@ -195,30 +193,29 @@ test_that("Recalculation is possible", {
 
 # identify_cba_macsplex_analyte() --------------------------------------------------
 df <- simplex[["cba"]]
-analytes <- vector("list", 30) %>% setNames(as.character(c(1:30)))
+analytes <- vector("list", 30) |> setNames(as.character(c(1:30)))
 args_ident_analyte <- list(.parameter = c("APC", "APC-Cy7"),
                            .column_name = "Analyte ID",
                            .method = "clara")
 test_that("CBS/MACSplex works -- no FS trimming",{
-  expect_is(identify_cba_macsplex_analyte(df = df,
+  expect_s3_class(identify_cba_macsplex_analyte(df = df,
                                  .analytes = analytes,
                                  .method_args = args_ident_analyte), "data.frame")
 
   annot_events <- identify_cba_macsplex_analyte(df = df,
                                               .analytes = analytes,
                                               .method_args = args_ident_analyte)
-  annot_events %>% head
 
   # Test columns are as expected
   expect_equal(ncol(annot_events), 6)
   expect_true("Analyte ID" %in% names(annot_events))
 
   # Test clusters are as expected
-  expect_is(annot_events[["Analyte ID"]], "character")
+  expect_type(annot_events[["Analyte ID"]], "character")
 })
 
 test_that("CBS/MACSplex works -- with FS trimming",{
-  expect_is(identify_cba_macsplex_analyte(df = df,
+  expect_s3_class(identify_cba_macsplex_analyte(df = df,
                                  .analytes = analytes,
                                  .method_args = args_ident_analyte,
                                  .trim_fs = 0.1, .parameter_fs = c("FSC", "SSC")), "data.frame")
@@ -234,12 +231,12 @@ test_that("CBS/MACSplex works -- with FS trimming",{
   expect_true("Analyte ID" %in% names(annot_events))
 
   # Test clusters are as expected
-  expect_is(annot_events[["Bead events"]], "character")
-  expect_is(annot_events[["Analyte ID"]], "character")
+  expect_type(annot_events[["Bead events"]], "character")
+  expect_type(annot_events[["Analyte ID"]], "character")
 })
 
 test_that("CBS/MACSplex fails",{
-  expect_is(identify_cba_macsplex_analyte(df = df,
+  expect_s3_class(identify_cba_macsplex_analyte(df = df,
                                           .analytes = analytes,
                                           .method_args = args_ident_analyte,
                                           .trim_fs = NULL, .parameter_fs = c("FSC", "SSC")), "data.frame")

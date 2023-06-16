@@ -21,11 +21,9 @@ Nothing. Just raise a warning
 Warn about deprecated parameters or functions
 }
 \examples{
-\dontrun{
-raise_deprecated("XX", "YY")
-raise_deprecated(old = "XX", new = "YY", caller = "ZZZ")
-raise_deprecated(old = "XX", new = "YY", caller = "ZZZ()")
-}
+beadplexr:::raise_deprecated("XX", "YY")
+beadplexr:::raise_deprecated(old = "XX", new = "YY", caller = "ZZZ")
+beadplexr:::raise_deprecated(old = "XX", new = "YY", caller = "ZZZ()")
 
 }
 \keyword{internal}

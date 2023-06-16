@@ -6,7 +6,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Preparing flow-data for use with with beadplexr}
+  %\VignetteIndexEntry{Preparing flow-data for use with with `beadplexr`}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

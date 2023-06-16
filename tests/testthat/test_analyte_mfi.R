@@ -1,5 +1,3 @@
-context("Calculate analyte MFI")
-
 # Preparation -------------------------------------------------------------
 data("lplex")
 df <- lplex[[1]]
@@ -12,9 +10,9 @@ df <- identify_analyte(df, .parameter = "FL6-H",
 
 # Analyte MFI -------------------------------------------------------------
 test_that("Analyte MFI - 1 parameter", {
-  expect_is(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "geometric"), "data.frame")
-  expect_is(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "harmonic"), "data.frame")
-  expect_is(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "arithmetic"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "geometric"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "harmonic"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "arithmetic"), "data.frame")
 
   expect_lt(nrow(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "geometric")), .nrow_data)
   expect_lt(nrow(calc_analyte_mfi(df, .parameter = "FL2-H", .mean_fun = "harmonic")), .nrow_data)
@@ -26,9 +24,9 @@ test_that("Analyte MFI - 1 parameter", {
 })
 
 test_that("Analyte MFI - 2 parameter", {
-  expect_is(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "geometric"), "data.frame")
-  expect_is(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "harmonic"), "data.frame")
-  expect_is(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "arithmetic"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "geometric"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "harmonic"), "data.frame")
+  expect_s3_class(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "arithmetic"), "data.frame")
 
   expect_lt(nrow(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "geometric")), .nrow_data)
   expect_lt(nrow(calc_analyte_mfi(df, .parameter = c("FL2-H", "FL6-H"), .mean_fun = "harmonic")), .nrow_data)

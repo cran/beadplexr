@@ -78,35 +78,34 @@ Information on additional arguments passed, can be found here:
 \examples{
 \dontrun{
 library(beadplexr)
-library(magrittr)
 library(ggplot2)
 
 data("lplex")
 
 df <- lplex[[1]]
-df \%>\%
+df |>
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
-                      .method = "clara", .trim = 0.02) \%>\%
+                      .method = "clara", .trim = 0.02) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
   geom_point()
 
-f
+df |>
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
-                      .method = "clara", .desc = TRUE) \%>\%
+                      .method = "clara", .desc = TRUE) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
   geom_point()
 
-df \%>\%
+df |>
   identify_analyte(.parameter = c("FSC-A", "SSC-A"),
                       .analyte_id = c("A", "B"),
                       .column_name = "analyte",
-                      .method = "dbscan") \%>\%
+                      .method = "dbscan") |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = analyte) +
   geom_point()

@@ -18,8 +18,7 @@ A numeric
 Calculate population center
 }
 \examples{
-\dontrun{
-calc_centre(.x = rnorm(100))
-}
+beadplexr:::calc_centre(.x = rnorm(100))
+
 }
 \keyword{internal}

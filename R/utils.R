@@ -1,16 +1,20 @@
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
+if (getRversion() >= "2.15.1")
+  utils::globalVariables(c(".", ".data"))
 
 #' Despeckle parameters
 #'
 #' Remove lonely, noisy data points in a 2D scatter matrix
 #'
-#' @param df A tidy data.frame
-#' @param .parameters A character of the length of two giving the parameters to despeckle.
-#' @param .bins A numeric giving the resolution of the raster matrix.
-#' @param .neighbours A numeric giving the minimum number of neighbors. Points with fewer neighbors are removed.
+#' @param df A tidy data.frame.
+#' @param .parameters A character of the length of two giving the parameters to
+#'   despeckle.
+#' @param .bins A numeric giving the resolution of the raster matrix. Increasing
+#'   the resolution results in more isolated events.
+#' @param .neighbours A numeric giving the minimum number of neighbours. Points
+#'   with fewer neighbours are removed.
 #' @param .data Deprecated. Use `df`.
-#' @param ... Additional parameters passed to [raster::clump()]
+#' @param ... Deprecated. It's use has no effect.
 #'
 #' @details
 #' The values of the two parameters are binned into the given number of bins.
@@ -18,125 +22,257 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 #' parameters ending up as rows, the bins of the second parameter as
 #' columns, and combinations are marked by `1`.
 #'
-#' This matrix is turned into a `RasterLayer` by [raster::raster()] and the
-#' number of neighbors are calculated by [raster::clump()].
-#'
 #' The rows of the `df` where lonely points are found in `.parameters` are removed.
 #'
-#' @note
-#' This function requires that the `igraph` package is available.
-#'
 #' @return A `data.frame` with noisy points removed.
-#'
-#' @importFrom raster "%in%"
 #'
 #' @export
 #'
 #' @examples
 #' library(beadplexr)
-#' library(magrittr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   ggplot() +
 #'   aes(x = `FL6-H`, y = `FL2-H`) +
 #'   geom_point()
 #'
-#' lplex[[1]] %>%
-#'   despeckle(.parameters = c("FL6-H", "FL2-H"), .neighbours = 8) %>%
+#' lplex[[1]] |>
+#'   despeckle(.parameters = c("FL6-H", "FL2-H"), .neighbours = 8) |>
 #'   ggplot() +
 #'   aes(x = `FL6-H`, y = `FL2-H`) +
 #'   geom_point()
 #'
-#' lplex[[1]] %>%
-#'   despeckle(.parameters = c("FL6-H", "FL2-H"), .bin = 128, direction = 4) %>%
+#' lplex[[1]] |>
+#'   despeckle(.parameters = c("FL6-H", "FL2-H"), .bin = 128) |>
 #'   ggplot() +
 #'   aes(x = `FL6-H`, y = `FL2-H`) +
 #'   geom_point()
 #'
-despeckle <- function(df, .parameters, .bins = 256L, .neighbours = 4L, .data = NULL, ...){
-  if(!is.null(.data)){
-    raise_deprecated(old = ".data", new = "df", caller = "despeckle")
-    df <- .data
+despeckle <-
+  function(df,
+           .parameters,
+           .bins = 256L,
+           .neighbours = 4L,
+           .data = NULL,
+           ...) {
+    if (!is.null(.data)) {
+      raise_deprecated(old = ".data",
+                       new = "df",
+                       caller = "despeckle")
+      df <- .data
+    }
+    if (length(list(...)) > 0) {
+      raise_deprecated(old = "Additional args to `raster::clump()`",
+                       new = "",
+                       caller = "despeckle")
+    }
+
+    if (length(.parameters) != 2) {
+      stop(".parameters must be of length two. No more, and no less")
+    }
+    if (FALSE %in% (.parameters %in% names(df))) {
+      stop(".parameters not found in data")
+    }
+
+    .col_names_bin <- c("x_bin", "y_bin")
+    names(.parameters) <- .col_names_bin
+
+    # We calculate the number of neighbors each point have when the two parameters
+    # are plotted against each other. This works best if we have integers, but we
+    # must also be able to identify the points we have discharge in the original
+    # data. By breaking the values of the two parameters into numbered bins, and
+    # by keeping this information, we have what we need
+    .set_bins <- function(x, .bins) {
+      as.character(base::cut(x, breaks = .bins, labels = seq_along(1:.bins)))
+    }
+
+    .binned_data <-
+      df |>
+      dplyr::mutate(dplyr::across(dplyr::all_of(.parameters), ~ .set_bins(., .bins = .bins)))
+
+    # Extract the information to a matrix.
+    # The columns of interest in have 'bin' in their names, and since the same
+    # x_bin - y_bin combination can be found more than once we remove all
+    # duplicates before spreading, setting row names and cast to matrix
+    .binned_matrix <-
+      .binned_data |>
+      dplyr::select(dplyr::all_of(.col_names_bin)) |>
+      dplyr::distinct() |>
+      dplyr::mutate(present = 1L) |>
+      tidyr::pivot_wider(
+        names_from = .col_names_bin[2],
+        values_from = "present",
+        values_fill = 0L
+      ) |>
+      tibble::column_to_rownames(var = .col_names_bin[1]) |>
+      as.matrix()
+
+    .despeckled_data <-
+      .binned_matrix |>
+      count_neighbours() |>
+      tibble::as_tibble(rownames = .col_names_bin[1]) |>
+      tidyr::pivot_longer(
+        cols = !dplyr::any_of(.col_names_bin[1]),
+        names_to = .col_names_bin[2],
+        values_to = "num_neighbour"
+      )
+
+    # Having the bin numbers of all data points and their number of neighbours we
+    # can now filter, clean and return
+    .despeckled_data |>
+      dplyr::filter(.data[["num_neighbour"]] >= .neighbours) |>
+      dplyr::left_join(.binned_data, by = .col_names_bin) |>
+      dplyr::select(-dplyr::all_of(c(.col_names_bin, "num_neighbour")))
   }
 
-  if(length(.parameters) != 2){
-    stop(".parameters must be of length two. No more, and no less")
+#' Pad a matrix
+#'
+#' @param x The matrix to pad.
+#' @param pad_size An integer giving the number of columns/rows to pad with.
+#' @param pad A single value giving the padding.
+#'
+#' @return
+#' A matrix
+#'
+#' @keywords internal
+#'
+#' @examples
+#'
+#' x <- matrix(c(1:9), nrow = 3, ncol = 3)
+#' beadplexr:::pad_matrix(x)
+#'
+#' x <- matrix(c(1:4), nrow = 2, ncol = 2)
+#' beadplexr:::pad_matrix(x)
+#' beadplexr:::pad_matrix(x, pad_size = 2L)
+#' beadplexr:::pad_matrix(x, pad = NA)
+#' beadplexr:::pad_matrix(x, pad = "xx")
+#'
+#' x <- matrix(c(1:6), nrow = 3, ncol = 2)
+#' beadplexr:::pad_matrix(x)
+#'
+pad_matrix <- function(x, pad_size = 1L, pad = 0L) {
+  nc <- ncol(x) + pad_size * 2
+  nr <- nrow(x) + pad_size * 2
+  pm <- matrix(rep(pad, nr * nc),
+               nrow = nr,
+               ncol = nc)
+
+  pm[seq_len(nrow(x)) + pad_size,
+     seq_len(ncol(x)) + pad_size] <- x
+  pm
+}
+
+#' Count neighbours for each element in a binary matrix
+#'
+#' @param x The matrix to count the neighbours in.
+#'
+#' @return
+#'
+#' A matrix of the same size as `x` giving the number of elements with non-zero
+#' values in neighbouring cells of the matrix.
+#'
+#' @keywords internal
+#'
+#' @examples
+#'
+#' x <- matrix(
+#' c(1L, 1L, 0L,
+#'   1L, 1L, 0L,
+#'   0L, 1L, 1L),
+#' nrow = 3,
+#' ncol = 3,
+#' byrow = TRUE
+#' )
+#' beadplexr:::count_neighbours(x)
+#'
+#' x <- matrix(
+#'   c(TRUE, TRUE, FALSE,
+#'     TRUE, TRUE, FALSE,
+#'    FALSE, TRUE, TRUE),
+#'   nrow = 3,
+#'   ncol = 3,
+#'  byrow = TRUE
+#' )
+#' beadplexr:::count_neighbours(x)
+#'
+#' x <- matrix(
+#'   c(1, 1, 0, 0,
+#'     1, 0, 0, 0,
+#'     0, 1, 1 ,1,
+#'     0, 1, 1, 1),
+#'   nrow = 4,
+#'   ncol = 4,
+#'   byrow = TRUE
+#' )
+#' beadplexr:::count_neighbours(x)
+#'
+#' \dontrun{
+#'   x <- matrix(
+#'     c("1", "1", "0",
+#'       "1", "1", "0",
+#'       "0", "1", "1"),
+#'     nrow = 3,
+#'     ncol = 3,
+#'     byrow = TRUE
+#'   )
+#'   #beadplexr:::count_neighbours(x)
+#' }
+#'
+count_neighbours <- function(x) {
+  if (!(is.numeric(x) | is.logical(x))) {
+    stop(paste("x must be numeric or logical, not", typeof(x)))
   }
-  if(FALSE %in% (.parameters %in% names(df))){
-    stop(".parameters not found in data")
+  nm <- matrix(rep(0, ncol(x) * nrow(x)),
+               nrow = nrow(x),
+               ncol = ncol(x))
+
+
+  x_rn <- rownames(x)
+  x_cn <- colnames(x)
+
+  # Padd with 0s
+  x <- pad_matrix(x)
+
+  num_cols <- ncol(x)
+  num_rows <- nrow(x)
+
+  for (i in seq_len(num_rows)) {
+    for (j in seq_len(num_cols)) {
+      # Neighbourhood is a square of the size 3
+      i_end <- i + 2
+      j_end <- j + 2
+
+      i_centre <- i + 1
+      j_centre <- j + 1
+
+      if (i_centre > num_rows) {
+        next
+      }
+
+      if (j_centre > num_cols) {
+        next
+      }
+
+      cv <- x[i_centre, j_centre]
+
+      if (cv == 0) {
+        next
+      }
+
+      nm[i, j] <- sum(x[c(i:i_end), c(j:j_end)]) - cv
+    }
   }
 
-  .col_names_bin <- c("x_bin", "y_bin")
-  names(.parameters) <- .col_names_bin
-  # We use the raster package to calculate the number of neighbors each point
-  # have when the two paramters are plotted against eachother. This works best
-  # if we have integers, but we must also be able to  identify the points we
-  # have discharge in the original data. By breaking the values of the two
-  # parameters into numbered bins, and by keeping this information, we
-  # have what we need
-  .set_bins <- function(x, .bins){
-    as.character(base::cut(x, breaks = .bins, labels = seq_along(1:.bins)))
+  if (!is.null(x_rn)) {
+    rownames(nm) <- x_rn
   }
-
-  .binned_data <-
-    df %>%
-      dplyr::mutate_at(.vars = .parameters, .funs = ~.set_bins(., .bins = .bins))
-
-  # Raster only works with a matrix so this we need to have.
-  # The columns of interest in have 'bin' in their names, and since the same
-  # x_bin - y_bin combination can be found more than once we remove all
-  # duplicates before spreading, setting rownames and cast to matrix
-  .binned_matrix <-
-    .binned_data %>%
-    dplyr::select(dplyr::one_of(.col_names_bin)) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(present = 1L) %>%
-    tidyr::spread(key = .col_names_bin[2], value = "present", fill = 0L) %>%
-    tibble::as_tibble() %>%
-    tibble::column_to_rownames(var = .col_names_bin[1]) %>% as.matrix
-  # It a little bit of work getting to the values with low number of neighbors.
-  # First we have to find the number of neighboutrs ofcourse and the ones below
-  # the cutoff so we can the number of neightbours to nothing
-  .clump_res <- .binned_matrix %>%
-    raster::raster() %>%
-    raster::clump(...)
-
-  # clump assigns each data point a number and a count of neighbors
-  .speckles <-
-    .clump_res %>%
-    raster::freq() %>%
-    tibble::as_tibble() %>%
-    dplyr::filter(!!rlang::sym("count") < .neighbours)
-
-  .clump_res[.clump_res %in% .speckles$value] <- NA
-  # The number of neighbors are stored in a single vector which we must turn
-  # into a tidy data.frame. The column and row names of the binned matrix
-  # corrospond to the bin number, which is what we need to filter the original
-  # data
-
-  .despeckled_data <-
-    .clump_res@data@values %>%
-    as.integer() %>%
-    matrix(ncol = ncol(.binned_matrix), byrow = TRUE) %>%
-    magrittr::set_colnames(value = colnames(.binned_matrix)) %>%
-    magrittr::set_rownames(value = NULL) %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(!!.col_names_bin[1] := rownames(.binned_matrix)) %>%
-    tidyr::gather(
-      key = !!.col_names_bin[2],
-      value = "raster_number",
-      -dplyr::one_of(.col_names_bin[1])
-    ) %>%
-    dplyr::filter(!is.na(!!rlang::sym("raster_number")))
-
-  # Having the bin numbers of all data points with more than the minimum number
-  # of neighbors we can now filtermclean and return
-  .despeckled_data %>%
-    dplyr::left_join(.binned_data, by = .col_names_bin) %>%
-    dplyr::select(-dplyr::one_of(c(.col_names_bin, "raster_number")))
+  if (!is.null(x_cn)) {
+    colnames(nm) <- x_cn
+  }
+  nm
 }
 
 #' Chebyshev distance
@@ -155,17 +291,24 @@ despeckle <- function(df, .parameters, .bins = 256L, .neighbours = 4L, .data = N
 #' x <- matrix(rnorm(100), nrow = 5)
 #' dist_chebyshev(x)
 #'
-dist_chebyshev <- function(x, diag = FALSE, upper =FALSE) {
-  x <- x %>% as.matrix()
+#' x <- matrix(
+#' c(1, 1, 0, 0,
+#'   1, 0, 0, 0,
+#'   0, 1, 1 ,1,
+#'   0, 1, 1, 1),
+#' nrow = 4,
+#' ncol = 4,
+#' byrow = TRUE
+#' )
+#' dist_chebyshev(x, diag = TRUE, upper = TRUE)
+#'
+dist_chebyshev <- function(x, diag = FALSE, upper = FALSE) {
+  x <- x |> as.matrix()
   N <- nrow(x)
   .pairs <- utils::combn(N, 2)
 
-  .dist <- apply(.pairs, MARGIN = 2, function(i){
-    max(
-      abs(
-        x[i[1], ] - x[i[2], ]
-      )
-    )
+  .dist <- apply(.pairs, MARGIN = 2, function(i) {
+    max(abs(x[i[1],] - x[i[2],]))
   })
 
   attr(.dist, "Size") <- N
@@ -177,6 +320,7 @@ dist_chebyshev <- function(x, diag = FALSE, upper =FALSE) {
   class(.dist) <- "dist"
   .dist
 }
+
 
 #' Cast list of analytes to `data.frame`
 #'
@@ -204,16 +348,20 @@ dist_chebyshev <- function(x, diag = FALSE, upper =FALSE) {
 #'                 A2 = list(name = "name_a2", concentration = 50000)))
 #'
 #' as_data_frame_analyte(.analytes)
-as_data_frame_analyte <- function(.analytes, .id_bead = "Bead group", .id_analyte = "Analyte ID"){
-  if(! inherits(.analytes, "list")){
-    stop("I expect .analytes to be a list")
+as_data_frame_analyte <-
+  function(.analytes,
+           .id_bead = "Bead group",
+           .id_analyte = "Analyte ID") {
+    if (!inherits(.analytes, "list")) {
+      stop("I expect .analytes to be a list")
+    }
+
+    .analytes |>
+      purrr::map_df(function(.l) {
+        .l |> purrr::map_df(function(.x) {
+          tibble::tibble(name = .x$name,
+                         concentration = .x$concentration)
+        }, .id = .id_analyte)
+      }, .id = .id_bead)
+
   }
-
-  .analytes %>%
-    purrr::map_df(function(.l){
-      .l %>% purrr::map_df(function(.x){
-        tibble::tibble(name = .x$name, concentration = .x$concentration)
-      }, .id = .id_analyte)
-    }, .id = .id_bead)
-
-}

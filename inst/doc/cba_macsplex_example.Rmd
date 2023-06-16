@@ -8,7 +8,7 @@ output:
     fig_width: 2.5
     fig_height: 2.5
 vignette: >
-  %\VignetteIndexEntry{CBA-MACSPlex-beadplexr}
+  %\VignetteIndexEntry{beadplexr with CBA and MACSPlex assays}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

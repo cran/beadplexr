@@ -13,38 +13,26 @@
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#' raise_deprecated("XX", "YY")
-#' raise_deprecated(old = "XX", new = "YY", caller = "ZZZ")
-#' raise_deprecated(old = "XX", new = "YY", caller = "ZZZ()")
-#' }
+#' beadplexr:::raise_deprecated("XX", "YY")
+#' beadplexr:::raise_deprecated(old = "XX", new = "YY", caller = "ZZZ")
+#' beadplexr:::raise_deprecated(old = "XX", new = "YY", caller = "ZZZ()")
 #'
 raise_deprecated <- function(old, new, caller = NULL){
-  warn_str <- paste("'{old}' {fun-caller} is deprecated, use '{new}' instead.",
-                    "'{old}' will be removed in the next version")
 
-  if(!is.null(caller)){
+  if(is.null(caller)){
+    warn_str <- paste("'{old}' is deprecated, use '{new}' instead.",
+                      "'{old}' will be removed in the next version")
+  } else{
     if(!grepl("\\(\\)$", caller)){
       caller <- paste0(caller, "()")
     }
-    warn_str <- gsub(
-      "{fun-caller}",
-      paste("in", caller),
-      warn_str,
-      fixed = TRUE)
-  }else{
-    warn_str <- gsub(
-      "{fun-caller} ",
-      "",
-      warn_str,
-      fixed = TRUE)
-
+    warn_str <- paste("'{old}' in {caller} is deprecated, use '{new}' instead.",
+                      "'{old}' will be removed in the next version")
+    warn_str <- gsub("\\{caller\\}", caller, warn_str)
   }
 
-  warn_str <- warn_str %>%
-    gsub("{old}", old, ., fixed = TRUE) %>%
-    gsub("{new}", new, ., fixed = TRUE)
+  warn_str <- gsub("\\{old\\}", old, warn_str)
+  warn_str <- gsub("\\{new\\}", new, warn_str)
 
   .Deprecated(msg = warn_str)
 }
-

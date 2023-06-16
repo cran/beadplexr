@@ -11,9 +11,7 @@ density_cut(.x, .k, .lower = 0.1, .upper = 2, .step = 0.1)
 
 \item{.k}{Numeric giving the number of expected clusters.}
 
-\item{.lower}{The interval for possible value of adjust.}
-
-\item{.upper}{The interval for possible value of adjust.}
+\item{.lower, .upper}{The interval for possible value of adjust.}
 
 \item{.step}{A numeric giving the increment to adjust. Sometimes low values
 are needed to find a proper adjust value.}

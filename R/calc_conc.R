@@ -55,9 +55,13 @@
 #'
 #' calc_std_conc(.standard_sample = c(7:0),
 #'                                  .start_concentration = 5000)
-#' # Sample 5 is missing
+#'
+#' suppressWarnings(
+#' # Sample 5 is missing - raises a warning
 #' calc_std_conc(.standard_sample = c(7, 6, 4, 3, 2, 1, 0),
 #'                                  .start_concentration = 5000)
+#' )
+#'
 #' calc_std_conc(.standard_sample = rep(c(7:0), 2),
 #'                                  .start_concentration = 5000)
 #' calc_std_conc(.standard_sample = c(9:0),
@@ -87,28 +91,28 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
 
   # Order the standard samples from high to low, but remember the original position
   .ss_org <-  .standard_sample
-  .standard_sample <- .standard_sample %>% unique()
+  .standard_sample <- .standard_sample |> unique()
 
   if(length(.standard_sample) < 8){
     warning(paste(8 - length(.standard_sample), "standard samples are missing. The result might not be correct"))
   }
 
   if(inherits(.standard_sample, "numeric")){
-    .standard_sample <- .standard_sample %>% sort(decreasing = TRUE)
+    .standard_sample <- .standard_sample |> sort(decreasing = TRUE)
 
     # Get the difference between each sample.
-    std_dilution <- .standard_sample %>% diff() %>% abs
+    std_dilution <- .standard_sample |> diff() |> abs()
   }else{
     # We cannot calculate the difference between the standards because they are
     # not numeric. We must then assume equal difference while preserving the
     # logic of order
     .numeric_values <- grep("^[0-9]*$", .standard_sample)
-    .alpha_values <- .standard_sample[!.numeric_values] %>% sort
-    .numeric_values <- .standard_sample[.numeric_values] %>% sort(decreasing = TRUE)
+    .alpha_values <- .standard_sample[!.numeric_values] |> sort()
+    .numeric_values <- .standard_sample[.numeric_values] |> sort(decreasing = TRUE)
 
     .standard_sample <- c(.alpha_values, .numeric_values)
 
-    std_dilution <- seq_along(1:length(.standard_sample)) %>% diff()
+    std_dilution <- seq_along(1:length(.standard_sample)) |> diff()
   }
 
   if(length(.dilution_factor) == 1){
@@ -119,9 +123,9 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
     # The first element is missing, so we insert is. The standards are diluted in a
     # 1:4 serial dilution and by taking the cumulative product we can calculate the
     # actual dilution from the first sample
-    std_dilution <-  c(1, (std_dilution * .dilution_factor)) %>% cumprod()
+    std_dilution <-  c(1, (std_dilution * .dilution_factor)) |> cumprod()
   }else{
-    std_dilution <- .dilution_factor %>% cumprod()
+    std_dilution <- .dilution_factor |> cumprod()
   }
 
   # Calculate the standard concentration for each standard
@@ -132,7 +136,7 @@ calc_std_conc <- function(.standard_sample, .start_concentration, .dilution_fact
   }
 
   names(std_concentration) <- .standard_sample
-  std_concentration[as.character(.ss_org)] %>% unname()
+  std_concentration[as.character(.ss_org)] |> unname()
 }
 
 #' Fit a standard curve
@@ -176,10 +180,14 @@ fit_standard_curve <- function(df,
     df <- .data
   }
 
-  df <- df %>%
-    dplyr::filter_at(.vars = c(.parameter, .concentration),
-                     dplyr::all_vars(!is.infinite(.))) %>%
-    dplyr::select(dplyr::one_of(.parameter, .concentration)) %>%
+  df <-
+    df |>
+      dplyr::filter(
+        dplyr::if_all(
+          dplyr::all_of(c(.parameter, .concentration)),
+          .fns = ~!is.infinite(.))
+        ) |>
+    dplyr::select(dplyr::all_of(c(.parameter, .concentration))) |>
     stats::setNames(c("y", "x"))
 
   fct <- switch (.fct,
@@ -255,18 +263,17 @@ calculate_concentration <- function(df, .model,
     df <- .data
   }
 
-  .response_values <- df %>%
-    dplyr::select(dplyr::one_of(.parameter)) %>%
-    purrr::flatten_dbl()
+  .response_values <- df |>
+    dplyr::pull(dplyr::all_of(.parameter))
 
   ed_res <- suppressWarnings(drc::ED(.model, .response_values,
                                      type = "absolute",
                                      od = TRUE,
-                                     display = FALSE)) %>%
-    tibble::as_tibble() %>%
+                                     display = FALSE)) |>
+    tibble::as_tibble() |>
     stats::setNames(c(.value, paste(.value, "error")))
 
-  df %>%
+  df |>
     dplyr::bind_cols(ed_res)
 }
 

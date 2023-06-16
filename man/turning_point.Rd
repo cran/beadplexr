@@ -28,8 +28,7 @@ named, the names become column names in the returned data.frames}
 \item{...}{
   Arguments passed on to \code{\link[=approx_adjust]{approx_adjust}}
   \describe{
-    \item{\code{.lower}}{The interval for possible value of adjust.}
-    \item{\code{.upper}}{The interval for possible value of adjust.}
+    \item{\code{.lower,.upper}}{The interval for possible value of adjust.}
     \item{\code{.step}}{A numeric giving the increment to adjust. Sometimes low values
 are needed to find a proper adjust value.}
   }}

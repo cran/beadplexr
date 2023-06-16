@@ -132,12 +132,12 @@ library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   # Speed things up a bit by selecting one fourth of the events.
   # Probably not something you'd usually do
-  dplyr::sample_frac(0.25) \%>\%
+  dplyr::sample_frac(0.25) |>
   bp_kmeans(.parameter = c("FSC-A", "SSC-A"),
-            .column_name = "population", .trim = 0.1, .k = 2) \%>\%
+            .column_name = "population", .trim = 0.1, .k = 2) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
@@ -148,22 +148,22 @@ library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   # Speed things up a bit by selecting one fourth of the events.
   # Probably not something you'd usually do
-  dplyr::sample_frac(0.25) \%>\%
+  dplyr::sample_frac(0.25) |>
   bp_clara(.parameter = c("FSC-A", "SSC-A"),
-           .column_name = "population", .trim = 0.1, .k = 2) \%>\%
+           .column_name = "population", .trim = 0.1, .k = 2) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   # Speed things up a bit by selecting one fourth of the events.
   # Probably not something you'd usually do
-  dplyr::sample_frac(0.25) \%>\%
+  dplyr::sample_frac(0.25) |>
   bp_clara(.parameter = c("FSC-A", "SSC-A"),
-           .column_name = "population", .trim = 0, .k = 2) \%>\%
+           .column_name = "population", .trim = 0, .k = 2) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
@@ -175,55 +175,55 @@ library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   # Speed things up a bit by selecting one fourth of the events.
   # Probably not something you'd usually do
-  dplyr::sample_frac(0.25) \%>\%
+  dplyr::sample_frac(0.25) |>
   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
-            eps = 0.2, MinPts = 50) \%>\%
+            eps = 0.2, MinPts = 50) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
 
-pop1 <- lplex[[1]] \%>\%
+pop1 <- lplex[[1]] |>
   # Speed things up a bit by selecting one fourth of the events.
   # Probably not something you'd usually do
-  dplyr::sample_frac(0.25) \%>\%
+  dplyr::sample_frac(0.25) |>
   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
-    eps = 0.2, MinPts = 50) \%>\%
+    eps = 0.2, MinPts = 50) |>
   dplyr::filter(population == "1")
 
-pop1 \%>\%
+pop1 |>
   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
-    eps = 0.2, MinPts = 50) \%>\%
-  .$population \%>\% unique
+    eps = 0.2, MinPts = 50) |>
+  pull(population) |>
+  unique()
 
-pop1 \%>\%
+pop1 |>
   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
-    eps = 0.2, MinPts = 50, scale = FALSE) \%>\%
-  .$population \%>\% unique
+    eps = 0.2, MinPts = 50, scale = FALSE) |>
+  pull(population) |>
+  unique()
 }
 library(beadplexr)
-library(magrittr)
 library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   bp_mclust(.parameter = c("FSC-A", "SSC-A"),
-           .column_name = "population", .trim = 0, .k = 2) \%>\%
+           .column_name = "population", .trim = 0, .k = 2) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()
 library(beadplexr)
-library(magrittr)
 library(ggplot2)
 
 data("lplex")
 
-lplex[[1]] \%>\%
+lplex[[1]] |>
   bp_density_cut(.parameter = c("FSC-A"),
-           .column_name = "population", .trim = 0, .k = 2) \%>\%
+           .column_name = "population", .trim = 0, .k = 2) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
   geom_point()

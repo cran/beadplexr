@@ -64,9 +64,11 @@ to call \code{\link[=identify_analyte]{identify_analyte()}} with CBA or MACSPlex
 The parameter \code{.analytes} is either a simple vector with the IDs or, in the
 case of the LEGENDplex system, a list giving the IDs of analytes among the groups A and B.
 
-A list for the LEGENDplex system might look like this:\preformatted{  list(A = c("A1", "A2"),
+A list for the LEGENDplex system might look like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  list(A = c("A1", "A2"),
        B = c("B1", "B2"))
-}
+}\if{html}{\out{</div>}}
 
 The \strong{order} of analyte IDs is important and must match the expected order of analytes.
 }
@@ -98,14 +100,14 @@ annot_events <- identify_legendplex_analyte(df = df,
                                             .analytes = panel_info$analytes,
                                             .method_args = args_ident_analyte)
 
-annot_events \%>\% facs_plot(.beads = "Bead group")
+annot_events |> facs_plot(.beads = "Bead group")
 
-annot_events \%>\%
-  filter(`Bead group` == "A") \%>\%
+annot_events |>
+  filter(`Bead group` == "A") |>
   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 
-annot_events \%>\%
-  filter(`Bead group` == "B") \%>\%
+annot_events |>
+  filter(`Bead group` == "B") |>
   facs_plot(.x = "FL2-H", .y = "FL6-H", .beads = "Analyte ID")
 }
 \dontrun{
@@ -114,7 +116,7 @@ data(simplex)
 
 df <- simplex[["cba"]]
 
-analytes <- vector("list", 30) \%>\% setNames(as.character(c(1:30)))
+analytes <- vector("list", 30) |> setNames(as.character(c(1:30)))
 
 args_ident_analyte <- list(.parameter = c("APC", "APC-Cy7"),
                            .column_name = "Analyte ID",
@@ -124,9 +126,9 @@ annot_events <- identify_cba_analyte(df = df,
                      .analytes = analytes,
                      .method_args = args_ident_analyte)
 
-annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC")
+annot_events |> facs_plot(.x = "FSC", .y = "SSC")
 
-annot_events \%>\%
+annot_events |>
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 
 annot_events <- identify_cba_analyte(df = df,
@@ -135,11 +137,11 @@ annot_events <- identify_cba_analyte(df = df,
                      .trim_fs = 0.1,
                      .parameter_fs = c("FSC", "SSC"))
 
-annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
+annot_events |> facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 
 # Looks strange because some true beads events have randomly been placed far
 # from the center in the forward-side scatter when the data was created
-annot_events \%>\%
+annot_events |>
   facs_plot(.x = "APC", .y = "APC-Cy7", .beads = "Analyte ID")
 }
 \dontrun{
@@ -147,7 +149,7 @@ library(beadplexr)
 data(simplex)
 
 df <- simplex[["mplex"]]
-analytes <- vector("list", 10) \%>\% setNames(as.character(c(1:10)))
+analytes <- vector("list", 10) |> setNames(as.character(c(1:10)))
 
 args_ident_analyte <- list(.parameter = c("FITC", "PE"),
                            .column_name = "Analyte ID",
@@ -158,9 +160,9 @@ annot_events <- identify_macsplex_analyte(df = df,
                                      .analytes = analytes,
                                      .method_args = args_ident_analyte)
 
-annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC")
+annot_events |> facs_plot(.x = "FSC", .y = "SSC")
 
-annot_events \%>\%
+annot_events |>
   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 
 annot_events <- identify_macsplex_analyte(df = df,
@@ -169,10 +171,10 @@ annot_events <- identify_macsplex_analyte(df = df,
                                      .trim_fs = 0.1,
                                      .parameter_fs = c("FSC", "SSC"))
 
-annot_events \%>\% facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
+annot_events |> facs_plot(.x = "FSC", .y = "SSC", .beads = "Bead events")
 # Looks strange because some true beads events have randomly been placed far
 # from the center in the forward-side scatter when the data was created
-annot_events \%>\%
+annot_events |>
   facs_plot(.x = "FITC", .y = "PE", .beads = "Analyte ID")
 }
 }

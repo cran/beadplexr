@@ -17,14 +17,12 @@ is \emph{not} present in the \code{.list}, an empty vector is returned.
 Get column names from the method arguments
 }
 \examples{
-\dontrun{
 library(beadplexr)
-library(magrittr)
 
-list(.column_name = "XXX") \%>\% get_col_names_args
-list(A = list(.column_name = "XXX")) \%>\% get_col_names_args
-list(A = list(.column_name = "Inner"), .column_name = "Outer") \%>\% get_col_names_args
-list(A = "ccc") \%>\% get_col_names_args
-}
+list(.column_name = "XXX") |> beadplexr:::get_col_names_args()
+list(A = list(.column_name = "XXX")) |> beadplexr:::get_col_names_args()
+list(A = list(.column_name = "Inner"), .column_name = "Outer") |> beadplexr:::get_col_names_args()
+list(A = "ccc") |> beadplexr:::get_col_names_args()
+
 }
 \keyword{internal}

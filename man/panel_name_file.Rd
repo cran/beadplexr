@@ -16,8 +16,7 @@ A character
 Conversion from panel name to internal panel info file name
 }
 \examples{
-\dontrun{
-  panel_name_file(.panel_name = "Human Th Cytokine Panel (13-plex)")
-}
+beadplexr:::panel_name_file(.panel_name = "Human Th Cytokine Panel (13-plex)")
+
 }
 \keyword{internal}

@@ -1,13 +1,11 @@
 
 # Calculate standard concentration ----------------------------------------
-context("Calculate standard concentration")
-
 test_that("Calculation is correct",{
   expect_identical(calc_std_conc(c(0:7), 10000),
                    c(0, 10000/(4^6), 10000/(4^5), 10000/(4^4), 10000/(4^3), 10000/(4^2), 10000/(4), 10000))
 
   expect_identical(calc_std_conc(c(7:1, 0), 5, c(1:20)),
-                   c(5/(c(1:7) %>% cumprod()), 0))
+                   c(5/(c(1:7) |> cumprod()), 0))
 
   expect_identical(calc_std_conc(c(0:7), 10000)[1], 0)
 
@@ -15,15 +13,15 @@ test_that("Calculation is correct",{
 })
 
 test_that("Numeric is returned", {
-  expect_is(calc_std_conc(c(0:9), 5), "numeric")
+  expect_type(calc_std_conc(c(0:9), 5), "double")
 
-  expect_is(calc_std_conc(c(letters[1:8]), 5), "numeric")
-  expect_is(calc_std_conc(c(letters[1:7], 0), 5), "numeric")
-  expect_is(calc_std_conc(c(letters[1:7], 0, 1), 5), "numeric")
+  expect_type(calc_std_conc(c(letters[1:8]), 5), "double")
+  expect_type(calc_std_conc(c(letters[1:7], 0), 5), "double")
+  expect_type(calc_std_conc(c(letters[1:7], 0, 1), 5), "double")
 
-  expect_is(calc_std_conc(c(7:1, 0), 5, c(1, 2, 2, 2, 4, 6, 6, 0)), "numeric")
-  expect_is(calc_std_conc(c(7:1, 0), 5, c(1, 2, 2, 2, 4, 6, 6, 100000)), "numeric")
-  expect_is(calc_std_conc(c(8:1), 5, c(1, 2, 2, 2, 4, 6, 6, 100000)), "numeric")
+  expect_type(calc_std_conc(c(7:1, 0), 5, c(1, 2, 2, 2, 4, 6, 6, 0)), "double")
+  expect_type(calc_std_conc(c(7:1, 0), 5, c(1, 2, 2, 2, 4, 6, 6, 100000)), "double")
+  expect_type(calc_std_conc(c(8:1), 5, c(1, 2, 2, 2, 4, 6, 6, 100000)), "double")
 })
 
 test_that("Errors and warnings are thrown", {
@@ -49,17 +47,17 @@ test_that("Fitting a standard curve is possible", {
   # Parameters
   # The warning "NaNs produced" is procuded only when running devtols::test(), not when running the functions individually.
   # I gave up trying to fix things nicely, and just added the `suppressWarnings`. Now everything is dandy.
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Concentration")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Conc entra")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Concentration")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Conc entra")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Concentration")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2-H", .concentration = "Conc entra")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Concentration")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Conc entra")), "drc")
 
   expect_error(fit_standard_curve(df = mfi_data, .parameter = "FL", .concentration = "Concentration"))
   expect_error(fit_standard_curve(df = mfi_data, .parameter = "FL2.H", .concentration = "Conc"))
 
   # Different fit methods
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .fct = "LL.4")), "drc")
-  expect_is(suppressWarnings(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL.3")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .fct = "LL.4")), "drc")
+  expect_s3_class(suppressWarnings(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL.3")), "drc")
 
   # Not sure why all these fail...
   expect_error(fit_standard_curve(df = mfi_data, .concentration = "Conc entra", .fct = "LL3"))

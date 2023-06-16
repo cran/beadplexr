@@ -41,28 +41,27 @@ Replace internal cluster IDs with informative analyte IDs
 \examples{
 \dontrun{
 library(beadplexr)
-library(magrittr)
 library(ggplot2)
 
 data("lplex")
 
-df <- lplex[[1]] \%>\%
+df <- lplex[[1]] |>
   bp_clara(.parameter = c("FSC-A", "SSC-A"), .column_name = "analyte", .k = 2)
 
-df \%>\%
+df |>
   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
                                    .analyte_id = c("A", "B"),
                                    .column_name = "pop name",
-                                   .cluster_column_name = "analyte") \%>\%
+                                   .cluster_column_name = "analyte") |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
   geom_point()
 
-df \%>\%
+df |>
   beadplexr:::assign_analyte_id(.parameter = c("FSC-A", "SSC-A"),
                                    .analyte_id = c("A", "B"),
                                    .column_name = "pop name",
-                                   .cluster_column_name = "analyte", .desc = TRUE) \%>\%
+                                   .cluster_column_name = "analyte", .desc = TRUE) |>
   ggplot() +
   aes(x = `FSC-A`, y = `SSC-A`, colour = `pop name`) +
   geom_point()

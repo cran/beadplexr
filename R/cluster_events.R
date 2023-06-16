@@ -54,12 +54,12 @@
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   # Speed things up a bit by selecting one fourth of the events.
 #'   # Probably not something you'd usually do
-#'   dplyr::sample_frac(0.25) %>%
+#'   dplyr::sample_frac(0.25) |>
 #'   bp_kmeans(.parameter = c("FSC-A", "SSC-A"),
-#'             .column_name = "population", .trim = 0.1, .k = 2) %>%
+#'             .column_name = "population", .trim = 0.1, .k = 2) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
@@ -91,11 +91,11 @@ bp_kmeans <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL,
 
   # Do kmeans clustering
   .clust_res <- do.call(stats::kmeans, .all_args)
-  df[[.column_name]] <- .clust_res$cluster %>% as.character()
+  df[[.column_name]] <- .clust_res$cluster |> as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(df, factor(df[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) |>
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
     df
@@ -121,22 +121,22 @@ bp_kmeans <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL,
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   # Speed things up a bit by selecting one fourth of the events.
 #'   # Probably not something you'd usually do
-#'   dplyr::sample_frac(0.25) %>%
+#'   dplyr::sample_frac(0.25) |>
 #'   bp_clara(.parameter = c("FSC-A", "SSC-A"),
-#'            .column_name = "population", .trim = 0.1, .k = 2) %>%
+#'            .column_name = "population", .trim = 0.1, .k = 2) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   # Speed things up a bit by selecting one fourth of the events.
 #'   # Probably not something you'd usually do
-#'   dplyr::sample_frac(0.25) %>%
+#'   dplyr::sample_frac(0.25) |>
 #'   bp_clara(.parameter = c("FSC-A", "SSC-A"),
-#'            .column_name = "population", .trim = 0, .k = 2) %>%
+#'            .column_name = "population", .trim = 0, .k = 2) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
@@ -173,11 +173,11 @@ bp_clara <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, 
   }
 
   .clust_res <- do.call(cluster::clara, .all_args)
-  df[[.column_name]] <- .clust_res$cluster %>% as.character()
+  df[[.column_name]] <- .clust_res$cluster |> as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(df, factor(df[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) |>
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
     df
@@ -207,33 +207,35 @@ bp_clara <- function(df, .parameter, .column_name, .k, .trim = 0, .data = NULL, 
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   # Speed things up a bit by selecting one fourth of the events.
 #'   # Probably not something you'd usually do
-#'   dplyr::sample_frac(0.25) %>%
+#'   dplyr::sample_frac(0.25) |>
 #'   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
-#'             eps = 0.2, MinPts = 50) %>%
+#'             eps = 0.2, MinPts = 50) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-#' pop1 <- lplex[[1]] %>%
+#' pop1 <- lplex[[1]] |>
 #'   # Speed things up a bit by selecting one fourth of the events.
 #'   # Probably not something you'd usually do
-#'   dplyr::sample_frac(0.25) %>%
+#'   dplyr::sample_frac(0.25) |>
 #'   bp_dbscan(.parameter = c("FSC-A", "SSC-A"), .column_name = "population",
-#'     eps = 0.2, MinPts = 50) %>%
+#'     eps = 0.2, MinPts = 50) |>
 #'   dplyr::filter(population == "1")
 #'
-#' pop1 %>%
+#' pop1 |>
 #'   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
-#'     eps = 0.2, MinPts = 50) %>%
-#'   .$population %>% unique
+#'     eps = 0.2, MinPts = 50) |>
+#'   pull(population) |>
+#'   unique()
 #'
-#' pop1 %>%
+#' pop1 |>
 #'   bp_dbscan(.parameter = c("FL6-H", "FL2-H"), .column_name = "population",
-#'     eps = 0.2, MinPts = 50, scale = FALSE) %>%
-#'   .$population %>% unique
+#'     eps = 0.2, MinPts = 50, scale = FALSE) |>
+#'   pull(population) |>
+#'   unique()
 #' }
 bp_dbscan <- function(df, .parameter, .column_name, .eps = 0.2, .MinPts = 50 , .data = NULL, ...){
   if(!is.null(.data)){
@@ -262,7 +264,7 @@ bp_dbscan <- function(df, .parameter, .column_name, .eps = 0.2, .MinPts = 50 , .
   .clust_res <- do.call(fpc::dbscan, .all_args)
   .clust_res <- .clust_res$cluster
   .clust_res <- ifelse(.clust_res == 0, NA, .clust_res)
-  df[[.column_name]] <- .clust_res %>% as.character()
+  df[[.column_name]] <- .clust_res |> as.character()
   df
 }
 
@@ -280,14 +282,13 @@ bp_dbscan <- function(df, .parameter, .column_name, .eps = 0.2, .MinPts = 50 , .
 #'
 #' @examples
 #' library(beadplexr)
-#' library(magrittr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   bp_mclust(.parameter = c("FSC-A", "SSC-A"),
-#'            .column_name = "population", .trim = 0, .k = 2) %>%
+#'            .column_name = "population", .trim = 0, .k = 2) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
@@ -328,11 +329,11 @@ bp_mclust <- function(df, .parameter, .column_name, .k, .trim = 0, .sample_frac 
   }
 
   .clust_res <- do.call(mclust::Mclust, .all_args)
-  df[[.column_name]] <- .clust_res$classification %>% as.character()
+  df[[.column_name]] <- .clust_res$classification |> as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(df, factor(df[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) |>
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
     df
@@ -358,7 +359,7 @@ bp_mclust <- function(df, .parameter, .column_name, .k, .trim = 0, .sample_frac 
 #'
 density_cut <- function(.x, .k, .lower = 0.1, .upper = 2, .step = 0.1){
 
-  .adjust <- .x %>% approx_adjust(.k = .k,
+  .adjust <- .x |> approx_adjust(.k = .k,
                                   .lower = .lower,
                                   .upper = .upper,
                                   .step = .step)
@@ -373,12 +374,12 @@ density_cut <- function(.x, .k, .lower = 0.1, .upper = 2, .step = 0.1){
                            .adjust = .adjust)
   minima <- minima[["minima"]][[1]]
 
-  .range <- .x %>%
-    range %>%
-    c(minima) %>%
-    sort
+  .range <- .x |>
+    range() |>
+    c(minima) |>
+    sort()
 
-  .x %>% cut(breaks = .range, labels = seq_len(length(.range) - 1))
+  .x |> cut(breaks = .range, labels = seq_len(length(.range) - 1))
 }
 
 #' @rdname cluster_events
@@ -392,14 +393,13 @@ density_cut <- function(.x, .k, .lower = 0.1, .upper = 2, .step = 0.1){
 #'
 #' @examples
 #' library(beadplexr)
-#' library(magrittr)
 #' library(ggplot2)
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
+#' lplex[[1]] |>
 #'   bp_density_cut(.parameter = c("FSC-A"),
-#'            .column_name = "population", .trim = 0, .k = 2) %>%
+#'            .column_name = "population", .trim = 0, .k = 2) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
@@ -427,13 +427,13 @@ bp_density_cut <- function(df, .parameter, .column_name, .k, .trim = 0, .data = 
     return(df)
   }
 
-  .clusters <- .parameter %>% purrr::map(call_cut_parameter) %>% stats::setNames(.parameter)
+  .clusters <- .parameter |> purrr::map(call_cut_parameter) |> stats::setNames(.parameter)
 
-  df[[.column_name]] <- Reduce(compare_vec_elements, .clusters) %>% as.character
+  df[[.column_name]] <- Reduce(compare_vec_elements, .clusters) |> as.character()
 
   # Do trimming
   if(.trim > 0){
-    split(df, factor(df[[.column_name]])) %>%
+    split(df, factor(df[[.column_name]])) |>
       purrr::map_df(trim_population, .parameter = .parameter, .column_name = .column_name, .trim = .trim)
   }else{
     df
@@ -454,13 +454,12 @@ bp_density_cut <- function(df, .parameter, .column_name, .k, .trim = 0, .data = 
 #'
 #'
 #' @examples
-#' \dontrun{
-#' calc_dist_to_centre(.x = c(10, 15), .c = c(1, 2))
-#' }
+#' beadplexr:::calc_dist_to_centre(.x = c(10, 15), .c = c(1, 2))
+#'
 calc_dist_to_centre <- function(.x, .c){
-  (.x - .c)^2 %>%
-    sum %>%
-    sqrt
+  (.x - .c)^2 |>
+    sum() |>
+    sqrt()
 }
 
 #' Calculate population center
@@ -473,9 +472,8 @@ calc_dist_to_centre <- function(.x, .c){
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#' calc_centre(.x = rnorm(100))
-#' }
+#' beadplexr:::calc_centre(.x = rnorm(100))
+#'
 calc_centre <- function(.x, .method = "density"){
   dens_res <- stats::density(.x)
 
@@ -511,19 +509,19 @@ calc_centre <- function(.x, .method = "density"){
 #'
 #' data("lplex")
 #'
-#' lplex[[1]] %>%
-#'   filter(`FSC-A` > 3.2e5L) %>%
-#'   mutate(population = "1") %>%
-#'   trim_population(.parameter = c("FSC-A", "SSC-A"), .column_name = "population", .trim = 0.1) %>%
+#' lplex[[1]] |>
+#'   filter(`FSC-A` > 3.2e5L) |>
+#'   mutate(population = "1") |>
+#'   trim_population(.parameter = c("FSC-A", "SSC-A"), .column_name = "population", .trim = 0.1) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
 #'
-#' lplex[[1]] %>%
-#'   filter(`FSC-A` > 3.2e5L) %>%
-#'   mutate(population = as.character(1)) %>%
+#' lplex[[1]] |>
+#'   filter(`FSC-A` > 3.2e5L) |>
+#'   mutate(population = "1") |>
 #'   trim_population(.parameter = c("FSC-A", "SSC-A"),
-#'                   .column_name = "population", .trim = 0.8) %>%
+#'                   .column_name = "population", .trim = 0.8) |>
 #'   ggplot() +
 #'   aes(x = `FSC-A`, y = `SSC-A`, colour = population) +
 #'   geom_point()
@@ -546,15 +544,15 @@ trim_population <- function(df,
 
   # It is much faster to to calculate per row of the matrix, than dplyrs rowwise
   # so we create the matrix now and calculate using this
-  .data_matrix <- df %>%
-    dplyr::ungroup() %>%
-    dplyr::select(dplyr::one_of(.parameter)) %>%
+  .data_matrix <- df |>
+    dplyr::ungroup() |>
+    dplyr::select(dplyr::all_of(.parameter)) |>
     as.matrix()
 
-  .centre <- .data_matrix %>%
+  .centre <- .data_matrix |>
     apply(2, calc_centre, .method = "density")
 
-  .distances <- .data_matrix %>%
+  .distances <- .data_matrix |>
     apply(1, calc_dist_to_centre, .c = .centre)
 
   .in_cluster <- .distances  <  stats::quantile(.distances, probs = (1 - .trim))

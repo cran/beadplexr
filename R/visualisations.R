@@ -29,13 +29,9 @@
 #' @examples
 #' \dontrun{
 #' library(beadplexr)
+#' data("lplex")
 #'
-#' .file_name <- system.file("extdata", "K2-C07-A7.fcs",
-#'                           package = "beadplexr")
-#'
-#' df <- read_fcs(.file_name = .file_name,
-#'                   .filter = list("FSC-A" = c(2e5L, 6.3e5L),
-#'                                  "SSC-A" = c(2e5, 1e6L)))
+#' df <-  lplex[[1]]
 #' df$bead_group <- ifelse(df$`FSC-A` < 4e5L, "A", "B")
 #'
 #' # Using facs_plot
@@ -88,25 +84,26 @@ facs_scatter <- function(df, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .plot_di
     df <- .data
   }
 
-  df <- df %>% dplyr::ungroup()
+  df <- df |> dplyr::ungroup()
 
   if(.plot_distinct){
-    if(!is.null(.beads)){
-      df <- df %>%
-        dplyr::distinct(!!rlang::sym(.x), !!rlang::sym(.y), !!rlang::sym(.beads))
-    }else{
-      df <- df %>%
-        dplyr::distinct(!!rlang::sym(.x), !!rlang::sym(.y))
-    }
+    df <- df |>
+      dplyr::select(
+        dplyr::all_of(c(.x, .y)),
+        # .beads may not exist
+        dplyr::any_of(.beads)
+
+      ) |>
+      dplyr::distinct()
   }
 
-  tmp_plot <- df %>%
+  tmp_plot <- df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
+    ggplot2::aes(x = .data[[.x]], y = .data[[.y]]) +
     ggplot2::geom_point(size = 0.5)
 
   if(!is.null(.beads)){
-    tmp_plot <- tmp_plot + ggplot2::aes_(colour = as.name(.beads))
+    tmp_plot <- tmp_plot + ggplot2::aes(colour = .data[[.beads]])
   }
   tmp_plot
 }
@@ -119,15 +116,15 @@ facs_density2d <- function(df, .x = "FSC-A", .y = "SSC-A", .beads = NULL, .data 
     df <- .data
   }
 
-  df <- df %>% dplyr::ungroup()
+  df <- df |> dplyr::ungroup()
 
-  tmp_plot <- df %>%
+  tmp_plot <- df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
+    ggplot2::aes(x = .data[[.x]], y = .data[[.y]]) +
     ggplot2::geom_density_2d()
 
     if(!is.null(.beads)){
-      tmp_plot <- tmp_plot + ggplot2::aes_(colour = as.name(.beads))
+      tmp_plot <- tmp_plot + ggplot2::aes(colour = .data[[.beads]])
     }
   tmp_plot
 }
@@ -140,15 +137,15 @@ facs_density1d <- function(df, .x = "FSC-A", .beads = NULL, .data = NULL){
     df <- .data
   }
 
-  df <- df %>% dplyr::ungroup()
+  df <- df |> dplyr::ungroup()
 
-  tmp_plot <- df %>%
+  tmp_plot <- df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.x)) +
+    ggplot2::aes(x = .data[[.x]]) +
     ggplot2::geom_density()
 
   if(!is.null(.beads)){
-    tmp_plot <- tmp_plot + ggplot2::aes_(fill = as.name(.beads))
+    tmp_plot <- tmp_plot + ggplot2::aes(fill = .data[[.beads]])
   }
   tmp_plot
 }
@@ -161,10 +158,10 @@ facs_hexbin <- function(df, .x = "FSC-A", .y = "SSC-A", .bins = 75, .data = NULL
     df <- .data
   }
 
-  df <- df %>% dplyr::ungroup()
-  df %>%
+  df <- df |> dplyr::ungroup()
+  df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.x), y = as.name(.y)) +
+    ggplot2::aes(x = .data[[.x]], y = .data[[.y]]) +
     ggplot2::geom_hex(bins = .bins) +
     ggplot2::scale_fill_gradientn(colours = c("blue", "green", "yellow", "red")) +
     ggplot2:: theme(legend.position = "none")
@@ -233,28 +230,33 @@ plot_std_curve <- function(df, .model, .title = NULL,
   }
 
   # Create data for displaying fit line and interval
-  fit_line_range <- df %>%
-    dplyr::filter_at(.vars = c(.parameter, .concentration),
-                     dplyr::all_vars(!is.infinite(.))) %>%
-    dplyr::select(dplyr::one_of(.concentration)) %>%
-    purrr::flatten_dbl() %>%
+  fit_line_range <-
+    df |>
+    dplyr::filter(
+      dplyr::if_any(
+        dplyr::all_of(c(.concentration)),
+        .fns = ~!is.infinite(.)
+      )) |>
+    dplyr::pull(dplyr::all_of(.concentration)) |>
     range()
 
   fit_line_range <- data.frame(x = seq(min(fit_line_range), max(fit_line_range), length = 100))
-  fit_line_range <- dplyr::bind_cols(fit_line_range,
-                                     suppressWarnings(stats::predict(.model,
-                                                    newdata = fit_line_range,
-                                                    interval = "confidence")) %>%
-                                       as.data.frame) %>%
+  fit_line_range <- dplyr::bind_cols(
+    fit_line_range,
+    suppressWarnings(stats::predict(.model,
+                                    newdata = fit_line_range,
+                                    interval = "confidence")) |>
+      as.data.frame()
+  ) |>
     stats::setNames(c(.concentration, .parameter, "Lower", "Upper"))
 
-  df %>%
+  df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.concentration),
-                        y = as.name(.parameter)) +
+    ggplot2::aes(x = .data[[.concentration]],
+                        y = .data[[.parameter]]) +
     ggplot2::geom_point()  +
     ggplot2::geom_ribbon(data = fit_line_range,
-                         ggplot2::aes_string(ymin = "Lower", ymax = "Upper"), alpha=0.2) +
+                         ggplot2::aes(ymin = .data[["Lower"]], ymax = .data[["Upper"]]), alpha=0.2) +
     ggplot2::geom_line(data = fit_line_range, colour = "blue") +
     ggplot2::labs(title = .title)
 }
@@ -270,9 +272,14 @@ plot_target_est_conc <- function(df, .title = NULL,
     df <- .data
   }
 
-  df <- df %>%
-    dplyr::filter_at(.vars = c(.std_concentration, .concentration),
-                     dplyr::all_vars(!is.nan(.) & !is.infinite(.) & !is.na(.)))
+  df <-
+    df |>
+    dplyr::filter(
+      dplyr::if_all(
+        dplyr::all_of( c(.std_concentration, .concentration)),
+        .fns = ~!is.infinite(.) & !is.nan(.) & !is.na(.)
+      ))
+
 
   .fit_formula <- stats::as.formula(paste(.concentration, .std_concentration, sep = "~"))
 
@@ -285,25 +292,33 @@ plot_target_est_conc <- function(df, .title = NULL,
   slope <- stats::coef(lm_res_summary)[2]
 
   conc_min <-
-    df %>%
-    dplyr::summarise_at(.vars = .std_concentration, .funs = min)
+    df |>
+    dplyr::summarise(
+      dplyr::across(
+        dplyr::all_of(.std_concentration),
+        .fns = min
+      ))
 
   conc_max <-
-    df %>%
-    dplyr::summarise_at(.vars = .concentration, .funs = max)
+    df |>
+    dplyr::summarise(
+      dplyr::across(
+        dplyr::all_of(.concentration),
+        .fns = max
+      ))
 
   fit_text <-
-    dplyr::bind_cols(conc_min, conc_max) %>%
+    dplyr::bind_cols(conc_min, conc_max) |>
     dplyr::mutate(label = paste("R2:", format(r_squared, digits = 3), "\n",
                                 "Slope:", format(slope, digits = 3), "\n",
                                 "p:", format.pval(p_value, digits = 3)))
 
-  df %>%
+  df |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.std_concentration), y = as.name(.concentration)) +
+    ggplot2::aes(x = .data[[.std_concentration]], y = .data[[.concentration]]) +
     ggplot2::geom_point() +
     ggplot2::geom_text(data = fit_text,
-                       ggplot2::aes_string(label = "label"),
+                       ggplot2::aes(label = .data[["label"]]),
                        vjust = 1, hjust = 0) +
     ggplot2::stat_smooth(method = "lm", formula = y ~ x) +
     ggplot2::labs(title = .title)
@@ -318,33 +333,36 @@ plot_estimate <- function(.sample_data, .standard_data, .model, .title = NULL,
 
   # Create data for displaying fit line and interval
 
-  fit_line_range <- .standard_data %>%
-    dplyr::filter_at(.vars = c(.parameter, .concentration),
-                     dplyr::all_vars(!is.infinite(.))) %>%
-    dplyr::select(dplyr::one_of(.concentration)) %>%
-    purrr::flatten_dbl() %>%
+  fit_line_range <- .standard_data |>
+    dplyr::filter(
+      dplyr::if_any(
+        dplyr::all_of(.concentration),
+        .fns = ~!is.infinite(.)
+      )) |>
+    dplyr::pull(dplyr::all_of(.concentration)) |>
     range()
 
   fit_line_range <- data.frame(x = seq(min(fit_line_range),
                                        max(fit_line_range),
                                        length = 100))
-  fit_line_range <-  dplyr::bind_cols(fit_line_range,
-                                      suppressWarnings(stats::predict(.model,
-                                                     newdata = fit_line_range,
-                                                     interval = "confidence")) %>%
-                                        as.data.frame) %>%
+  fit_line_range <-  dplyr::bind_cols(
+    fit_line_range,
+    suppressWarnings(stats::predict(.model,
+                                    newdata = fit_line_range,
+                                    interval = "confidence")) |>
+      as.data.frame()
+  ) |>
     stats::setNames(c(.concentration, .parameter, "Lower", "Upper"))
 
-  .standard_data %>%
+  .standard_data |>
     ggplot2::ggplot() +
-    ggplot2::aes_(x = as.name(.concentration), y = as.name(.parameter)) +
+    ggplot2::aes(x = .data[[.concentration]], y = .data[[.parameter]]) +
     ggplot2::geom_ribbon(data = fit_line_range,
-                         ggplot2::aes_string(ymin = "Lower", ymax = "Upper"),
+                         ggplot2::aes(ymin = .data[["Lower"]], ymax = .data[["Upper"]]),
                          alpha=0.2) +
     ggplot2::geom_line(data = fit_line_range, colour = "blue") +
     ggplot2::geom_hline(data = .sample_data,
-                        ggplot2::aes_string(yintercept = as.name(.parameter)),
+                        ggplot2::aes(yintercept = .data[[.parameter]]),
                         linetype = 2) +
     ggplot2::labs(title = .title)
 }
-

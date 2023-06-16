@@ -33,8 +33,7 @@ but implemented as:
 }
 
 \examples{
-\dontrun{
-geometric_mean(runif(10))
-}
+beadplexr:::geometric_mean(runif(10))
+
 }
 \keyword{internal}

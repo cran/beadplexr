@@ -87,7 +87,10 @@ panel_info$panel_name
 panel_info <- load_panel(.file_name = .file_name, .panel_name = .panel_name)
 panel_info$panel_name
 
+suppressWarnings(
+# The pattern matches several files, which raises a warning
 panel_info <- load_panel(.panel_pattern = "panel_2_13-plex")
+)
 panel_info$panel_name
 
 }

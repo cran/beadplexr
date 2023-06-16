@@ -1,5 +1,3 @@
-context("Cluster manipulation")
-
 # Preparation -------------------------------------------------------------
 library(beadplexr)
 data("lplex")
@@ -27,13 +25,13 @@ test_that("Calculation fails", {
 # Trim clusters -----------------------------------------------------------
 df$population <- 1L
 test_that("Clusters are trimmed", {
-  expect_is(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0.1), "data.frame")
+  expect_s3_class(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0.1), "data.frame")
   expect_equal(nrow(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0.1)), .nrow_data)
 
-  expect_is(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0), "data.frame")
+  expect_s3_class(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0), "data.frame")
   expect_equal(nrow(trim_population(df, .parameter = .parameters, .column_name = "population", .trim = 0)), .nrow_data)
 
-  expect_is(trim_population(df, .parameter = .parameters[1], .column_name = "population", .trim = 0), "data.frame")
+  expect_s3_class(trim_population(df, .parameter = .parameters[1], .column_name = "population", .trim = 0), "data.frame")
   expect_equal(nrow(trim_population(df, .parameter = .parameters[2], .column_name = "population", .trim = 0)), .nrow_data)
 })
 

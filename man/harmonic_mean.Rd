@@ -26,8 +26,7 @@ The calculation of the harmonic mean is as follows:
 }
 
 \examples{
-\dontrun{
-harmonic_mean(runif(10))
-}
+beadplexr:::harmonic_mean(runif(10))
+
 }
 \keyword{internal}

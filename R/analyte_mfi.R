@@ -20,15 +20,15 @@
 #'
 #' data("lplex")
 #'
-#' df <- lplex[[1]] %>%
-#'   filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) %>%
+#' df <- lplex[[1]] |>
+#'   filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) |>
 #'   identify_analyte(.parameter = "FL6-H",
 #'                    .analyte_id = as.character(c(1:7)))
 #'
-#' df %>%
+#' df |>
 #'   calc_analyte_mfi(.parameter = "FL2-H")
 #'
-#' df %>%
+#' df |>
 #'   calc_analyte_mfi(.parameter = "FL2-H",
 #'               .mean_fun = "harmonic")
 calc_analyte_mfi <- function(df,
@@ -48,9 +48,17 @@ calc_analyte_mfi <- function(df,
     arithmetic = mean
   )
 
-  df %>%
-    dplyr::group_by(!!!rlang::syms(.column_name)) %>%
-    dplyr::summarise_at(.parameter,.funs = .mean_fun)
+  df |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(.column_name)
+      )) |>
+    dplyr::summarise(
+      dplyr::across(
+        dplyr::all_of(.parameter),
+        .fns = .mean_fun
+      )
+      )
 }
 
 #' Calculate harmonic mean
@@ -69,9 +77,8 @@ calc_analyte_mfi <- function(df,
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#' harmonic_mean(runif(10))
-#' }
+#' beadplexr:::harmonic_mean(runif(10))
+#'
 harmonic_mean <- function(.x){
   .x <- .x[!is.na(.x)]
   length(.x)/sum(1/.x)
@@ -102,9 +109,8 @@ harmonic_mean <- function(.x){
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#' geometric_mean(runif(10))
-#' }
+#' beadplexr:::geometric_mean(runif(10))
+#'
 geometric_mean <- function(.x){
   .x <- .x[!is.na(.x)]
   exp(sum(log(.x[.x > 0])) / length(.x))

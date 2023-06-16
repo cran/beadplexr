@@ -64,15 +64,15 @@ library(dplyr)
 
 data("lplex")
 
-df <- lplex[[1]] \%>\%
-  filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) \%>\%
+df <- lplex[[1]] |>
+  filter(`FSC-A` > 4e5L, `FSC-A` < 6.3e5L) |>
   identify_analyte(.parameter = "FL6-H",
                    .analyte_id = as.character(c(1:7)))
 
-df \%>\%
+df |>
   calc_analyte_mfi(.parameter = "FL2-H")
 
-df \%>\%
+df |>
   calc_analyte_mfi(.parameter = "FL2-H",
               .mean_fun = "harmonic")
 }

@@ -1,3 +1,14 @@
+# beadplexr version 0.5
+
+## Major changes
+
++ Removal of dependency on `rgdal`
++ General code overhaul
+
+## Minor changes
+
++ Updated R-dependency to 4.3
+
 # beadplexr version 0.4.1
 
 ## Minor changes

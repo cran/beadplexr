@@ -70,13 +70,9 @@ data. For more control, use \code{ggplot2} directly.
 \examples{
 \dontrun{
 library(beadplexr)
+data("lplex")
 
-.file_name <- system.file("extdata", "K2-C07-A7.fcs",
-                          package = "beadplexr")
-
-df <- read_fcs(.file_name = .file_name,
-                  .filter = list("FSC-A" = c(2e5L, 6.3e5L),
-                                 "SSC-A" = c(2e5, 1e6L)))
+df <-  lplex[[1]]
 df$bead_group <- ifelse(df$`FSC-A` < 4e5L, "A", "B")
 
 # Using facs_plot
